@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">NVIDIA Wireless Display UI Services</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Unavailable due to Miracast being active.</string>
+    <string name="miracast_hdcp_title">HDCP Authentication failed with %1$s</string>
+    <string name="miracast_hdcp_failure_text">Premium content cannot be displayed.</string>
+    <string name="miracast_connection_status_discovery">Searching for\u0020</string>
+    <string name="miracast_connection_status_progress">Connecting to\u0020</string>
+    <string name="miracast_connection_status_connected">Now streaming to\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Could not find\u0020</string>
+    <string name="miracast_connection_status_warning_conn_lost">Lost connection to\u0020</string>
+    <string name="miracast_connection_status_warning_auth_failed">Authentication problem with\u0020</string>
+    <string name="miracast_access_settings_title">Access Miracast Settings</string>
+</resources>

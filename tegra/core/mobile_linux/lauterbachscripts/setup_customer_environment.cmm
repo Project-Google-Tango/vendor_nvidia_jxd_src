@@ -1,0 +1,65 @@
+; Lauterbach TRACE32 debugger script to set up paths and global environment variables used by other scripts.
+
+; Change case of the user configuration variables to what we expect.
+&TARGET_OS=STRING.LWR("&TARGET_OS")
+&TARGET_SOC=STRING.LWR("&TARGET_SOC")
+
+; Global variables used by other scripts:
+;
+;   BOOT_HANDOFF        bootloader to OS hand-off function
+;   KERNEL_LOAD_PHYS    OS (kernel) physical load address
+;   USE_ONCHIP_BRKPT    Use onchip breakpoints for CPU run-control
+
+GLOBAL &BOOT_HANDOFF
+GLOBAL &KERNEL_LOAD_PHYS
+GLOBAL &USE_ONCHIP_BRKPT
+
+; Enable on-chip breakpoints if the debugger has trouble setting soft breakpoints
+&USE_ONCHIP_BRKPT="TRUE"
+
+IF "&BUILD_FLAVOR"=="debug"
+(
+  ; do nothing
+)
+ELSE IF "&BUILD_FLAVOR"=="release"
+(
+  ; do nothing
+)
+ELSE IF "&BUILD_FLAVOR"==""
+(
+  &BUILD_FLAVOR="debug"
+)
+ELSE
+(
+  PRINT "BUILD_FLAVOR=&BUILD_FLAVOR is invalid"
+  STOP
+)
+
+; Set addresses that are specific to this OS.
+IF "&TARGET_SOC"=="ap20"
+(
+  &KERNEL_LOAD_PHYS="0x00A00800"
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&TARGET_SOC"=="t30"
+(
+  &KERNEL_LOAD_PHYS="0x80A00800"
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&TARGET_SOC"=="t11x"
+(
+  &KERNEL_LOAD_PHYS="0x80A00800"
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&TARGET_SOC"=="t14x"
+(
+  &KERNEL_LOAD_PHYS="0x80A00800"
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&KERNEL_LOAD_PHYS"==""
+(
+  PRINT "TARGET_SOC=&TARGET_SOC is not valid"
+  STOP
+)
+
+enddo

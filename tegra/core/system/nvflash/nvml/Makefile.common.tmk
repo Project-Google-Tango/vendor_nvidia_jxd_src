@@ -1,0 +1,109 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvflash_miniloader_XXX: common parts
+#
+###############################################################################
+#
+# This makefile fragment is included by (t30|t11x|t14x|...)/Makefile.tmk
+#
+# The paths are relative to the location of the including component makefile
+#
+NVBOOT_DRIVER_ROOT    := $(NV_SOURCE)/bootloader/microboot/nvboot/$(_MINILOADER_SOC)
+NV_COMPONENT_NAME     := nvflash_miniloader_$(_MINILOADER_SOC_FAMILY)
+NV_COMPONENT_MAP_FILE := $(NV_COMPONENT_NAME).map
+
+NV_COMPONENT_SOURCES  := \
+	../nvml_nvboot.c \
+	../nvml_server.c \
+	../nvml_memtest.c \
+	$(_MINILOADER_SOC_FAMILY)ml_utils.c
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	../../../../drivers/nvpinmux \
+	../../../../drivers/nvodm/services \
+	$(NVBOOT_DRIVER_ROOT)/ahb \
+	$(NVBOOT_DRIVER_ROOT)/clocks \
+	$(NVBOOT_DRIVER_ROOT)/irom_patch \
+	$(NVBOOT_DRIVER_ROOT)/pads \
+	$(NVBOOT_DRIVER_ROOT)/reset \
+	$(NVBOOT_DRIVER_ROOT)/sdmmc \
+	$(NVBOOT_DRIVER_ROOT)/sdram \
+	$(NVBOOT_DRIVER_ROOT)/util \
+	../../../../utils/nvos/aos/avp \
+	../../../../drivers/nvddk/i2c
+
+ifneq ($(NV_TARGET_ARCH),rvds_armv4)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	../../../../utils/nvos/aos/libgcc
+endif
+
+NV_COMPONENT_INCLUDES := \
+	../../../../utils/nvos/aos/nvap \
+	$(NV_SOURCE)/hwinc \
+	../../../../drivers/nvddk/fuses/read \
+	$(NV_SOURCE)/hwinc/$(_MINILOADER_SOC_FAMILY) \
+	../../../../drivers/nvboot/$(_MINILOADER_SOC)/include \
+	$(NV_SOURCE)/bootloader/microboot/hwinc \
+	$(NV_SOURCE)/core-private/include \
+	$(NVBOOT_DRIVER_ROOT)/include/$(_MINILOADER_SOC)
+
+NV_COMPONENT_CFLAGS   += \
+	-DNV_IS_AVP=1 \
+	-DNV_IS_AOS=1 \
+	-DNVML_BYPASS_PRINT=1 \
+	-DNVBOOT_SI_ONLY=1 \
+	-DNVBOOT_TARGET_FPGA=0 \
+	-DNVBOOT_TARGET_RTL=0 \
+	-DNVODM_BOARD_IS_FPGA=0
+
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+        $(NV_SOURCE)/core/drivers/nvrm
+#
+# Board specific components
+#
+NV_COMPONENT_ODM_STATIC := \
+        query
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-partner/Makefile.odm.tmk
+
+# C startup code provided by utils/nvos/aos/nvap/nvos_aos_gcc.c
+NV_COMPONENT_FLAG_C_INIT_PROVIDED_BY_NVOS := 1
+
+ifneq ($(NV_TARGET_ARCH),rvds_armv4)
+NV_COMPONENT_SCATTER_FILE := \
+	nvflash_miniloader_$(_MINILOADER_SOC_FAMILY).x
+else
+NV_COMPONENT_SCATTER_FILE := \
+	miniloader.ldscript
+endif
+
+build:: $(NV_COMPONENT_NAME).h
+
+ifneq ($(NV_TARGET_ARCH),rvds_armv4)
+$(NV_COMPONENT_NAME).h: $(NV_COMPONENT_NAME).bin
+	$(BIN2HEX) $< $@
+else
+$(NV_COMPONENT_NAME).h: $(NV_COMPONENT_NAME).bin
+	$(BIN2HEX) $</StartRegion $@
+endif
+
+$(NV_COMPONENT_NAME).bin: $(NV_COMPONENT_NAME)$(STATIC_EXECUTABLE_SUFFIX)
+	$(call NV_BUILD_MACRO_ELF2BIN)
+
+# leave miniloader binaries out of system image and release
+NV_COMPONENT_FLAG_SYSTEMIMAGE_SKIP := 1
+NV_COMPONENT_FLAG_RELEASE_SKIP     := 1
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

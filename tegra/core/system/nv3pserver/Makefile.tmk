@@ -1,0 +1,77 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnv3pserver target static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnv3pserver
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	nv3p_server.c \
+	nv3p_secureflow.c \
+	nv3p_server_utils.c \
+	nv3p_server_utils_t30.c \
+	nv3p_server_utils_t1xx.c
+
+NV_COMPONENT_INCLUDES          := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	../../drivers/nvboot/$(NV_TARGET_SOC)/include \
+	../fastboot
+
+NV_COMPONENT_CFLAGS            := \
+	-DNVODM_BOARD_IS_FPGA=0 \
+	-DNVODM_BOARD_IS_SIMULATION=0 \
+	-DENABLE_THREADED_DOWNLOAD=1
+
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_CFLAGS            += \
+	-DNV_AOS_ENTRY_POINT=0x80108000 \
+	-DNV_MICROBOOT_ENTRY_POINT=0x4000a000 \
+	-DNV_RNG_SUPPORT=0 \
+	-DENABLE_TXX \
+	-DCONFIG_ARCH_TEGRA_3x_SOC
+else
+NV_COMPONENT_CFLAGS            += \
+	-DNV_AOS_ENTRY_POINT=0x80108000 \
+	-DNV_MICROBOOT_ENTRY_POINT=0x4000e000 \
+	-DNV_RNG_SUPPORT=1
+endif
+
+ifeq ($(filter t30 t114, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS            += \
+	-DPMC_BASE=0x7000E400
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS            += \
+	-DNV_EMBEDDED_BUILD
+endif
+
+ifneq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_CFLAGS            += \
+	-DNV_LDK_BUILD
+endif
+
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

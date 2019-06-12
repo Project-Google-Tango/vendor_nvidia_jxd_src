@@ -1,0 +1,71 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvodm_services static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvodm_services
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_CFLAGS            :=
+
+NV_COMPONENT_SOURCES           := \
+	nvodm_services_os.c \
+	nvodm_services_os_common.c
+
+_avp_implementation :=
+ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AVP_IRAM),1)
+_avp_implementation := 1
+else ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+ifeq ($(NV_TARGET_ARCH),rvds_armv4)
+_avp_implementation := 1
+endif
+endif
+
+ifdef _avp_implementation
+NV_COMPONENT_INCLUDES          := \
+	$(NV_SOURCE)/hwinc
+NV_COMPONENT_SOURCES           += \
+	avp/nvodm_services_avp_spi.c \
+	avp/nvodm_services_avp_i2c.c \
+	avp/nvodm_services_avp_gpio.c \
+	avp/nvodm_services_avp_pmu.c \
+	avp/nvodm_services_avp_misc.c
+else
+NV_COMPONENT_SOURCES           += \
+	nvodm_services.c \
+	nvodm_services_common.c \
+	nvodm_services_ext.c \
+	nvodm_services_dev_i2c.c
+endif
+
+#
+# NOTE: The code from these modules is also executed on the AVP!
+#       Therefore they need to be compiled with code generation flags
+#       compatible with AVP, i.e. ARMv4T ARM code.
+#
+NV_COMPONENT_CODE_GENERATION   := avp
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# variable cleanup
+_avp_implementation :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

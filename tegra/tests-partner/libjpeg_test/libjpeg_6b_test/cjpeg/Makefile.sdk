@@ -1,0 +1,18 @@
+TARGETS = cjpeg
+
+CFLAGS   = $(NV_PLATFORM_OPT) $(NV_PLATFORM_CFLAGS)
+CPPFLAGS = $(NV_PLATFORM_SDK_INC) $(NV_PLATFORM_CPPFLAGS)
+LDFLAGS  = $(NV_PLATFORM_SDK_LIB) $(NV_PLATFORM_LDFLAGS)
+
+OBJS := cdjpeg.o cjpeg.o rdbmp.o rdgif.o rdppm.o rdrle.o \
+        rdswitch.o rdtarga.o rdy4m.o
+
+LDLIBS = -ljpeg -lnvtvmr
+
+include ../../../make/nvdefs.mk
+
+$(TARGETS): $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+clean clobber:
+	rm -rf $(OBJS) $(TARGETS)

@@ -1,0 +1,45 @@
+;*
+;* Copyright (c) 2007 NVIDIA Corporation.  All Rights Reserved.
+;*
+;* NVIDIA Corporation and its licensors retain all intellectual property and
+;* proprietary rights in and to this software and related documentation.  Any
+;* use, reproduction, disclosure or distribution of this software and related
+;* documentation without an express license agreement from NVIDIA Corporation
+;* is strictly prohibited.
+;*
+
+        AREA |.text|,ALIGN=4,CODE,READONLY
+
+        EXPORT  NvRmCountLeadingZeros
+
+;************************************************************************
+;*
+;*  FUNCTION
+;*
+;*      NvRmCountLeadingZeros
+;*
+;*  DESCRIPTION
+;*
+;*      This function counts the number of leading zeros in its input.
+;*
+;*  CALLS
+;*
+;*      None
+;*
+;*  INPUTS
+;*
+;*      input   =  (R0) value for which leading zeros are to be counted.
+;*
+;*  OUTPUTS
+;*
+;*      R0      = number of leading zeros in the input.
+;*
+;************************************************************************
+
+NvRmCountLeadingZeros   ; NvU32 NvRmCountLeadingZeros(NvU32 input)
+
+        CLZ     r0, r0
+        BX      lr
+
+        END
+

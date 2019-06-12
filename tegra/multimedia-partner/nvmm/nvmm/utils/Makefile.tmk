@@ -1,0 +1,142 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake component makefile for libnvmm_utils.
+#
+###############################################################################
+
+_nvmm_utils_common_name     := nvmm_utils
+_nvmm_utils_common_sources  := \
+	nvmetafile_asxparser.c \
+	nvmetafile_m3uparser.c \
+	nvmetafile_parser.c \
+	nvmm_bufmgr.c \
+	nvmm_file_util.c \
+	nvmm_format_scan.c \
+	nvmm_logger.c \
+	nvmm_mediaclock.c \
+	nvmm_queue.c \
+	nvmm_sock_util.c \
+	nvmm_ulp_kpi_logger.c \
+	nvmm_ulp_util.c \
+	nvmm_util.c
+_nvmm_utils_common_includes := \
+	../include
+_nvmm_utils_common_headers := \
+	$(NV_SOURCE)/camera/core/nvmm_camera \
+	$(NV_SOURCE)/camera-partner/imager/nvodm_imager \
+	$(NV_INTERFACE_GRAPHICS_DDK2D_V2) \
+	$(NV_SOURCE)/multimedia-partner/openmax/il
+_nvmm_utils_common_interfaces := \
+	$(NV_SOURCE)/multimedia/utils/nvfuse_bypass
+
+###############################################################################
+# Shared library.
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := $(_nvmm_utils_common_name)
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_SOURCES               := $(_nvmm_utils_common_sources)
+NV_COMPONENT_HAS_BROKEN_CODE       := \
+	sign-compare
+NV_COMPONENT_INCLUDES              := \
+	$(_nvmm_utils_common_includes) \
+	$(NV_SOURCE)/multimedia/utils/include
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+	$(_nvmm_utils_common_headers)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(_nvmm_utils_common_interfaces) \
+	$(NV_SOURCE)/core/drivers/nvrm \
+	$(NV_SOURCE)/core/utils/nvos
+ifneq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS += \
+	$(NV_SOURCE)/multimedia-partner/utils/nvavp
+endif
+
+#
+# Platform specific parts.
+#
+ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_LINUX),1)
+# All Linux variants: Android, L4T, embedded.
+NV_COMPONENT_SOURCES += \
+	nvmm_sock_linux.c
+NV_COMPONENT_CFLAGS  += \
+	-DNV_USE_NVAVP=1
+
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_SOURCES               += \
+      nvmm_logger_android.c
+NV_COMPONENT_NEEDED_INTERFACE_DIRS += \
+      $(NV_SOURCE)/tmake/external/android/log
+
+else
+NV_COMPONENT_SOURCES += \
+	nvmm_logger_default.c
+
+# according to L4T legacy build this file is only needed for testing
+systemimage:: $(NV_SYSTEMIMAGE_TEST_DATA_DIR)/metafileformatlibs.xml
+$(NV_SYSTEMIMAGE_TEST_DATA_DIR)/metafileformatlibs.xml: $(NV_COMPONENT_DIR)/metafileformatlibs.xml
+	$(CP) $< $@
+
+endif
+
+else ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+NV_COMPONENT_SOURCES               += \
+	nvmm_logger_default.c \
+	nvmm_sock_null.c
+NV_COMPONENT_CFLAGS                += \
+	-DNV_USE_NVAVP=0
+else
+$(error unrecognized build configuration for $(NV_COMPONENT_NAME))
+endif
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif # NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+
+
+###############################################################################
+# Static library.
+# Used by AOS builds.
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := $(_nvmm_utils_common_name)
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+
+NV_COMPONENT_SOURCES           := \
+	$(_nvmm_utils_common_sources) \
+	nvmm_logger_default.c \
+	nvmm_sock_null.c
+
+NV_COMPONENT_INCLUDES          := \
+	$(_nvmm_utils_common_includes)
+
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+	$(_nvmm_utils_common_headers)
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	$(_nvmm_utils_common_interfaces)
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif # NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+
+# Local variable clean-up.
+_nvmm_utils_common_name :=
+_nvmm_utils_common_sources :=
+_nvmm_utils_common_includes :=
+_nvmm_utils_common_headers :=
+_nvmm_utils_common_interfaces :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

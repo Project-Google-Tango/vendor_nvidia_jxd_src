@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">NVIDIA belaidžio ekrano vartotojo sąsajos paslaugos</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Neprieinama, kadangi įjungta „Miracast“.</string>
+    <string name="miracast_hdcp_title">HDCP prisijungimas nepavyko su %1$s </string>
+    <string name="miracast_hdcp_failure_text">Išskirtinio turinio negalima parodyti.</string>
+    <string name="miracast_connection_status_discovery">Ieškoma\u0020</string>
+    <string name="miracast_connection_status_progress">Jungiamasi prie\u0020</string>
+    <string name="miracast_connection_status_connected">Transliuojama į\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Nepavyko rasti\u0020</string>
+    <string name="miracast_connection_status_warning_conn_lost">Prarastas ryšys su\u0020</string>
+    <string name="miracast_connection_status_warning_auth_failed">Prisijungimo problema su\u0020</string>
+    <string name="miracast_access_settings_title">Atidaryti „Miracast“ nustatymus</string>
+</resources>

@@ -1,0 +1,9 @@
+# Copyright (c) 2012 NVIDIA CORPORATION.  All Rights Reserved.
+get_threshold
+get_tmon_handle
+read_ara
+read_curr_temp
+read_reg
+release_tmon_handle
+set_threshold
+write_reg

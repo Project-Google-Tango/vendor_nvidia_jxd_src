@@ -1,0 +1,15 @@
+; ===================================================================
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;
+; When you use Trace32 with Samba connection in Windows OS,
+; You should rematch directory path of vmlinux symbol informations.
+; This script change linux home directory of symbol debugging info
+; to samba network drive name to browse symbol into Trace32 simulator.
+;
+; ex) /home/joshua/14r7/kernel/../board-whistler.c ->
+;     X:/14r7/kernel/.../board-whistler.c
+; ===================================================================
+
+&LNXHOME=os.env(LNXHOME)
+&SMBDRIVE=os.env(SMBDRIVE)
+y.spath.translate "&(LNXHOME)" "&(SMBDRIVE)"

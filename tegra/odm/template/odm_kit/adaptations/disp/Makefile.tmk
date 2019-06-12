@@ -1,0 +1,44 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvodm_disp static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvodm_disp
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	display_hal.c \
+	amoled_amaf002.c \
+	bl_ap20.c \
+	bl_pcf50626.c \
+	dsi_to_lvds_converter.c \
+	panel_hdmi.c \
+	panel_lvds_wsga.c \
+	panel_null.c \
+	panel_samsungsdi.c \
+	panel_sharp_dsi.c \
+	panel_sharp_wvga.c \
+	panel_sharp_wvgap.c \
+	panel_tpo_wvga.c
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

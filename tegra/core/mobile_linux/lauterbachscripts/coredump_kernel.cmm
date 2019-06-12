@@ -1,0 +1,176 @@
+;---------------------------------------------------------------
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;---------------------------------------------------------------
+
+if !WINDOW.NAME(MAIN)
+(
+    Area.create MAIN
+    Area.view MAIN
+    Area.select MAIN
+)
+
+; Lauterbach TRACE32 debugger script to load a core dump with kernel symbols
+
+LOCAL &CORE_FILE
+LOCAL &KERNEL_ELF
+LOCAL &KERNEL_ELF_TEXT
+
+;GLOBAL &true=(0==0)
+;GLOBAL &false=(0==1)
+
+
+;;;;;;;;;;;;;;;;;;;;
+; Predefined values, if "", file dialogs will appear
+;
+; Location of the core file (dumped with nvdumper)
+;&CORE_FILE="~/my_dump"
+; Location of the vmlinux file
+;&KERNEL_ELF="~/vmlinux"
+; Location of the vmlinux file (with only the .text portion)
+;   Generate with 'arm-eabi-objcopy -j .text vmlinux vmlinux.text'
+;&KERNEL_ELF_TEXT="~/vmlinux.text"
+;;;;;;;;;;;;;;;;;;;;
+
+print "----------Current Settings---------"
+print "TOP=&TOP"
+print "CORE_FILE=&CORE_FILE"
+print "KERNEL_ELF=&KERNEL_ELF"
+print "KERNEL_ELF_TEXT=&KERNEL_ELF_TEXT"
+print "TEGRA_TOP=&TEGRA_TOP"
+print "BTARGET_OS=&TARGET_OS"
+print "BTARGET_SOC=&TARGET_SOC"
+print "BTARGET_BOARD=&TARGET_BOARD"
+print "BTARGET_CONFIG=&TARGET_CONFIG"
+print "BUILD_FLAVOR=&BUILD_FLAVOR"
+print "-----------------------------------"
+
+IF "&TARGET_SOC"=="t11x"
+(
+    system.cpu CortexA15MPCore
+    system.config corenumber 4.
+    core.number 4.
+)
+ELSE IF "&TARGET_SOC"=="t30"
+(
+    system.cpu CortexA9MPCoreSMP4
+)
+ELSE IF "&TARGET_SOC"=="ap20"
+(
+    system.cpu CortexA9MPCoreSMP2
+)
+ELSE
+(
+    print "Not supported SOC type: &TARGET_SOC"
+    enddo
+)
+SYStem.Option MMUSPACES ON
+system.up
+
+sYmbol.RESet
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Get location of the core dump
+IF "&CORE_FILE"==""
+(
+  print  "Select coredump file"
+  dialog.file &(TOP)/*
+  entry &CORE_FILE
+  if "&CORE_FILE"==""
+  (
+     print "Aborted"
+     enddo
+  )
+)
+
+print "Loading core dump: &CORE_FILE"
+IF "&TARGET_SOC"=="ap20"
+(
+    data.load.binary &CORE_FILE A:0x00000000 /NoClear
+)
+ELSE
+(
+    data.load.binary &CORE_FILE A:0x80000000 /NoClear
+)
+print " "
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Get location of kernel binaries
+IF "&KERNEL_ELF"==""
+(
+  print "Select Kernel ELF (vmlinux)..."
+  dialog.file &(TOP)/out/target/product/&(TARGET_BOARD)/obj/KERNEL/*
+  entry &KERNEL_ELF
+  if "&KERNEL_ELF"==""
+  (
+     print "Aborted"
+     enddo
+  )
+  print " "
+)
+
+
+IF "&KERNEL_ELF_TEXT"==""
+(
+  print "Where is the .text section of vmlinux file ?"
+  print "(Generate with 'arm-eabi-objcopy -j .text vmlinux vmlinux.text')"
+  print "(press cancel to auto-generate)"
+  dialog.file &(TOP)/out/target/product/&(TARGET_BOARD)/obj/KERNEL/*
+  entry &KERNEL_ELF_TEXT
+  if "&KERNEL_ELF_TEXT"==""
+  (
+     &KERNEL_ELF_TEXT=os.file.path(&KERNEL_ELF)+"/vmlinux.text"
+     print "KERNEL_ELF_TEXT not set....creating &KERNEL_ELF_TEXT..."
+     B::AREA
+     os arm-eabi-objcopy -j .text &KERNEL_ELF &KERNEL_ELF_TEXT
+     if os.return()!=0
+     (
+         print "&KERNEL_ELF_TEXT generation failed....aborting"
+         wait 5.s
+         enddo
+     )
+     Area.view MAIN
+  )
+)
+
+print "Loading kernel symbols: &KERNEL_ELF"
+data.load.elf &KERNEL_ELF /NOCODE
+print " "
+
+print "Loading linux support"
+task.config demo/arm/kernel/linux/linux
+menu.reprogram demo/arm/kernel/linux/linux
+help.filter.add rtoslinux
+
+
+
+; Make/Load the MMU mappings
+;
+; If you have an uncorrupted swapper_pg_dir area, you can load the page tables
+; from memory using the following MMU.FORMAT and MMU.SCAN:
+;
+print "Configuring MMU"
+; MMU.FORMAT LINUX swapper_pg_dir 0xc0000000--0xffffffff 0x80000000
+IF "&TARGET_SOC"=="ap20"
+(
+    MMU.Create 0xc0000000--0xffffffff 0x00000000
+    MMU.Common 0xc0000000--0xffffffff
+)
+ELSE
+(
+    MMU.Create 0xc0000000--0xffffffff 0x80000000
+    MMU.Common 0xc0000000--0xffffffff
+)
+
+MMU.TableWalk ON
+MMU.ON
+; MMU.SCAN
+
+; This is needed because it was most likely overwritten by the bootloader.
+; Since this is R/O, we just reload it from our vmlinux
+print "Reloading kernel .text sections"
+data.load.elf &KERNEL_ELF_TEXT /NOSYMBOL /NOCLEAR
+
+print "Core Dump Loading Complete"
+print " "
+
+enddo

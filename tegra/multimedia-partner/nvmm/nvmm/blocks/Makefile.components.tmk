@@ -1,0 +1,73 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile
+#
+# Makefile fragment for defining included nvmm blocks components.
+#
+###############################################################################
+#
+# NvMM compile time configuration - setup (initialisations needed
+# before reading in the flag files)
+TARGET_OS := linux
+
+# NvMM compile time configuration - include flag files
+include $(NV_SOURCE)/multimedia-partner/nvmm/nvmm/Makefile.nvmm_enable_defs
+include $(NV_SOURCE)/multimedia-partner/nvmm/nvmm/Makefile.nvmm_locale_defs
+
+# NvMM compile time configuration . cleanup
+LCDEFS    :=
+TARGET_OS :=
+
+#
+# Choose locale depending on including umbrella: CPU
+#
+_umbrella_locale := $(LOCALE_CPU) $(LOCALE_ALL)
+
+# _include_block
+#
+# First macro checks if block is enabled and belongs to the category
+# of blocks being processed at the moment. Category is defined by the
+# user by setting variable NVMM_CONFIGURABLE_TYPE before including
+# this template.
+#
+# Then macro checks if the locale defined for the block is found from
+# the list of locales defined for the umbrella build in question (CPU
+# only for now). If true, block is added to the list of components
+# included in the build for the umbrella in question.
+#
+# $(1): block type (misc, writer)
+# $(2): common prefix for block (xxx_ENABLED, xxx_LOCALE)
+# $(3): path to block component
+#
+define _include_block
+ifeq ($(NVMM_CONFIGURABLE_TYPE)-$($(2)_ENABLED),$(1)-1)
+ifneq ($(findstring $($(2)_LOCALE),$(_umbrella_locale)),)
+NVMM_CONFIGURABLE_COMPONENTS += $(NVMM_CONFIGURABLE_PATH)/$(3)
+endif
+endif
+endef
+_conditionally_include_block = $(eval $(call _include_block,$(strip $(1)),$(strip $(2)),$(strip $(3))))
+
+#
+# List of all possible "candidate" blocks being considered to be
+# included in the build
+#
+$(call _conditionally_include_block, writer, 3GPWRITER, 3gp_writer)
+
+# variable cleanup
+_conditionally_include_block           :=
+_include_block                         :=
+_umbrella_locale                       :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

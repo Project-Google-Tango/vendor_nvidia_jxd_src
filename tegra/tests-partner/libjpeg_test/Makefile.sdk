@@ -1,0 +1,8 @@
+
+SUBDIRS:= cjpeg djpeg jpegtran
+.PHONY: all clean $(SUBDIRS)
+
+all clean: $(SUBDIRS)
+
+$(SUBDIRS):
+	make -C $@ ${MAKECMDGOALS}

@@ -1,0 +1,47 @@
+#
+# Copyright (c) 2005-2013 NVIDIA Corporation.  All rights reserved.
+#
+# NVIDIA Corporation and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA Corporation is strictly prohibited.
+#
+
+nvgr_blit
+nvgr_buffers_are_equal
+nvgr_clear
+nvgr_decompress
+nvgr_dump
+nvgr_get_crop
+nvgr_get_fence
+nvgr_get_format
+nvgr_get_gpu_mapping
+nvgr_get_handle_size
+nvgr_get_memfd
+nvgr_get_stereo_info
+nvgr_get_surfaces
+nvgr_get_surfaces_no_buffer_magic
+nvgr_get_usage
+nvgr_get_write_count
+nvgr_inc_write_count
+nvgr_is_stereo
+nvgr_is_valid
+nvgr_is_yuv
+nvgr_override_property
+nvgr_put_read_fence
+nvgr_put_read_nvfence
+nvgr_put_write_fence
+nvgr_put_write_nvfence
+nvgr_read_event_counter
+nvgr_ref
+nvgr_scratch_alloc
+nvgr_scratch_free
+nvgr_set_compressed
+nvgr_set_crop
+nvgr_set_gpu_mapping
+nvgr_set_stereo_info
+nvgr_set_video_timestamp
+nvgr_should_decompress
+nvgr_unref
+nvgr_sync_dump

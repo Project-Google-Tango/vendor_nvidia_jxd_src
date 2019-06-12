@@ -1,0 +1,158 @@
+;---------------------------------------------------------------
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;---------------------------------------------------------------
+; Lauterbach TRACE32 debugger script to reconfigure the CPU-side JTAG with a variable number of active cores.
+
+if (VERSION.BUILD()<17663.)
+(
+  PRINT "Trace32 versions prior to build 17663 are not supported"
+  STOP
+)
+
+LOCAL &NUMBER_OF_CORES
+LOCAL &CORE_MASK
+LOCAL &CORE_BASE
+LOCAL &CORE_LIST
+LOCAL &IS_RUNNING
+&CORE_BASE=""
+&CORE_LIST=""
+&NUMBER_OF_CORES="AUTO_DETECT"
+
+IF "&QUERY_CORE_COUNT"=="TRUE"
+(
+  PRINT "How many cores are running right now (1, 2, 3 or 4) or A (for Auto-detect)?"
+  INKEY &KEY
+
+  IF &KEY==0x41
+  (
+    &NUMBER_OF_CORES="AUTO_DETECT"
+  )
+  ELSE IF &KEY==0x61
+  (
+    &NUMBER_OF_CORES="AUTO_DETECT"
+  )
+  ELSE IF &KEY==0x31
+  (
+    &NUMBER_OF_CORES=1.
+    &CORE_BASE="apb:0x80010000"
+    &CORE_LIST="0"
+  )
+  ELSE IF &KEY==0x32
+  (
+    &NUMBER_OF_CORES=2.
+    &CORE_BASE="apb:0x80010000 apb:0x80012000"
+    &CORE_LIST="0, 1"
+  )
+  ELSE IF &KEY==0x33
+  (
+    &NUMBER_OF_CORES=3.
+    &CORE_BASE="apb:0x80010000 apb:0x80012000 apb:0x80014000"
+    &CORE_LIST="0, 1, 2"
+  )
+  ELSE IF &KEY==0x34
+  (
+    &NUMBER_OF_CORES=4.
+    &CORE_BASE="apb:0x80010000 apb:0x80012000 apb:0x80014000 apb:0x80016000"
+    &CORE_LIST="0, 1, 2, 3"
+  )
+  ELSE
+  (
+     PRINT "Invalid number of cores."
+     STOP
+  )
+)
+
+;system.reset
+system.jtagclock rtck
+system.option enreset off
+
+IF ("&NUMBER_OF_CORES"=="AUTO_DETECT")
+(
+  &IS_RUNNING=RUN()
+  IF (&IS_RUNNING)
+  (
+    ; CPU is running, break so we can read the CPU complex status
+    BREAK
+  )
+  &CORE_MASK=data.long(SD:0xFE206470)  ; CLK_RST_CONTROLLER_CPU_CMPLX_STATUS_0
+  IF (&IS_RUNNING)
+  (
+    ; Start the CPU running again
+    GO
+  )
+  &CORE_MASK=&CORE_MASK&15.
+  &NUMBER_OF_CORES=0.
+
+  IF ((&CORE_MASK&1.)==0.)
+  (
+    &NUMBER_OF_CORES=&NUMBER_OF_CORES+1.
+    &CORE_BASE="&CORE_BASE apb:0x80010000"
+    &CORE_LIST="0"
+  )
+  IF ((&CORE_MASK&2.)==0.)
+  (
+    &NUMBER_OF_CORES=&NUMBER_OF_CORES+1.
+    &CORE_BASE="&CORE_BASE apb:0x80012000"
+    &CORE_LIST="&CORE_LIST, 1"
+  )
+  IF ((&CORE_MASK&4.)==0.)
+  (
+    &NUMBER_OF_CORES=&NUMBER_OF_CORES+1.
+    &CORE_BASE="&CORE_BASE apb:0x80014000"
+    &CORE_LIST="&CORE_LIST, 2"
+  )
+  IF ((&CORE_MASK&8.)==0.)
+  (
+    &NUMBER_OF_CORES=&NUMBER_OF_CORES+1.
+    &CORE_BASE="&CORE_BASE apb:0x80016000"
+    &CORE_LIST="&CORE_LIST, 3"
+  )
+  &NUMBER_OF_CORES=4.
+)
+
+IF (&NUMBER_OF_CORES==1.)
+(
+  system.cpu CORTEXA9
+)
+ELSE IF (&NUMBER_OF_CORES==2.)
+(
+  system.cpu CORTEXA9MPCoreSMP2
+)
+ELSE IF (&NUMBER_OF_CORES==3.)
+(
+  system.cpu CORTEXA9MPCoreSMP3
+)
+ELSE IF (&NUMBER_OF_CORES==4.)
+(
+  system.cpu CORTEXA9MPCoreSMP4
+)
+ELSE
+(
+  PRINT "Invalid number of CPU cores: &NUMBER_OF_CORES"
+  STOP
+)
+
+system.config corebase &CORE_BASE
+
+system.config irpre 0.
+system.config irpost 0.
+system.config drpre 0.
+system.config drpost 0.
+
+system.config DAPIRPOST 4
+system.config DAPDRPOST 1
+system.config DAPIRPRE 0
+system.config DAPDRPRE 0
+
+trace.disable
+
+tronchip.set PABORT OFF
+tronchip.set DABORT OFF
+tronchip.set UNDEF  OFF
+tronchip.set SWI    OFF
+
+PRINT "CPU cores: &CORE_LIST"
+wait 1.s
+
+enddo
+

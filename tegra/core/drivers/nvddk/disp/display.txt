@@ -1,0 +1,834 @@
+NvDdk Display Theory of Operation
+---------------------------------
+Copyright (c) 2007, 2009 NVIDIA Corporation.  All rights reserved.
+
+Contents:
+    1. Display technology overview
+    2. NvDdk display usage
+    3. Customer Adapation (NvOdm Display)
+    4. Use Cases
+    5. Content Protection
+
+1. Display Technology Overview
+
+  Displaying a picture on screen is the end result of a fairly complex software
+  and hardware pipeline. The basic pieces/stages are as follows: a block of
+  memory is designated as a displayable surface, software or hardware renders
+  into this memory, the display controller sends this memory to a display
+  device.
+
+  There are several layers of software that control the display hardware (the
+  display controller). The bottom-most layer is the display driver, aka the
+  Display DDK, aka NvDdk Display. The DDK is responsible for all display
+  register accesses and exports a fairly high-level API for upper layer
+  software. The operating system display manager (the windowing system) is then
+  responsbile for calling into the DDK. For Windows, this is the DDI. For
+  Linux, this is most likely a framebuffer device (/dev/fb0). See the Use Case
+  section for details.
+
+  The display controller is a block of hardware that, conceptually, has two
+  functions: the first is to prepare the display surface for viewing (may
+  perform some basic operations, such as scaling, blending, rotation, color
+  space conversion, etc). The second is to send the data to the display device
+  itself.
+
+  The display controller, in conjuction with the Display DDK, is also
+  responsible for content protection. Standard definition TV has a couple
+  types, Macrovision and CGMS-A. HDMI has HDCP. See the Use Case section for
+  detailed discussion.
+
+  Throughout this document, a "display" may refer to a LCD panel, computer
+  monitor (CRT), or TV (both standard and high-definition).  LCD panels are the
+  most common display device for the embedded market (cell phones, PDAs, etc.).
+
+  There are basically two classes of LCD panels: those with on-board memory
+  for pixel data and those without. Panels with no memory are called TFT or
+  "dumb" panels, panels with memory are "CPU interface" or "smart" panels.
+  TFT panels typically have larger resolution and have a parallel physical data
+  interface (one wire per pixel color bit -- 16 bit color requires 16 wires).
+  Smart panels are usually smaller and have serial (or sometimes parallel) data
+  physical interfaces with command/configuration registers.
+
+1.1 TFT LCD
+
+  The display controller must generate timing and data signals to the TFT
+  panel. Every panel is slightly different, but typically there are the
+  following timing signals: pixel clock, data enable, horizontal sync, and
+  vertical sync.  The panel will latch data (each pixel color bit is on a
+  dedicated wire) when the chip select, horizontal, vertical sync, and the
+  pixel clock are active (high). The panel can detect which pixel to draw by
+  the horizontal and vertical sync, plus the pixel clock. The vertical sync
+  signifies a new frame of data, the horizontal sync is the line (there are N
+  horizontal sync pulses per vertical sync), and the pixel clock is high for
+  each pixel (N pixel clock pulses per horizontal sync).
+
+  There are added complications, such as the amount of "blank time" required
+  between each horizontal and vertical sync and between each line of pixel
+  data. Also, some panels don't use horizontal and vertical sync pulses and
+  instead just use the data enable and can count the pixel clocks to determine
+  the horizontal line.
+
+1.2 Smart LCDs
+
+  Smart panels are infinitely variable, but there are some emerging standards,
+  such as DSI (from MIPI). Smart panels have their own pixel data memory and
+  generate their own timing signals to the panel. There is a mini display
+  controller built into the panel, so it is basically a TFT panel
+  wrapped up into a self-contained package. This is done so that the on-chip
+  display controller can be powered off along with the wires to the panel to
+  save power, or the on-chip display controller can drive other panels while
+  the smart panel still displays its current image (the small panel on the
+  front of a clam shell cell phone will display the carrier logo while the
+  phone is open, etc).
+
+  Pixel data can be sent in any number of ways, from a full parallel bus to a
+  serial bus. Register writes are usually sent over SPI (see
+  http://en.wikipedia.org/wiki/Spi), but there are several other, usually
+  proprietary/bizzare parallel busses (see the panel's data sheet for gory
+  details) for both commands and data.
+
+  The parallel interfaces look like memory interfaces with a chip select and
+  write enable. A signal typically called data/command (DC) or register select
+  (RS) qualifies the data as either a register index or a register
+  parameter/pixel data since the bus is shared for both commands and data. The
+  data bus can be anywhere from 8 to 18 bits wide and support different color
+  depths.  Interfaces smaller than the color depth require multiple
+  clocks/writes to transfer one full pixel.
+
+  Interface Width       Color Depth         Clocks/writes per pixel
+  ---------------       -----------         -----------------------
+  18 bits               18-bpp              1
+  9                     18-bpp              2
+  8                     24-bpp              3
+  8                     16-bpp              2
+
+  Since the smart panel has its own timing engine, some/most panels export a
+  signal to indicate when it is safe to send data. This is called FMARK or
+  the tear signal.
+
+1.3 SPI+TFT LCD
+  SPI+TFT LCDs use the interface described in section 1.1 for display data in 
+  addition to a SPI interface that sends commands to a driver on the LCD
+  module. Commands can enable voltages on the driver or set panel timing and
+  gamma.
+
+1.4 Primary and Secondary LCD Interfaces
+  Primary interfaces can be as wide as 24-bit TFT or 18-bit parallel smart LCD.
+  Due to pin count restraints, secondary LCD interfaces are limited to 8 or
+  9-bit parallel or SPI smart LCD.
+
+1.5 Televisions and Monitors
+
+  The display pipeline is basically the same for televisions and computer
+  monitors, with an added step of converting the digital signals to match the
+  TV or CRT. TVs require some extra data encoding that is done by a separate
+  hardware block that is connected to the display controller. The TV encoder
+  intercepts the output of the display, converts it to the NTSC or PAL TV
+  formats, and outputs the data to the standard TV/CRT connectors (component,
+  s-video, composite).
+
+  Monitors are similar to TVs, minus the TV encoder step; the digital data
+  has to be converted to analog and sent to the monitor connectors. Monitors
+  have strict timing requirements for the data signals which are specified in
+  the VESA specification.  Some monitors have on-board memories that can be
+  read to discover the manufacturer, supported resolutions, etc.
+
+  High definition television is achieved via HDMI (a collection of audio and
+  video standards). There is an HDMI hardware block that is connected to the
+  display controller (similarly to the TV encoder block), and will encode
+  the display controller output and transmit the data over the HDMI physical
+  interface (the details of which are not strictly important here), to the
+  HDMI-enabled TV.
+
+2. NvDdk Display Usage
+
+  The Display DDK has three fundamental software objects: controller, window,
+  and display.  A controller object represents one of the hardware display
+  controllers as described above.  A window is the "front end" of the display
+  controller (not the panel timing engine). There may be multiple windows per
+  controller. Each window has a display surface (the chunk of memory with pixel
+  data) and can be sized/positioned within the physical display space. The
+  display controller composites all of its windows to form the final image, so
+  windows are useful for overlay applications.  An example would be a media
+  player that is color-key blended over the operating system desktop. Display
+  objects represent a physical display (LCD, CRT, etc), and can be attached to
+  one of the controller objects.  Each display has one or more modes that
+  represent the device resolution and color depth.
+
+  The basic operations of the Display DDK are list objects, configure objects,
+  and connect objects. There may be multiple controllers, windows, and
+  displays. Windows are always associated with controllers, but a display
+  may be able to connect (attach) to any of the controller objects. To actually
+  draw something to the screen, a display must be attached to a controller,
+  the mode must be set on the display, and a window must have a surface.
+  Multiple displays may be attached to a single controller, if the displays
+  all support a common mode.
+
+  The display objects are not configurable, but will report which type of
+  display device it represents, its maxium resolution and color depth, and
+  some backlight controls (for LCDs). Displays are marked as "primary",
+  "secondary", or "removable". Primary is the main embedded display which will
+  have the user interface. Secondary displays may or may not exist. If they
+  exist, then they are usually the smaller embedded display (such is the case
+  with clamshell phones). Display objects may be marked "removable" if they are
+  not hard-wired into the product. TVs and monitors are removable displays.
+
+  Configuration for window objects include rotation, blending, vibrance,
+  scaling, size, position, gamma correction, and color space conversion (for
+  YUV surface formats).
+
+  Display controllers have background color configuration (the space on the
+  display not covered by a window). Controllers may also have a hardware cursor
+  (the mouse pointer), which is controlled/configured with a separate set of
+  APIs within the NvDdk Display.
+
+  Details on the API can be found in nvddk_disp.h.
+
+3. Customer Adaptation
+
+  The NvDdk Display software is de-coupled from the physical displays by the
+  NvOdm Display Adapatation layer. This layer of software is provided by the
+  customer and exports a list of display device objects (one object per
+  physical display in the system, both removable and non-removable).  These
+  objects are used to initialize the display, set the display mode, send the
+  pixel data, set the backlight, etc.
+
+  The NvODM Display Adapation layer also exports the display pin multiplexing
+  options. Display devices may be wired onto the product board in several ways.
+  In order to limit the combinations of pin configurations, the ODM layer
+  specifies a small number of configurations that match the majority of panels.
+  The pin-mux options are defined by the display type and number of displays,
+  eg. two smart panels, or one 24-bit TFT panel. The NvDdk software will set
+  the system configuration to match the ODM display object's pin-mux
+  configuration.
+
+  The ODM Display layer contains a power state machine, which applies mostly
+  for embedded LCDs. Power is a primary concern in the embedded market,
+  so LCD panels must be used with care to save as much power as possible.
+  Backlight management is key. Also, some LCD panels have low power modes
+  (described below).
+
+  Each ODM display object may have some custom configuration; each defined by
+  the display object type, as well as a special function API that is expandable
+  to accomodate new display technology features without changing the API. 
+  An example of a special feature is a partial display mode. Partial modes are
+  not full screen modes and usually have lower color depths. These modes save
+  power and are typically used in cell phones to display a clock and status
+  indicators when the phone is not in a fully-active state.
+
+  NvDdk Display calls this ODM layer. DDK client code does not need call any
+  NvOdm Display function directly.
+
+  Details for the customer adapation API can be found in nvodm_disp.h.
+
+4. Use Cases
+
+  This section will cover how to use NvDdk Display to actually do something
+  useful. Firstly, code will use Nvidia's custom types:
+
+  * NvU32 - unsigned integer, 32 bits wide
+  * NvError - error code numeration, NvSuccess is good, all others are bad
+  * NvRmSurface - the workhorse surface structure. It contains a memory handle
+        (usually memory that's allocated uncached), color format, bpp, width,
+        height, etc. All example code will use a function, allocate_surface(),
+        to allocate a surface with the given parameters.
+  * NvRmDeviceHandle - this is a handle to the RM (Resource Manager). The
+        Resource Manager is the fundamental device driver in the system.
+        Nothing works without it, so you'll need to get a handle to it.
+  * NV_CHECK_ERROR_CLEANUP - macro that checks for failure. It uses 'e' which
+        is of type NvError. If an error is encountered, then the macro will
+        jump to the 'fail' label.
+  * NV_ARRAY_SIZE - macro to calculate an array size
+
+  The Display DDK is an attribute and list based API, so, basically, one sets
+  the required attributes in an array, then enumerates the available objects,
+  and finally hook everything up.
+
+4.1 Basic Full Screen Window
+
+  This will put a surface onto the display device.
+
+    void full_screen_window( NvRmDeviceHandle hRm )
+    {
+        NvError e;
+        NvDdkDispMode mode;
+        NvDdkDispHandle hDisp;
+        NvDdkDispControllerHandle hControllers[NVDDK_DISP_MAX_CONTROLLERS];
+        NvDdkDispControllerHandle hController;
+        NvDdkDispWindowHandle hWindows[NVDDK_DISP_MAX_WINDOWS];
+        NvDdkDispWindowHandle hWindow;
+        NvDdkDispDisplayHandle hDisplay;
+        NvDdkDispWindowAttribute attrs[] =
+        {
+            NvDdkDispWindowAttribute_DestRect_Left,
+            NvDdkDispWindowAttribute_DestRect_Top,
+            NvDdkDispWindowAttribute_DestRect_Right,
+            NvDdkDispWindowAttribute_DestRect_Bottom,
+            NvDdkDispWindowAttribute_SourceRect_Left,
+            NvDdkDispWindowAttribute_SourceRect_Top,
+            NvDdkDispWindowAttribute_SourceRect_Right,
+            NvDdkDispWindowAttribute_SourceRect_Bottom,
+        };
+        NvU32 vals[8];
+        NvU32 *v;
+        NvU32 nControllers;
+        NvU32 nWindows;
+        NvRmSurface surf;
+
+        // the first step is to open the display ddk. this requires an RM
+        // handle.
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispOpen( hRm, &hDisp, 0 )
+        );
+
+        // list all of the controllers in the system. this call can be twice,
+        // the first will return the number of controllers, the second will
+        // populate the controller list.
+        nControllers = 0;
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispListControllers( hDisp, &nControllers, NULL )
+        );
+
+        // second call -- fills in the controller array
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispListControllers( hDisp, &nControllers, hControllers )
+        );
+
+        // use the first controller for everything
+        hController = hControllers[0];
+
+        // list all of the windows -- same two-call idea as the controllers
+        nWindows = 0;
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispListWindows( hController, &nWindodws, NULL )
+        );
+
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispListWindows( hController, &nWindodws, hWindows )
+        );
+
+        // use the first window for everything
+        hWindow = hWindows[0];
+
+        // there's a short-cut API to get the "primary display" -- this is
+        // the display (embedded LCD, for instance) that the OS will draw
+        // its desktop onto.
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispGetDisplayByUsage( hController,
+                NvDdkDispDisplayUsage_Primary, &hDisplay )
+        );
+
+        // attach the display to a controller. pick the first one.
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispAttachDisplay( hController, hDisplay, 0 )
+        );
+
+        // another short-cut api to just get the "best" mode, whatever that
+        // may be. usually, it's the first mode that is exported in the ODM
+        // adaptation.
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispGetBestMode( hController, &mode, 0 )
+        );
+
+        // go ahead and blindly set the mode on the controller. this doesn't
+        // do anything to the hardware yet. still need to setup the surface.
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispSetMode( hController, &mode, 0 )
+        );
+
+        // setup the window dimensions -- source rectangle (into the surface)
+        // is the same as the destination rectangle. this means that the
+        // surface is the same size as the display device. no scaling is done.
+        v = vals;
+        // destination rectangle
+        *v = 0; v++; // left
+        *v = 0; v++; // top
+        *v = mode.width; v++; // right
+        *v = mode.height; v++; // bottom
+        // source rectangle
+        *v = 0; v++; // left
+        *v = 0; v++; // top
+        *v = mode.width; v++; // right
+        *v = mode.height; // bottom
+
+        // set the window attributes, no flags
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispSetWindowAttributes( hWindow, &attrs[0], &vals[0],
+                NV_ARRAY_SIZE(attrs), 0 )
+        );
+
+        // allocate a pitch RBG 5-6-5 surface. "Pitch" is the most intuitive
+        // memory layout for pixels. A pixel lives at address:
+        //      (y*pitch) + (x*Bpp)
+        //
+        // 5-6-5 is a very common 16bpp color format: 5 bits of blue, 6 of
+        // green, 5 of red. Blue is the LSB.
+        NV_CHECK_ERROR_CLEANUP(
+            allocate_surface( hRm, &surf, mode.width, mode.height,
+                NvRmSurfaceLayout_Pitch, NvColorFormat_R5G6B5 )
+        );
+
+        // fill the surface with some pixels. don't show how to do this here.
+        fill_surface( &surf );
+
+        // finally, this will actually display something!
+        // attach the surface to the window. this will wait for the operation
+        // to complete. multiple surfaces may be specified for the YUV planar
+        // surfaces: 1 and 3 are legal values for the number of surfaces.
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispSetWindowSurface( hWindow, &surf, 1, NVDDK_DISP_WAIT )
+        );
+
+        return;
+
+    fail:
+        // do error cleanup here
+    }
+
+    // allocate_surface: create a surface that's mapped uncached.
+    NvError allocate_surface( NvRmDeviceHandle hRm, NvRmSurface *surf,
+        NvU32 width, NvU32 height, NvRmSurfaceLayout layout,
+        NvColorFormat format )
+    {
+        NvError err;
+        NvU32 size, align;
+        NvRmMemHandle hMem = 0;
+
+        NvOsMemset(surf, 0, sizeof(NvRmSurface));
+        surf->Width       = width;
+        surf->Height      = height;
+        surf->ColorFormat = format;
+        surf->Layout      = layout;
+
+        NvRmSurfaceComputePitch( hRm, 0, surf );
+        size  = NvRmSurfaceComputeSize( surf );
+        align = NvRmSurfaceComputeAlignment( hRm, surf );
+
+        err = NvRmMemHandleCreate(hRm, &hMem, size);
+        if( err!= NvSuccess )
+        {
+            goto fail;
+        }
+
+        err = NvRmMemAlloc(hMem, NULL, 0, align, NvOsMemAttribute_Uncached);
+        if( err != NvSuccess )
+        {
+            goto fail;
+        }
+
+        surf->hMem = hMem;
+        err = NvSuccess;
+        goto clean;
+
+    fail:
+        NvRmMemHandleFree( hMem );
+
+    clean:
+        return err;
+    }
+
+4.2 Overlays
+
+  Overlays are handled in hardware when two or more windows overlap each other.
+  They and come in several flavors: opaque, fixed alpha, per-pixel alpha.
+  Opaque is simple: the top surface is shown for the overlapping area. Fixed
+  alpha is alpha blending both surfaces according to the given alpha value.
+  Per-pixel alpha blending uses the alpha supplied by the surface's pixel to
+  blend with the other surface.
+
+  The choice to use a hardware 2D block to do overlays and only scan-out a
+  single surface vs using the display hardware to do the final composition is a
+  system issue that is not covered here. If you do choose to use display for
+  window composition, then this is how to do it.
+
+  First, an opaque overlay. Start with full_screen_window() in section 4.1.
+  Add a depth attribute to the window attributes, replace the single surface
+  with a surface array and a color array:
+
+        NvU32 width, height;
+        NvRmSurface surfs[NVDDK_DISP_MAX_WINDOWS];
+        NvU16 colors[] =
+            {
+                0x1f,
+                0x3f << 5,
+                0x1f << 11,
+            };
+        NvDdkDispWindowAttribute attrs[] =
+        {
+            NvDdkDispWindowAttribute_DestRect_Left,
+            NvDdkDispWindowAttribute_DestRect_Top,
+            NvDdkDispWindowAttribute_DestRect_Right,
+            NvDdkDispWindowAttribute_DestRect_Bottom,
+            NvDdkDispWindowAttribute_SourceRect_Left,
+            NvDdkDispWindowAttribute_SourceRect_Top,
+            NvDdkDispWindowAttribute_SourceRect_Right,
+            NvDdkDispWindowAttribute_SourceRect_Bottom,
+            NvDdkDispWindowAttribute_Depth,
+        };
+        NvU32 vals[9];
+
+  This will end up with 3 overlapping opaque windows, each solid red, green,
+  or blue. Instead of just filling one window, iterate over each window, fill
+  it, then set its attributes.
+
+        width = mode.width;
+        height = mode.height;
+
+        for( i = 0; i < nWindows; i++ )
+        {
+            NV_CHECK_ERROR_CLEANUP(
+                allocate_surface( hRm, &surfs[i], width, height,
+                    NvRmSurfaceLayout_Pitch, NvColorFormat_R5G6B5 )
+            );
+
+            // solid fill
+            fill_surface( &surf[i], colors[i] );
+
+            // the default location for each window is 0,0, so just change
+            // the window size to see the overlap
+
+            // destination rectangle
+            v = vals;
+            *v = 0; v++; // left
+            *v = 0; v++; // top
+            *v = width; v++; // right
+            *v = height; v++; // bottom
+            // source rectangle
+            *v = 0; v++; // left
+            *v = 0; v++; // top
+            *v = width; v++; // right
+            *v = height; v++; // bottom
+            // set the depth -- depth 0 is on top. this loop goes from bottom
+            // to top.
+            *v = nWindows - i - 1;
+
+            NV_CHECK_ERROR_CLEANUP(
+                NvDdkDispSetWindowAttributes( hWindows[nWindows - i - 1],
+                    &attrs[0], &vals[0], NV_ARRAY_SIZE(attrs), 0 )
+            )
+
+            NV_CHECK_ERROR_CLEANUP(
+                NvDdkDispSetWindowSurface( hWindows[nWindows - i - 1],
+                    &surfs[i], 1, 0 )
+            );
+
+            // each window is a quarter of the window under it
+            width /= 2;
+            height /= 2;
+        }
+    }
+
+  Alpha blending is setup in much the same way. Take the opaque case above and
+  add blending attributes, BlendType, AlphaOperation, AlphaValue:
+
+        NvDdkDispWindowAttribute attrs[] =
+        {
+            NvDdkDispWindowAttribute_DestRect_Left,
+            NvDdkDispWindowAttribute_DestRect_Top,
+            NvDdkDispWindowAttribute_DestRect_Right,
+            NvDdkDispWindowAttribute_DestRect_Bottom,
+            NvDdkDispWindowAttribute_SourceRect_Left,
+            NvDdkDispWindowAttribute_SourceRect_Top,
+            NvDdkDispWindowAttribute_SourceRect_Right,
+            NvDdkDispWindowAttribute_SourceRect_Bottom,
+            NvDdkDispWindowAttribute_BlendType,
+            NvDdkDispWindowAttribute_AlphaOperation,
+            NvDdkDispWindowAttribute_AlphaValue,
+            NvDdkDispWindowAttribute_Depth,
+        };
+        NvU32 vals[12];
+
+  Setup the attributes in the window loop:
+
+        for( i = 0; i < nWindows; i++ )
+        {
+            // ... same code as above
+
+            // destination rectangle
+            v = vals;
+            *v = 0; v++; // left
+            *v = 0; v++; // top
+            *v = width; v++; // right
+            *v = height; v++; // bottom
+            // source rectangle
+            *v = 0; v++; // left
+            *v = 0; v++; // top
+            *v = width; v++; // right
+            *v = height; v++; // bottom
+
+            // setup fixed alpha value of 127
+            *v = NvDdkDispBlendType_Alpha; v++;
+            *v = NvDdkDispAlphaOperation_WeightedMean; v++;
+            *v = 127; v++;
+
+            // set the depth -- depth 0 is on top. this loop goes from bottom
+            // to top.
+            *v = nWindows - i - 1;
+
+            // ...
+        }
+
+  Per-pixel alpha is identical, just change the surface fill and instead of
+  using NvDdkDispBlendType_Alpha, use NvDdkDispBlendType_PerPixelAlpha.
+
+  Color key uses NvDdkDispBlendType_ColorKey as the blend type. The bottom
+  window must have the color key attribute set as the blend type and have
+  the color key color in its surface. Use NvDdkDispWindowAttribute_ColorKey
+  to set the color key color value. A range of colors may also be specified
+  with NvDdkDispWindowAttribute_ColorKeyLower and
+  NvDdkDispWindowAttribute_ColorKeyUpper.
+
+4.3 TV
+
+  This shows how to setup TV, both standard and high-definition.
+
+  Start with full_screen_window(). Replace NvDdkDispGetDisplayByUsage() with
+  code that finds a TV. There needs to be a display array in the data section:
+
+        NvDdkDispDisplayHandle hDisplays[NVDDK_DISP_MAX_DISPLAYS];
+        NvDdkDispDispayHandle hDisplay = 0;
+        NvU32 nDisplays;
+        NvU32 i;
+
+  The code:
+
+        // find a standard def tv
+        nDisplays = 0;
+
+        // first call, get the number of displays
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispListDisplays( hController, &nDisplays, NULL )
+        );
+
+        // fill in the display array
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispListDisplays( hController, &nDisplays, hDisplays )
+        );
+
+        // iterate over the displays, find a tv.
+        for( i = 0; i < nDisplays; i++ )
+        {
+            NvU32 type;
+
+            NV_CHECK_ERROR_CLEANUP(
+                NvDdkDispGetDisplayAttribute( hDisplays[i],
+                    NvDdkDispDisplayAttribute_Type, &type )
+            );
+
+            if( type == NvDdkDispDisplayType_TV )
+            {
+                hDisplay = hDisplays[i];
+                break;
+            }
+        }
+
+        // make sure this found a tv
+        if( !hDisplay )
+        {
+            return;
+        }
+
+  The rest of the setup is identical. Attach the display, setup the surface,
+  set the mode.
+
+  To find a high-def TV, replace the check for the display type with
+  NvDdkDispDisplayType_HDMI. HDMI has the added complication of audio. The
+  audio configuration is done via a single API to set the audio sample
+  frequency, like so:
+
+        // set the audio frequency to 48khz
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispSetDisplayAttribute( hDisplay,
+                NvDdkDispDisplayAttribute_AudioFrequency,
+                NvDdkDispAudioFrequency_48000hz, 0 )
+        );
+
+  The HDMI hardware gets its audio data from the SPIF controller, which is
+  programmed elsewhere outside of the display DDK.
+
+5. Content Protection
+
+  There are several types of content protection for television. For standard
+  definition, there is Macrovision and CGMS-A. Macrovision is supported by the
+  tv hardware automatically; to enable it, do:
+
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispSetContentProtection( hDisplay,
+                NvDdkDispContentProtection_Macrovision, 0, 0, 0 )
+        );
+
+  CGMS-A is a signal that is sent to the TV on line 20 (WSS) or line 21
+  (Closed Captioning). It has copy-protection bits that specify how many
+  times the content may be copied -- no times, one generation, or copied
+  without restriction. To enable CGMS-A, a context structure is required:
+
+        NvDdkDispCGMSAContext context;
+
+        // setup the context, see nvddk_disp.h for details
+        context.Payload = 0x3; // no copy allowed, no burst
+        context.LineSelect = 1;
+
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispSetContentProtection( hDisplay,
+                NvDdkDispContentProtection_CGMSA, &context,
+                sizeof(context), 0 )
+        );
+
+  High definition television's content protection is handled by the HDCP (High
+  Definition Content Protection). The full specification can be found online
+  at http://digital-cp.com. HDCP requires software participation that is not
+  built into the DDK. HDCP is based on a private key verification protocol.
+  Once the sender (the source) verifies an HDCP reciever (a sink), then
+  the signal is encrypted. The source to sink verification is called
+  "downstream" verification.
+
+  If the HDMI cable is unplugged, then the signal must be stopped and the
+  verification protocol has to be restarted. Once a signal is started to a
+  sink, the downstream link must be checked every 128 frames, or two seconds.
+  The DDK does not automatically do this, but it does export an API to verify
+  the link. The DDK also does not automatically detect a cable plug event.
+
+  There is also "upstream" authentication, which verifies the source hardware
+  with the software (media player, etc). The upstream verification is also a
+  key verification protocol. The software must have its own set of keys. To
+  void putting keys into the source code, there is an ODM API that allows for
+  customers to put their keys into a dynamically loaded library that may be
+  shipped binary-only, etc. The APIs for ODM HDCP customization are:
+
+        /* keys may get revoked. check to see if the key selection vectors
+         * are still valid.
+         */
+        typedef NvBool (*NvOdmDispHdmiHdcpIsRevokedKsvType)( NvU64 *Ksv,
+            NvU32 nKsvs );
+
+        #define DC_HDCP_GLOB_SIZE (((3 * 64) + (1 * 64) + (40 * 56)) / 8)
+        #define DC_HDCP_KEY_OFFSET (((3 * 64) + (1 * 64)) / 8)
+
+        /**
+         * Returns a pointer to a decrypted glob for HDCP Upstream
+         * authentication. The pointer must be de-allocated with
+         * NvOdmDispHdmiReleaseGlob. If this is called multiple times without
+         * first releasing the glob, then this will fail (return NULL).
+         *
+         * @param size Pointer to the size of the glob
+         */
+        typedef void * (*NvOdmDispHdmiGetGlobType)( NvU32 *size );
+
+        /**
+         * De-allocates/clears glob memory.
+         */
+        typedef void (*NvOdmDispHdmiReleaseGlobType)( void *glob );
+
+
+  The HDCP specification should be consulted for a full implementation, but
+  a basic pseduo-code skeleton for HDCP authentication is as follows. This
+  should be used as an example of how to use the display DDK's HDCP
+  functionality only:
+
+    void hotplug_setup( void )
+    {
+        // setup the DDK as usual -- hDisplay is an HDMI display.
+        // ...
+
+        // setup hot plug gpio interrupt, spawn a thread for the cable detect
+        // debounce. this should enable the power rail for the HPD pin.
+        setup_hotplug_gpio( ... );
+        spawn_thread( debounce_thread );
+    }
+
+    // need a context struct which has the key vectors and can signal a
+    // cable disconnect to the DDK
+    void debounce_thread( NvDdkDispHdcpContext *context )
+    {
+        for( ;; )
+        {
+            while( !pin_stable() ) { sleep(timeout); }
+
+            // got a stable pin, see if we are plugged in, or not.
+            if( pin_value() )
+            {
+                // enable display as usual
+                // ...
+                display_enable();
+
+                hdcp_enable( context );
+            }
+            else
+            {
+                hdcp_disable();
+
+                // disable display normally
+                display_disable();
+            }
+        }
+    }
+
+    // gpio interrupt handler callback
+    void pin_interrupt( void )
+    {
+        // get the context from somewhere, let the DDK know that the cable
+        // has been disconnected.
+        context->bHotplugDeasserted = NV_TRUE;
+    }
+
+    void hdcp_enable( NvDdkDispHdcpContext *context )
+    {
+        NvError e;
+
+        // try to verify downstream -- need to check for interrupts
+        while( !pin_pending() )
+        {
+            context->bHotplugDeasserted = NV_FALSE;
+            e = NvDdkDispSetContentProtection( hDisplay,
+                    NvDdkDispContentProtection_HDCP, context,
+                    sizeof(*context), 0 );
+            if( e == NvSuccess )
+            {
+                break;
+            }
+            
+            // try again in 2 seconds, or so (per spec).
+            sleep_ms( 1750 );
+        }
+
+        // downstream was successful, but need to be sure that there wasn't a
+        // hot-plug deassert
+        if( pin_pending() )
+        {
+            hdcp_disable();
+            return;
+        }
+
+        // go into the link-verification loop
+        while( pin_value() )
+        {
+            context->bHotplugDeasserted = NV_FALSE;
+            context->bEnabled = NV_FALSE;
+            e = NvDdkDispSetContentProtection( hDisplay,
+                    NvDdkDispContentProtection_HDCP, context,
+                    sizeof(*context), 0 );
+            if( e != NvSuccess || !context->bEnabled )
+            {
+                break;
+            }
+
+            sleep_ms( 1750 );
+        }
+
+    clean:
+        hdcp_disable();
+        display_disable();
+    }
+
+    void hdcp_disable( void )
+    {
+        NvError e;
+
+        NV_CHECK_ERROR_CLEANUP(
+            NvDdkDispSetContentProtection( hDisplay,
+                NvDdkDispContentProtection_None, 0, 0, 0 )
+        );
+
+    fail:
+        // do some error reporting
+    }

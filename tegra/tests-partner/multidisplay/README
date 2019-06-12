@@ -1,0 +1,24 @@
+Simple example application using the new Presentation API in android 4.2.
+
+Usage:
+- Connect HDMI (or some other external display)
+   * If you don't have an external display, you can use a simulated display from android developer options.
+   * [Settings] -> [Developer options] -> [Simulate secondary displays]
+-  Start the application
+
+[Select Video] Opens up a filechooser to select a video for our presentation.
+
+[Play Video] Starts video playback, does nothing if there is no video selected.
+
+[Pause Video] Pauses video playback.
+
+[Hide system UI] Hides the statusbar and other system UI elements from both displays.
+
+[Switch HDMI Mode] Toggles between MIRRORING and CINEMA mode. 
+   * Mirroring displays a complete copy of the internal screen on the external screen. 
+   * Cinema mode displays the video on external screen and controls (and system UI) on internal.
+
+
+Known Issues:
+- There seems to be a bug in the android framework when you disconnect your external display during a presentation.
+  This doesn't always lead to crash, but it does produce unhandled exceptions which may lead to the mediaplayer to crash.

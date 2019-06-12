@@ -1,0 +1,194 @@
+#!/usr/bin/python
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA Corporation and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA Corporation is strictly prohibited.
+#
+
+"""
+
+Generates a blob and copies into <OUT>/.
+
+Usage:
+-----
+For Un-Encrypted Binaries : nvblob <tuple of (binary_name, parition_name, version_number)>
+For Encrypted Binaries    : nvblob -e <tuple of (binary_name, partition_name, version_number)>
+
+NOTE : in case of Encrypted Binaries one of the tuples MUST be BCT.
+
+"""
+
+import sys
+
+if sys.hexversion < 0x02060000:
+  print >> sys.stderr, "Python 2.6 or newer is required."
+  sys.exit(1)
+
+import os
+import sys
+import subprocess
+import tempfile
+import zipfile
+import struct
+import getopt
+
+source_ota = ''
+
+def Run(args, **kwargs):
+  """Create and return a subprocess.Popen object."""
+  print "  running: ", " ".join(args)
+  return subprocess.Popen(args, **kwargs)
+
+def add_into_zip(zip_file, directory):
+    for dirname, dirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            zip_entry = os.path.join(dirname, filename)
+            zip_file.write(zip_entry)
+
+def main(argv):
+
+    # Check "TOP" variable is set and is valid
+    if not os.environ.has_key("TOP") or not os.path.isdir(os.environ["TOP"]):
+        sys.stderr.write("Environment variable TOP not set or invalid.\n")
+        return
+
+    # Check "OUT" variable is set and is valid
+    if not os.environ.has_key("OUT") or not os.path.isdir(os.environ["OUT"]):
+        sys.stderr.write("Environment variable OUT not set or invalid.\n")
+        return
+
+    out_path = os.environ.get("OUT")
+    partition_info = sys.argv[1:]
+
+    print 'OUT   :', out_path
+    print 'PARTITION INFO   :', partition_info
+
+    isencrypted = ''
+    if (partition_info[0] == '-e'):
+        isencrypted = 1
+        partition_info = partition_info[1:]
+
+    number_of_elements = len(partition_info)
+
+    if ((number_of_elements % 3) != 0):
+        print __doc__
+        return
+
+    i = 0
+    partition_info_list = []
+    while (i < number_of_elements):
+        if os.path.isfile(partition_info[i]):
+            binary_name = partition_info[i]
+        else:
+            binary_name = os.path.join(out_path, partition_info[i])
+            if not os.path.isfile(binary_name):
+                sys.stderr.write("File %s does not exist\n" % binary_name)
+                return
+        i = i + 1
+        partition_name = partition_info[i]
+        i = i + 1
+        version_number = partition_info[i]
+        i = i + 1
+        if (isencrypted ==1):
+            #set the MSB of version number to 1
+            version_number = (int(version_number) | 0x80000000)
+        print "Using %s for %s partition" % (binary_name, partition_name)
+        partition_info_tuple = (binary_name, partition_name, version_number)
+        partition_info_list.append(partition_info_tuple)
+
+
+    number_of_elements = len(partition_info_list)
+
+    # create a binary file for creating a dump.
+    unsigned_blob = ".blob"
+    blob = open(unsigned_blob, "wb")
+    # write fixed header into the blob
+    header_size = struct.calcsize('=16sIIIIIIIIIII')
+    update_header_tuple = ("MSM-RADIO-UPDATE", 0x00010000, header_size, header_size, number_of_elements, 0, 0, 0, 0, 0, 0, 0)
+    update_header = struct.pack('=16sIIIIIIIIIII', *update_header_tuple)
+    blob.write(update_header)
+
+    # reserve space for entries. Come back and write the actual value after populating the structures for each binary
+    empty_entry_tuple = ("", 0, 0 , 0)
+    empty_entry = struct.pack('=4sIII', *empty_entry_tuple)
+    for i in range(0, number_of_elements):
+        blob.write(empty_entry)
+
+    # write each binary and populate the structure for each binary
+    unique_files = {}
+    entry_list = []
+    for i in range(0, number_of_elements):
+        entry_tuple = ()
+        if (partition_info_list[i][0] in unique_files):
+            (current_pos, length) = unique_files[partition_info_list[i][0]]
+            entry_tuple = (partition_info_list[i][1], current_pos, length,
+                int(partition_info_list[i][2]))
+            entry_list.append(entry_tuple)
+            continue
+        current_pos = blob.tell()
+        bin_file = partition_info_list[i][0]
+        binary_handle = open(bin_file, 'rb')
+        binary_handle.seek(0, os.SEEK_END)
+        length = binary_handle.tell()
+        entry_tuple = (partition_info_list[i][1], current_pos, length, int(partition_info_list[i][2]))
+        entry_list.append(entry_tuple)
+        binary_handle.seek(0, os.SEEK_SET)
+        blob.write(binary_handle.read())
+        binary_handle.close()
+        unique_files[partition_info_list[i][0]] = (current_pos, length)
+
+    # now we have populated the structures. write at appropriate location
+    blob.seek(header_size, os.SEEK_SET)
+    for i in range(0, number_of_elements):
+        entry = struct.pack('=4sIII', *entry_list[i])
+        blob.write(entry)
+
+    blob.close()
+
+    app_path = os.environ.get("TOP")
+    app_path = os.path.join(app_path,"out/host/linux-x86/bin/nvsignblob")
+    if os.path.exists(app_path):
+        pass
+    else:
+        print "nvblob failed. Cause : nvsignblob application not found."
+        return;
+    key_path = os.environ.get("TOP")
+    key_path = os.path.join(key_path,"device/nvidia/common/security/signkey.pk8")
+    if os.path.exists(key_path):
+        pass
+    else:
+        print "nvblob failed. Cause : signkey.pk8 file not found."
+        return;
+    out_path = os.path.join(out_path,"blob")
+    try:
+        p = Run([app_path,key_path,unsigned_blob,out_path]);
+    except OSError:
+        print "OSError : nvblob failed";
+        return;
+    else:
+        p.communicate();
+        if p.returncode != 0:
+            print "nvblob failed";
+            return;
+
+    try:
+        p = Run(["rm", unsigned_blob]);
+    except OSError:
+        print "OSError : nvblob failed";
+        return;
+    else:
+        p.communicate();
+        if p.returncode != 0:
+            print "nvblob failed";
+            return;
+        else:
+            print "done."
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+    sys.exit(0)

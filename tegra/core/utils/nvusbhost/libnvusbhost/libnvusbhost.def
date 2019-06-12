@@ -1,0 +1,12 @@
+EXPORTS
+    NvUsbDeviceClose
+    NvUsbDeviceSetBusNum
+    NvUsbDeviceOpen
+    NvUsbDeviceWrite
+    NvUsbDeviceRead
+    NvUsbDeviceAbort
+    NvUsbDeviceSetReadPolicy
+    NvUsbDeviceSetWritePolicy
+    NvUsbDeviceReadMode
+    NvUsbDeviceQueryConnectionStatus
+    NvUsbDeviceReadDevId

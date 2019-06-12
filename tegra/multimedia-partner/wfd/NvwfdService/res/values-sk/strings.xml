@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">Služby používateľského rozhrania bezdrôtovej obrazovky NVIDIA</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Nedostupné, pretože technológia Miracast je aktívna.</string>
+    <string name="miracast_hdcp_title">Overenie HDCP v technológii %1$s zlyhalo </string>
+    <string name="miracast_hdcp_failure_text">Prémiový obsah nie je možné zobraziť.</string>
+    <string name="miracast_connection_status_discovery">Prebieha hľadanie stavu pripojenia\u0020</string>
+    <string name="miracast_connection_status_progress">Pripája sa k technológii\u0020</string>
+    <string name="miracast_connection_status_connected">Vysiela sa prúd údajov do technológie\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Nenašla sa technológia\u0020</string>
+    <string name="miracast_connection_status_warning_conn_lost">Stratilo sa pripojenie k technológii\u0020</string>
+    <string name="miracast_connection_status_warning_auth_failed">Problém s overením v rámci technológie\u0020</string>
+    <string name="miracast_access_settings_title">Nastavenie prístupu k technológii Miracast</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="button_selectvideo">Select Video</string>
+  <string name="button_startvideo">Play Video</string>
+  <string name="button_pausevideo">Pause Video</string>
+  <string name="button_hideui">Hide system UI</string>
+  <string name="button_mode">HDMI: Mirroring</string>
+</resources>

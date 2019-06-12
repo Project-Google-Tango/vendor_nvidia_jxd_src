@@ -1,0 +1,18 @@
+; Lauterbach TRACE32 debugger script containing the T30-specific parts to power the up the CPU from the AVP.
+
+; For NVIDIA internal use only. Customers must not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+; NOTE: THIS IS A HELPER SCRIPT FOR avp_power_cpu.cmm AND AS SUCH SHOULD NOT BE CALLED DIRECTLY.
+
+// Insert a spin instruction into IRAM.
+D.A SR:0x40000000 b 0x40000000
+
+// Set the CPU reset vector to the spin instruction.
+D.S SR:0x6000F100 0x40000000
+
+// Enable power to CPU
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_power_enable.cmm
+
+ENDDO
+

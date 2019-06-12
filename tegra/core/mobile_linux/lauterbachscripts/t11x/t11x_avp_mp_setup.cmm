@@ -1,0 +1,86 @@
+; Lauterbach TRACE32 debugger script to reconfigure JTAG for the CPU with all CPU cores active.
+
+if (VERSION.BUILD()<17663.)
+(
+  PRINT "Trace32 versions prior to build 17663 are not supported"
+  STOP
+)
+
+LOCAL &REG
+LOCAL &MISC_CLK_ENB
+LOCAL &NUMBER_OF_CORES
+&NUMBER_OF_CORES="4"
+
+PRINT "How many G CPU cores should be started (0, 1, 2, 3 or 4)?"
+INKEY &KEY
+;PRINT "Input==&KEY"
+
+IF &KEY==0x30
+(
+    &NUMBER_OF_CORES="0"
+)
+ELSE IF &KEY==0x31
+(
+    &NUMBER_OF_CORES="1"
+)
+ELSE IF &KEY==0x32
+(
+    &NUMBER_OF_CORES="2"
+)
+ELSE IF &KEY==0x33
+(
+    &NUMBER_OF_CORES="3"
+)
+ELSE IF &KEY==0x34
+(
+    &NUMBER_OF_CORES="4"
+)
+ELSE
+(
+   PRINT "Invalid number of cores."
+   STOP
+)
+
+; Make sure all fuse registers are visible
+&MISC_CLK_ENB=data.long(D:0x60006048)   ; CLK_RST_CONTROLLER_MISC_CLK_ENB_0
+&REG=&MISC_CLK_ENB|0x10000000           ; CLK_RST_CONTROLLER_MISC_CLK_ENB_0_CFG_ALL_VISIBLE
+D.S SD:0x60006048 %LE %LONG &REG        ; CLK_RST_CONTROLLER_MISC_CLK_ENB_0
+
+; Make the fuse bypass registers writable.
+D.S SD:0x7000F830 %LE %LONG 0x00000000  ; FUSE_WRITE_ACCESS_SW_0
+
+; Enable fuse bypass
+D.S SD:0x7000F824 %LE %LONG 0x00000001  ; FUSE_FUSEBYPASS_0
+
+; Set number of G CPU cores
+&REG=4-&NUMBER_OF_CORES
+&REG=&REG<<3
+;PRINT "FUSE_SKU_DIRECT_CONFIG_0 = &REG"
+D.S SD:0x7000F9F4 %LE %LONG &REG        ; FUSE_SKU_DIRECT_CONFIG_0
+
+LOCAL &TEMP
+&TEMP=data.long(D:0x7000F9F4)
+IF &TEMP!=&REG
+(
+   PRINT "ERROR: FUSE_SKU_DIRECT_CONFIG_0 should be &REG but is &TEMP"
+   STOP
+)
+
+; Make the fuse bypass registers read-only.
+D.S SD:0x7000F830 %LE %LONG 0x00000001  ; FUSE_WRITE_ACCESS_SW_0
+
+; Restore original MISC_CLK_ENB value.
+D.S SD:0x60006048 %LE %LONG &MISC_CLK_ENB ; CLK_RST_CONTROLLER_MISC_CLK_ENB_0
+
+IF &NUMBER_OF_CORES==1
+(
+  ; Good grammar always counts
+  PRINT "Fuses set to allow 1 G CPU to start"
+)
+ELSE
+(
+  PRINT "Fuses set to allow &NUMBER_OF_CORES G CPUs to start"
+)
+
+enddo
+

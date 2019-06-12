@@ -1,0 +1,34 @@
+# Memory map layout (512 megs)
+#
+#   0x80000000 to +108KB is reserved by OS.
+#   Program should loaded beyond that.
+#
+ExternalRAM 0x80108000 (0xa0000000 - 0x108000)
+{
+        MainRegion 0x80108000 FIXED
+        {
+            *init_cpu.o (+ENTRY, MainRegion, +RO, +RW, +ZI)
+        }
+
+        .text +0
+        {
+            *(+RO, +RW)
+        }
+
+        stuff1 +0
+        {
+            *(+ZI)
+        }
+
+        ; Carve off a region into which the loader can patch the test's
+        ; command-line arguments.
+        AosProcessArgs +0 NOCOMPRESS
+        {
+            *(AosProcessArgs)
+        }
+
+        EndRegion +0
+        {
+            *init_cpu.o (EndRegion)
+        }
+}

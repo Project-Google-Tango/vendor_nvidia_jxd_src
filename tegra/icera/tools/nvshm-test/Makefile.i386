@@ -1,0 +1,8 @@
+# Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+
+CFLAGS = -m32 -g -Wall -Wextra
+
+all: nvshmtest
+
+clean:
+	rm -f nvshmtest

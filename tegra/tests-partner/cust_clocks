@@ -1,0 +1,1438 @@
+#!/bin/bash
+
+####################################################################
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+# Change power-saving features:
+#     disable CPU hotplug(CPU quiet),
+#     and force CPU/EMC/cbus frequencies to max
+# See -help for usage detail
+#
+####################################################################
+
+
+#################################
+# _echo
+#        Action: tests verbose level, the verbose func call is pre-determined
+#        prints the str if the verbose level >=
+#
+#################################
+function _echo () {
+
+        local argList="$@"
+
+        local v=${argList:0:1}                    # extracts first char, which states verbose level
+        local printStr=${argList:1}               # extracts the rest of the strings
+
+        #### equal to current verbose level? If so, then outputs
+        [[ $_V -ge $v ]] && echo -e ${printStr}
+}
+
+#################################
+# turn shadow processor on or off, or use the shadow processor only
+#################################
+function func_shadow()
+{
+        local state=$1
+        case ${state} in
+        "on")
+                # not sure why this is sometimes needed?
+                adb shell chmod 755 /sys/kernel/cluster/active
+                func_lowpower on
+                _echo 1 "STATUS: Shadow processor enabled"
+                ;;
+        "off")
+                func_lowpower off
+                _echo 1 "STATUS: Shadow processor disabled"
+                ;;
+        "only")
+                # not sure why this is sometimes needed?
+                adb shell chmod 755 /sys/kernel/cluster/active
+                func_cores off
+                func_lowpower on
+                adb shell "cluster set immediate 1"
+                adb shell "cluster set force 1"
+                adb shell "cluster set active lp"
+                _echo 1 "STATUS: Shadow processor on only"
+
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks shadow\" requires an \"on\" or \"off\" or \"only\" argument"
+                ;;
+        esac
+}
+
+#################################
+# lowerpower
+#         Action: enable/disable low power modes when cpu is idle which can turn off the cpu
+#                enable idle mode cmd = echo 0 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/no_lp
+#                disable idle mode cmd= echo 1 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/no_lp
+#################################
+function func_lowpower()
+{
+        local state=$1
+        case ${state} in
+        "on")
+                adb shell "echo 0 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/no_lp"
+                _echo 1 "STATUS: Idle power mode enabled"
+                ;;
+        "off")
+                adb shell "echo 1 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/no_lp"
+                _echo 1 "STATUS: Idle power mode disabled"
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks lp\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# set_emc_dfs
+#         Action: enable/disable emc, based on 'on' 'off' command
+#################################
+function func_set_emc_dfs()
+{
+    local state=$1
+    local emc_sysfs="/sys/module/tegra3_emc/parameters/emc_enable"
+    if [ $IsT124 -eq 1 ]; then
+        emc_sysfs="/sys/module/tegra12_emc/parameters/emc_enable"
+    elif [ $IsT114 -eq 1 ]; then
+        emc_sysfs="/sys/module/tegra11_emc/parameters/emc_enable"
+    elif [ $IsT148 -eq 1 ]; then
+        emc_sysfs="/sys/module/tegra14_emc/parameters/emc_enable"
+    fi
+        case ${state} in
+        "on")
+
+                adb shell "echo 1 > $emc_sysfs"
+                _echo 1 "STATUS: emc enabled"
+                ;;
+        "off")
+
+
+                adb shell "echo 0 > $emc_sysfs"
+                _echo 1 "STATUS: emc disabled"
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks emc_enable\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# set_3dclock_dfs
+#         Action: enable/disable 3d clock, based on 'on' 'off' command
+#################################
+function func_set_3dclock_dfs()
+{
+        local state=$1
+        case ${state} in
+        "on")
+                #enable 3d scaling
+
+                adb shell "echo 1 > /sys/devices/platform/tegra_grhost/enable_3d_scaling"
+
+                ### not sure to use: adb shell "cat /d/clock/3d/max > /d/clock/3d/rate"
+                _echo 1 "STATUS: 3dclock scaling dfs enabled"
+                ;;
+        "off")
+                #### disable 3d scaling && set max 3d clock
+
+                adb shell "echo 0 > /sys/devices/platform/tegra_grhost/enable_3d_scaling"
+
+                adb shell "cat /d/clock/3d/max > /d/clock/3d/rate"
+                _echo 1 "STATUS: 3dclock set to max and 3d scaling dfs disabled"
+
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks 3dclock dfs\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# set_avp_DFS
+#         Action: enable/disable avp clock, based on 'on' 'off' command
+#################################
+function func_set_avp_dfs()
+{
+        local state=$1
+        case ${state} in
+        "on")
+                #### enable avp
+
+                adb shell "echo 1 > /d/tegra_actmon/avp/state"
+
+                # adb shell "echo 300000000 > /d/clock/mon.avp/rate" ## ??
+                _echo 1 "STATUS: avp dfs enabled"
+                ;;
+        "off")
+                #### disable avp && set max avp clock
+
+                adb shell "echo 0 > /d/tegra_actmon/avp/state"
+
+                adb shell "echo /d/clock/mon.avp/max > /d/clock/mon.avp/rate" ## ??
+
+                _echo 1 "STATUS: avp set to max and avp dfs disabled"
+
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks avp dfs \" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# set_cpu_dvfs
+#         Action: enable/disable dfs and dvs for CPU
+#        1. enable/disable cpu dfs : interactive, userspace, performance
+#        2. enable/disable cpu dvs
+#################################
+function func_set_cpu_dvfs()
+{
+    local state=$1
+    local cpu_online
+    local cpu_sysfs="/sys/module/tegra3_dvfs/parameters/disable_cpu"
+    if [ $IsT124 -eq 1 ]; then
+        cpu_sysfs="/sys/module/tegra12_dvfs/parameters/disable_cpu"
+    elif [ $IsT114 -eq 1 ]; then
+        cpu_sysfs="/sys/module/tegra11_dvfs/parameters/disable_cpu"
+    elif [ $IsT148 -eq 1 ]; then
+        cpu_sysfs="/sys/module/tegra14_dvfs/parameters/disable_cpu"
+    fi
+        case ${state} in
+        "on")
+                #### enable DFS for CPU0 - CPU3 with 'interactive' to policy governor
+
+                for ((i=0;i < $CORECPU_COUNT;i++)) {
+                        cpu_online=`adb shell cat /sys/devices/system/cpu/cpu${i}/online`
+                        cpu_online=${cpu_online:0:$((${#cpu_online} - 1))}
+
+                        #### get the first char to compare
+                        if [ "$cpu_online" == "1" ]; then
+                                _echo 1 "STATUS: CPU$i dfs enabled to 'interactive' mode "
+                                adb shell "echo "interactive" > /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_governor"
+
+                        else
+                                _echo 1 "CPU${i} is offline."
+                        fi
+                }
+
+                #### enable dvs on cpu
+                adb shell "echo 0 > $cpu_sysfs"
+
+                _echo 1 "STATUS: CPU dvs enabled"
+
+                ;;
+        "on_max")
+
+
+                #### enable DFS for CPU0 - CPU3 with 'performance' to policy governor for max speed
+                for ((i=0;i < $CORECPU_COUNT;i++)) {
+                        cpu_online=`adb shell cat /sys/devices/system/cpu/cpu${i}/online`
+                        cpu_online=${cpu_online:0:$((${#cpu_online} - 1))}
+
+                        #### get the first char to compare
+                        if [ "$cpu_online" == "1" ]; then
+                                _echo 1 "STATUS: CPU$i dfs enabled to 'performance' mode"
+                                adb shell "echo "performance" > /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_governor"
+
+                        else
+                                _echo 1 "CPU${i} is offline."
+                        fi
+                }
+
+                #### disable dvs on cpu
+                adb shell "echo 1 > $cpu_sysfs"
+                _echo 1 "STATUS: CPU dvs disabled"
+                ;;
+
+        "off")
+                #### disable DFS for CPU0 - CPU3 with 'userspace' to policy governor
+                for ((i=0;i < $CORECPU_COUNT;i++)) {
+                        cpu_online=`adb shell cat /sys/devices/system/cpu/cpu${i}/online`
+                        cpu_online=${cpu_online:0:$((${#cpu_online} - 1))}
+
+                        #### get the first char to compare
+                        if [ "$cpu_online" == "1" ]; then
+                                _echo 1 "STATUS: CPU$i dfs disabled to 'userspace' mode"
+                                adb shell "echo "userspace" > /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_governor"
+
+                        else
+                                _echo 1 "CPU${i} is offline."
+                        fi
+                }
+
+
+                #### disable dvs on cpu
+                adb shell "echo 1 > $cpu_sysfs"
+                _echo 1 "STATUS: CPU dvs disabled"
+
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks cpu_dvfs\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# set_core_dvs
+#         Action: enable/disable dvs for core
+#################################
+function func_set_core_dvs()
+{
+    local state=$1
+    local core_sysfs="/sys/module/tegra3_dvfs/parameters/disable_core"
+    if [ $IsT124 -eq 1 ]; then
+        core_sysfs="/sys/module/tegra12_dvfs/parameters/disable_core"
+    elif [ $IsT114 -eq 1 ]; then
+        core_sysfs="/sys/module/tegra11_dvfs/parameters/disable_core"
+    elif [ $IsT148 -eq 1 ]; then
+        core_sysfs="/sys/module/tegra14_dvfs/parameters/disable_core"
+    fi
+        case ${state} in
+        "on")
+
+                ##### enable dvs on cores
+                adb shell "echo 0 > $core_sysfs"
+                _echo 1 "STATUS: core dvs enabled"
+
+                ;;
+        "off")
+
+                ##### disable dvs on cores
+                adb shell "echo 1 > $core_sysfs"
+                _echo 1 "STATUS: core dvs disabled"
+
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks core_dvs\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+
+#################################
+# autohotplug
+#         Action: enable/disable autohotplug which will turn off slave cpu's when workload is low
+#        enable cmd = echo 1 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/enable
+#        disable cmd = echo 0 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/enable
+#################################
+function func_autohotplug()
+{
+       local state=$1
+        case ${state} in
+        "on")
+                adb shell "echo 1 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/enable"
+                _echo 1 "STATUS: autohotplug(cpuquiet) enabled"
+                ;;
+        "off")
+                adb shell "echo 0 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/enable"
+                adb shell "echo 1 > /sys/kernel/cluster/immediate"
+                adb shell "echo 1 > /sys/kernel/cluster/force"
+                _echo 1 "STATUS: autohotplug(cpuquiet) disabled"
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks autohotplug\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# cores
+#         Action: To turn cores on/off
+#        [on]
+#        1. disable idle mode
+#        2. turn off auto hotplug
+#        3. turn core(s) on
+#                 i.e. cmd = hotplug 1 1 ===> CPU1 on-line
+#                i.e. cmd = echo 1 > /sys/devices/system/cpu/cpux/online (same as above)
+#        4. report back CPU(0) online
+#       [off]
+#        1. disable idle mode
+#        2. turn off auto hotplug
+#        3. turn core(s) off
+#                 i.e. cmd = hotplug 1 0 ===> CPU1 off-line
+#                i.e. cmd = echo 0 > /sys/devices/system/cpu/cpux/online (same as above)
+#        4. report back CPU(0) online
+#         Note: SIDE EFFECT: disables auto-hotplug and idle power modes so the control sticks
+#        Note: $1 is on/off, $2 selectively can be the list of cores to be operated on
+#################################
+function func_cores()
+{
+        local state=$1
+        shift
+
+        case ${state} in
+        "on")
+                func_lowpower off
+                func_autohotplug off
+                local i
+
+                #### if there are no additional args then turn every core on
+                if [ $# -eq 0 ] ; then
+                        #### turn all slave cores on, start with index 1
+                        for ((i=1;i < $CORECPU_COUNT;i++)) {
+                                adb shell hotplug ${i} 1
+                                 _echo 1 "STATUS: core$i enabled"
+                        }
+                else
+                        #### loop through remaining args and enable those cores
+                        while [ $# -gt 0 ]; do
+                                adb shell hotplug $1 1
+                                 _echo 1 "STATUS: core$1 disabled"
+                                shift
+                        done
+                fi
+
+                 _echo 0 "Active cores (note that auto-hotplug(cpuquiet) and cpu idle power modes are disabled):"
+                local cmd=`adb shell cat /sys/devices/system/cpu/online`
+                 _echo 0 "CPU$cmd"
+                ;;
+        "off")
+                func_lowpower off
+                func_autohotplug off
+
+                #### if there are no additional args then turn every core off
+                if [ $# -eq 0 ]; then
+                        # turn all slave cores off
+                        for ((i=1;i < $CORECPU_COUNT;i++)) {
+                                 _echo 1 "STATUS: core$i disabled"
+                                adb shell hotplug ${i} 0
+                        }
+                else
+                        # loop through remaining args and disable those cores
+                        while [ $# -gt 0 ]; do
+                                 _echo 1 "STATUS: core$1 disabled"
+                                adb shell hotplug $1 0
+                                shift
+                        done
+                fi
+
+                 _echo 0 "Active cores (note that auto-hotplug(cpuquiet) and cpu idle power modes are disabled):"
+                local cmd=`adb shell cat /sys/devices/system/cpu/online`
+                 _echo 0 "CPU$cmd"
+                ;;
+        *)
+                 _echo 0 "ERROR: \"clocks cores\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# shared_bus
+#         Action: attach or detach shared bus, affect all 3 shared buses: EMC, sbus, cbus
+#
+#        attach: bus rate is set per client requests, any direct setting will be over-written
+#        attach cmd: echo 0 > /sys/module/tegra3_clocks/parameters/detach_shared_bus
+#
+#        detach: all bus client requests are ignored, and the bus rate is set directly
+#        detach cmd: echo 1 > /sys/module/tegra3_clocks/parameters/detach_shared_bus
+#################################
+function func_shared_bus()
+{
+    local state=$1
+    local shared_bus_sysfs="/sys/module/tegra3_clocks/parameters/detach_shared_bus"
+    if [[ $IsT124 -eq 1 || $IsT114 -eq 1 || $IsT148 -eq 1 ]]; then
+        shared_bus_sysfs="/d/clock/override.emc/state"
+    fi
+        case ${state} in
+        "attach")
+                adb shell "echo 0 > $shared_bus_sysfs"
+                 _echo 1 "STATUS: Shared bus attached"
+                ;;
+        "detach")
+                adb shell "echo 1 > $shared_bus_sysfs"
+                _echo 1 "STATUS: Shared bus detached"
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks shared\" requires a \"attach\" or \"detach\" argument"
+                ;;
+        esac
+}
+
+#################################
+# print clock_tree
+#         Acition: print full clock tree
+#        cmd = adb shell cat /d/clock/clock_tree
+#################################
+function func_print_clock_tree()
+{
+        adb shell cat /d/clock/clock_tree
+}
+
+#################################
+# print clocks
+#         Action: print all relevant configurable clocks: CPU, GPU, Memory, Sys
+#
+#################################
+function func_print_clocks()
+{
+
+        func_get_cpu
+        func_get_gpu
+        func_get_mem
+        func_get_sys
+}
+
+#################################
+# print usage
+#         Action: print supported usage
+#
+#################################
+function func_print_usage()
+{
+        echo "clocks [thing to control] [things state]"
+        echo "       -- defaults to printing all clocks with no args"
+        echo "       -- expected usage is to \"clocks max\" which detaches shared clocks, and disables auto hotplug(cpuquiet) and cpu idle modes, then set the clock of interest"
+        echo "       autohotplug         -- turn auto-hotplug(cpuquiet) on or off for automatic cpu core management"
+        echo "       cores               -- turn all cores on or off (disables auto-hotplug and cpu idle modes)"
+        echo "       cpu                 -- set cpu frequency to freq arg (in kHz) or use one of [min/max/default]"
+        echo "       default             -- turn on auto-hotplug and cpu idle modes and reattach clocks"
+        echo "       get                 -- get info for [cpu/mem/gpu/sys/kernel/release/all]"
+        echo "       gpu                 -- set gpu (cbus) frequency to freq arg (in kHz)"
+        echo "       help                -- you've come to the right place"
+        echo "       lowpower            -- turn low power modes on or off (turn off to prevent power gating cpu)"
+        echo "       max                 -- max all (cpu/gpu/emc/system bus) clocks after disabling DVFS and detaching shared clocks"
+        echo "       mem                 -- set memory (emc) frequency to freq arg (in kHz)"
+        echo "       shadow              -- turn shadow processor on/off, or use only the shadow processor"
+        echo "       shared              -- \"attach\" or \"detach\" shared bus"
+        echo "       sys                 -- set system bus (sbus) frequency to freq arg (in kHz)"
+        echo "       stayon              -- turn system stayon status on or off"
+        echo "       tegrastats          -- turn tegrastats logging on or off, use logcat to view"
+        echo "       tree                -- print entire clock tree"
+        echo "       turbo               -- max clocks but with single cpu core on and clocked to max"
+        echo "       -v                  -- turns on verbose support"
+        echo "       version             -- prints the current script version"
+        echo "       vsync               -- turn vsync \"off\" or \"on\""
+}
+
+#################################
+# is_frequency_valid
+#         Action: helper to determine if passed argument value is in valid argument list
+#
+#################################
+function func_is_frequency_valid() {
+    local n=$#
+    local value=${!n}
+    for ((i=1;i < $#;i++)) {
+        if [ "${!i}" == "${value}" ]; then
+            echo "true"
+            return 0
+        fi
+    }
+    echo "false"
+    return 1
+}
+
+#################################
+# get_cpu
+#         Action: get cpu clock that are online or report offline status
+#        [min/max/cur] cmd = adb shell "cat /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_[min/max/cur]_freq
+#        available freq cmd = adb shell cat /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_available_frequencies
+#################################
+function func_get_cpu() {
+
+        local cpu_online
+        ### output PM Qos min/max
+
+        local pmqos_max_freq=`adb shell cat /dev/cpu_freq_max | od -An -i`
+        local pmqos_min_freq=`adb shell cat /dev/cpu_freq_min | od -An -i`
+
+        _echo 0 "PM Qos (min,max) in kHz: $pmqos_min_freq $pmqos_max_freq"
+
+        ### output min/max_scaling result
+        for ((i=0;i < $CORECPU_COUNT;i++)) {
+                cpu_online=`adb shell cat /sys/devices/system/cpu/cpu${i}/online`
+                cpu_online=${cpu_online:0:$((${#cpu_online} - 1))}
+
+                #### get the first char to compare
+                if [ "$cpu_online" == "1" ]; then
+                        _echo 0 "CPU core ${i} frequencies (min,curr,max) in kHz:"
+                        adb shell "cat /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_min_freq"
+                        adb shell "cat /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_cur_freq"
+                        adb shell "cat /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_max_freq"
+
+                        _echo 0 "Available CPU${i} clocks in kHz:"
+                        adb shell cat /sys/devices/system/cpu/cpu${i}/cpufreq/scaling_available_frequencies
+                else
+                        _echo 0 "CPU${i} is offline"
+                fi
+        }
+
+}
+
+#################################
+# get_gpu
+#         Action: get gpu clock
+#        current freq cmd = adb shell cat /d/clock/cbus/rate
+#        available freq cmd = adb shell cat /d/clock/cbus/possible_rates
+#################################
+function func_get_gpu() {
+    if [[ $IsT124 -eq 1 || $IsT114 -eq 1 || $IsT148 -eq 1 ]]; then
+        _echo 0 "GPU clock (current):"
+        adb shell cat /d/clock/c2bus/rate
+        _echo 0 "Available GPU clocks:"
+        adb shell cat /d/clock/c2bus/possible_rates
+        _echo 0 "3D GPU clock:"
+        if [ $IsT124 -eq 1 ]; then
+                adb shell "cat /d/gk20a/rate"
+        else
+                adb shell "cat /d/clock/3d/rate"
+        fi
+    else
+        _echo 0 "GPU clock (current):"
+        adb shell cat /d/clock/cbus/rate
+        _echo 0 "Available GPU clocks:"
+        adb shell cat /d/clock/cbus/possible_rates
+        _echo 0 "3D GPU clock:"
+        adb shell cat /d/clock/3d/rate
+    fi
+}
+
+#################################
+# get_mem
+#         Action: get mem clock
+#        current freq cmd = adb shell cat /d/clock/emc/rate
+#        available freq cmd = adb shell cat /d/tegra_emc/stats
+#################################
+function func_get_mem() {
+
+        _echo 0 "Memory clock (current):"
+        adb shell cat /d/clock/emc/rate
+        _echo 0 "Available Memory clocks:"
+        adb shell cat /d/clock/emc/possible_rates
+}
+
+#################################
+# get_sys
+#        Action: get sys clock
+#        current freq cmd = adb shell cat /d/clock/sbus/rate
+#        available freq cmd = adb shell cat /d/clock/sbus/possible_rates
+#################################
+function func_get_sys() {
+
+        _echo 0 "System bus clock (current):"
+        adb shell cat /d/clock/sbus/rate
+        _echo 0 "Available System bus clocks:"
+        adb shell cat /d/clock/sbus/possible_rates
+}
+
+#################################
+# get_info
+#         Action: get clock based in the input parameter
+#        supported argument choice = 'cpu' 'sys' 'mem' 'gpu' 'kernel' 'all'
+#
+#################################
+function func_get_info()
+{
+        local task=$1
+
+        case ${task} in
+        "cpu")
+                func_get_cpu
+                ;;
+        "gpu")
+                func_get_gpu
+                ;;
+        "mem")
+                func_get_mem
+                ;;
+        "sys")
+                func_get_sys
+                ;;
+        "kernel")
+                _echo 0 "Kernel version:"
+                func_get_kernel_version
+                ;;
+        "release")
+                _echo 0 "Android release:"
+                func_get_android_release
+                ;;
+        "all")
+                func_get_cpu
+                func_get_gpu
+                func_get_mem
+                func_get_sys
+                _echo 0 "Kernel version:"
+                func_get_kernel_version
+                _echo 0 "Android release:"
+                func_get_android_release
+                _echo 0 "Tegra version:"
+                _echo 0 $TEGRA_MODEL
+                _echo 0 "CPU Part: $CPU_PART  Rev." $CPU_REVISION
+                ;;
+        *)
+                _echo 0 "ERROR: unknown argument. Please try 'cpu' 'gpu' 'sys' 'mem' 'kernel' 'release' or 'all'."
+                ;;
+        esac
+
+}
+
+#################################
+# set_cpu
+#         Action: set cpu clocks
+#        input argument = a valid integer frequency or 'max' or 'min' or 'default'
+#        1. Get the list of supported freq list from CPU0
+#                cmd = adb shell cat /sys/devices/system/cpu/cpuN/cpufreq/scaling_available_frequencies
+#        2. If the given freq is in the list, write the freq to min/max bounds
+#                min cmd =adb shell "echo $target_freq > /sys/devices/system/cpu/cpuN/cpufreq/scaling_min_freq"
+#                max cmd = adb shell "echo $target_freq > /sys/devices/system/cpu/cpuN/cpufreq/scaling_max_freq"
+#        3. Report back the min/max/current freq for on/off line CPU cores
+#################################
+function func_set_cpu()
+{
+        local clock_setting_cpu=$1
+
+        local target_index=0
+
+                #        TODO: in the future, may need to identify available
+                #                frequencies based on cpu index by $CORECPU_COUNT or $TEGRA_MODEL
+                #                Currently assumed index 0
+
+        if [[ $CORECPU_COUNT -ge 4 ]]; then
+                target_index=0
+        fi
+
+        #### change the default delimiter to split the freq list into an array
+
+        local old_IFS=$IFS
+
+        IFS=$' ' #use for new delimiter
+
+        local cmd="adb shell cat /sys/devices/system/cpu/cpu$target_index/cpufreq/scaling_available_frequencies"
+        local valid_freqList=( $($cmd) )
+
+        IFS=${old_IFS}
+
+        local freq_count=${#valid_freqList[@]}
+
+        # error checking
+        if [ $freq_count -eq 0 ] || [[ ${valid_freqList[0]} =~ [[:alpha:]] ]]; then
+                _echo 0 "ERROR: The command "$cmd" is not supported on this $TEGRA_MODEL device"
+                _echo 1 "ERROR msg= ${valid_freqList[@]}"
+                exit
+        fi
+
+        #### in case if the last element is empty string, we delete it
+
+        if [ -n "${valid_freqList[$freq_count-1]}" ]; then
+                unset valid_freqList[$freq_count-1]
+                freq_count=${#valid_freqList[@]}
+                _echo 1 "STATUS: Available CPU frequency list = ${valid_freqList[@]}"
+
+        fi
+
+        local min_freq=${valid_freqList[0]}
+        local max_freq=${valid_freqList[$freq_count-1]}
+
+        ### we need to check PMQos max/min pairs and determine the
+        ### actual min = higher of the 2 values, actual max = lower of the 2 values
+
+        local pmqos_max_freq=`adb shell cat /dev/cpu_freq_max | od -An -i`
+        local pmqos_min_freq=`adb shell cat /dev/cpu_freq_min | od -An -i`
+
+        if [ $min_freq -lt $pmqos_min_freq ]; then
+                min_freq=$pmqos_min_freq
+        fi
+
+        if [ $max_freq -gt $pmqos_max_freq ]; then
+                max_freq=$pmqos_max_freq
+        fi
+
+        local bContinue=1;
+        #### check to see if we need to set to the min/max freq
+
+        if [[ $clock_setting_cpu =~ 'max' ]]; then
+                min_freq=$max_freq
+                _echo 1 "Status: Setting CPU clock to max frequency at $max_freq" KHz
+        elif [[ $clock_setting_cpu =~ 'min' ]]; then
+                max_freq=$min_freq
+                _echo 1 "Status: Setting CPU clock to min frequency at $min_freq" KHz
+        elif [[ $clock_setting_cpu =~ 'default' ]]; then
+                #already set, no need to change
+                _echo 1 "Status: Setting CPU clock to default frequency at min at $min_freq and max at $max_freq " KHz
+        else
+                ### make sure the given freq is w/in the min/max range
+                if [[ $clock_setting_cpu -gt $max_freq || $clock_setting_cpu -lt $min_freq ]];then
+                        bContinue=0
+                else
+                        min_freq=$clock_setting_cpu
+                        max_freq=$clock_setting_cpu
+                fi
+        fi
+
+        #### set the freq for the cpu clock for CPU 0 to $CORECOU_COUNT
+        if [ $bContinue -eq 1 ]; then
+                local k=0
+                local cpu_online
+
+                while [[ $k -lt $CORECPU_COUNT ]]; do
+                    adb shell "echo $min_freq > /sys/devices/system/cpu/cpu$k/cpufreq/scaling_min_freq" >& /dev/null
+                    let k++
+                done
+
+                k=0
+                while [[ $k -lt $CORECPU_COUNT ]]; do
+                    adb shell "echo $max_freq > /sys/devices/system/cpu/cpu$k/cpufreq/scaling_max_freq" >& /dev/null
+                    let k++
+                done
+
+                k=0
+                while [[ $k -lt $CORECPU_COUNT ]]; do
+                    adb shell "echo $min_freq > /sys/devices/system/cpu/cpu$k/cpufreq/scaling_min_freq" >& /dev/null
+                    let k++
+                done
+
+
+                k=0
+                ### do 2 loops to give time for policy governor to pick up the request
+                while [[ $k -lt $CORECPU_COUNT ]]; do
+                        cpu_online=`adb shell cat /sys/devices/system/cpu/cpu${k}/online`
+                        cpu_online=${cpu_online:0:$((${#cpu_online} - 1))}
+
+                        #### get the first char to compare
+                        if [ "$cpu_online" == "1" ]; then
+                                _echo 0 "CPU${k} clocks (min,curr,max):"
+                                adb shell "cat /sys/devices/system/cpu/cpu${k}/cpufreq/scaling_min_freq"
+                                adb shell "cat /sys/devices/system/cpu/cpu${k}/cpufreq/scaling_cur_freq"
+                                adb shell "cat /sys/devices/system/cpu/cpu${k}/cpufreq/scaling_max_freq"
+
+                        else
+                                _echo 0 "CPU${k} is offline"
+                        fi
+                        let k++
+                done
+        else
+                _echo "0" "ERROR: Invalid CPU frequency, the choice must be in KHz and between $min_freq and $max_freq"
+                _echo "0" "Note: Code will also force one of the following frequencies to be available: ${valid_freqList[@]}"
+        exit
+        fi
+}
+
+#################################
+# set_gpu
+#         Action: set gpu clocks
+#        $1 = a valid integer frequency or 'max' or 'min'
+#        cmd = adb shell "echo ${clock_setting_gpu}000 > /d/clock/cbus/rate"
+#################################
+function func_set_gpu()
+{
+        local clock_setting_gpu=$1
+
+        #### change the default delimiter to split the freq list into an array
+
+        local old_IFS=$IFS
+
+        IFS=$' ' #use for new delimiter
+        if [[ $IsT124 -eq 1 || $IsT114 -eq 1 || $IsT148 -eq 1 ]]; then
+            local cmd="adb shell cat /d/clock/c2bus/possible_rates"
+        else
+            local cmd="adb shell cat /d/clock/cbus/possible_rates"
+        fi
+
+        local valid_freqList=( $($cmd) )
+
+        IFS=${old_IFS}
+
+        local freq_count=${#valid_freqList[@]}
+
+        #### error checking, in case the cmd is not supported and returns ' file is not found'
+        if [ $freq_count -eq 0 ] || [[ ${valid_freqList[0]} =~ [[:alpha:]] ]]; then
+                _echo 0 "ERROR: The command "$cmd" is not supported on this $TEGRA_MODEL device"
+                _echo 1 "ERROR msg= ${valid_freqList[@]}"
+                exit
+        fi
+
+        #### in case if the last element is empty string, we delete it
+
+        if [ -n "${valid_freqList[$freq_count-1]}" ]; then
+                unset valid_freqList[$freq_count-1]
+                freq_count=${#valid_freqList[@]}
+                _echo 1 "STATUS: Available GPU frequency list = ${valid_freqList[@]} "
+
+        fi
+
+        ####check to see if we need to set to the min/max freq
+
+        if [[ $clock_setting_gpu =~ 'max' ]]; then
+                freq_count=${#valid_freqList[@]}
+                clock_setting_gpu=${valid_freqList[$freq_count-1]}
+                _echo 1 "Status: Setting gpu bus clock to max frequency at $clock_setting_gpu" KHz
+        elif [[ $clock_setting_gpu =~ 'min' ]]; then
+                clock_setting_gpu=${valid_freqList[0]}
+                _echo 1 "Status: Setting gpu bus clock to min frequency at $clock_setting_gpu" KHz
+        fi
+
+        #### set the freq for the gpu clock
+
+        if [ $(func_is_frequency_valid "${valid_freqList[@]}" "$clock_setting_gpu") == "true" ]; then
+                if [[ $IsT124 -eq 1 || $IsT114 -eq 1 || $IsT148 -eq 1 ]]; then
+                        adb shell "echo ${clock_setting_gpu}000 > /d/clock/c2bus/rate"
+                        _echo 0 "GPU clock (current):"
+                        adb shell cat /d/clock/c2bus/rate
+                else
+                        adb shell "echo ${clock_setting_gpu}000 > /d/clock/cbus/rate"
+                        _echo 0 "GPU clock (current):"
+                        adb shell cat /d/clock/cbus/rate
+                fi
+        else
+                _echo 0 "ERROR: Invalid GPU frequency, must be in KHz and one of: ${valid_freqList[@]}"
+        exit
+        fi
+}
+
+#################################
+# set_mem
+#         Action: set memory clocks
+#        $1 = a valid integer frequency or 'max' or 'min'
+#        cmd = echo ${clock_setting_mem}000 > /d/clock/emc/rate"
+#################################
+function func_set_mem()
+{
+        local clock_setting_mem=$1
+
+        local old_IFS=$IFS
+        IFS=$' ' #use for new delimiter
+
+        local output=( $(adb shell cat /d/clock/emc/possible_rates) ) #not sure why only this way works
+
+        IFS=${old_IFS}
+
+        local freq_count=${#output[@]}
+
+        if [[ $freq_count -eq 0 ]]; then
+                _echo 0 "ERROR: The command $cmd is not supported on this $TEGRA_MODEL device"
+                exit
+        fi
+
+        #continue
+        local frequency
+        local i=0                         #skip the first line, #"rate kHz   time"
+        local valid_freqList=( )         #create an empty array
+
+        while [ $i -lt ${freq_count} ]; do
+
+                if [[ ${output[$i]} =~ [[:digit:]]+ ]]; then #test for valid freq
+                        #echo "$i: ${BASH_REMATCH[0]}"
+                        valid_freqList=( "${valid_freqList[@]}" ${BASH_REMATCH[0]}) #add new freq
+                fi
+                let i++
+        done
+
+        freq_count=${#valid_freqList[@]}
+
+        #### output available freq based on verbose level
+        _echo 1 "STATUS: Available memory frequency list = ${valid_freqList[@]} (kHz)"
+
+        if [ $freq_count -gt 0 ]; then
+
+                #### check to see if we need to set to the min/max freq
+
+                if [[ $clock_setting_mem =~ 'max' ]]; then
+                        freq_count=${#valid_freqList[@]}
+                        clock_setting_mem=${valid_freqList[$freq_count-1]}
+                        _echo 1 "Status: Setting memory clock to max frequency at $clock_setting_mem" KHz
+                elif [[ $clock_setting_mem =~ 'min' ]]; then
+                        clock_setting_mem=${valid_freqList[0]}
+                        _echo 1 "Status: Setting memory clock to min frequency at $clock_setting_mem" KHz
+                fi
+
+                #### set the freq for the mem clock
+
+                if [ $(func_is_frequency_valid "${valid_freqList[@]}" "$clock_setting_mem") == "true" ]; then
+
+                        if [[ $IsT124 -eq 1 || $IsT114 -eq 1 || $IsT148 -eq 1 ]]; then
+                                adb shell "echo ${clock_setting_mem}000 > /d/clock/override.emc/rate"
+                                func_shared_bus detach
+                        else
+                                adb shell "echo ${clock_setting_mem}000 > /d/clock/emc/rate"
+                                func_shared_bus detach
+                                func_set_emc_dfs off
+                        fi
+                        _echo 0 "Memory clock(current):"
+                        adb shell cat /d/clock/emc/rate
+                else
+                        _echo 0 "ERROR: Invalid EMC frequency, must be in KHz and one of: ${valid_freqList[@]}"
+                fi
+        fi
+}
+
+#################################
+# set_sys
+#         Action: set system bus clocks
+#        $1 = a valid integer frequency or 'max' or 'min'
+#        1. Get available freq
+#                cmd = "adb shell cat /d/clock/sbus/possible_rates"
+#        2. Sets the freq
+#                cmd = adb shell "echo ${clock_setting_sys}000 > /d/clock/sbus/rate"
+#        3. Reports back current mem clock
+#                cmd = adb shell cat /d/clock/sbus/rate
+#################################
+function func_set_sys()
+{
+        local clock_setting_sys=$1
+
+        #### change the default delimiter to split the freq list into an array
+
+        local old_IFS=$IFS
+
+        IFS=$' ' #use for new delimiter
+        local cmd="adb shell cat /d/clock/sbus/possible_rates"
+
+        local valid_freqList=( $($cmd) )
+
+        IFS=${old_IFS}
+
+        local freq_count=${#valid_freqList[@]}
+
+        #### error checking, in case the cmd is not supported and returns ' file is not found'
+        if [ $freq_count -eq 0 ] || [[ ${valid_freqList[0]} =~ [[:alpha:]] ]]; then
+                _echo 0 "ERROR: The command "$cmd" is not supported on this $TEGRA_MODEL device"
+                _echo 1 "ERROR msg= ${valid_freqList[@]}"
+                exit
+        fi
+
+        ####in case if the last element is empty string, we delete it
+
+        if [ -n "${valid_freqList[$freq_count-1]}" ]; then
+                unset valid_freqList[$freq_count-1]
+                freq_count=${#valid_freqList[@]}
+                _echo 1 "STATUS: Available system bus clock list =  ${valid_freqList[@]} "
+        fi
+
+        #### check to see if we need to set to the min/max freq
+
+        if [[ $clock_setting_sys =~ 'max' ]]; then
+                freq_count=${#valid_freqList[@]}
+                clock_setting_sys=${valid_freqList[$freq_count-1]}
+                _echo 1 "STATUS: Setting sys bus clock to max frequency at $clock_setting_sys" KHz
+        elif [[ $clock_setting_sys =~ 'min' ]]; then
+                clock_setting_sys=${valid_freqList[0]}
+                _echo 1 "STATUS: Setting sys bus clock to min frequency at $clock_setting_sys" KHz
+        fi
+
+        #### set the freq for the sys clock
+
+        if [ $(func_is_frequency_valid "${valid_freqList[@]}" "$clock_setting_sys") == "true" ]; then
+                adb shell "echo ${clock_setting_sys}000 > /d/clock/sbus/rate"
+                _echo 0 "System bus clock (current):"
+                adb shell cat /d/clock/sbus/rate
+        else
+                _echo 0 "ERROR: Invalid system bus frequency, must be in KHz and one of: ${valid_freqList[@]}"
+        exit
+        fi
+}
+
+#################################
+# default
+#         Action: restore default power strategy so that clocks are handled automatically
+#
+#################################
+function func_default()
+{
+    func_cores on
+    func_lowpower off
+    func_set_cpu default
+
+    func_lowpower on
+    func_autohotplug on
+    func_shared_bus attach
+
+    ## enable dvfs
+    func_set_cpu_dvfs on
+    func_set_core_dvs on
+    func_set_avp_dfs on
+    func_set_emc_dfs on
+
+    ## print out the rest of the clks since CPU is printed above
+    #if [  $_V -eq 1 ];then
+        func_get_mem
+        func_get_sys
+        func_get_gpu
+    #fi
+}
+
+#################################
+# set_max_clocks
+#         Action: force all configurable clocks to max
+#        1. turn cores on
+#        2. detach shared bus, sets CPU dvfs
+#        3. set max clocks for: cpu, gpu, mem, sys
+#################################
+function func_set_max_clocks()
+{
+
+    func_cores on
+    func_shared_bus detach
+    func_set_cpu_dvfs on_max
+
+    func_set_cpu max
+    func_set_gpu max
+    func_set_mem max
+    func_set_sys max
+}
+
+#################################
+# turbo
+#         Action: turbocharge cpu core 0 to max freq
+#         NOTE: you can only hit max freq with one core enabled
+#
+#################################
+function func_turbo()
+{
+    func_shared_bus detach
+    func_lowpower off
+    func_set_cpu_dvfs on_max
+    func_cores off
+    func_set_cpu max
+
+}
+
+#################################
+# vsync
+#         Action: enable/disable vsync based on release version
+#        enable cmd: adb shell "echo 0 > /sys/module/dc/parameters/no_vsync"
+#        enable cmd: adb shell "echo 0 > /sys/module/window/parameters/no_vsync"
+#        disable cmd: adb shell "echo 1 > /sys/module/dc/parameters/no_vsync"
+#        disable cmd: adb shell "echo 1 > /sys/module/window/parameters/no_vsync"
+#################################
+function func_vsync()
+{
+        local state=$1
+        local release=$(func_get_android_release)
+        case ${state} in
+        "on")
+                case ${release:0:3} in
+                "4.1")
+                        adb shell "echo 0 > /sys/module/window/parameters/no_vsync"
+                        ;;
+                *)
+                        adb shell "echo 0 > /sys/module/dc/parameters/no_vsync"
+                        ;;
+                esac
+                _echo 1 "STATUS: VSYNC enabled"
+                ;;
+        "off")
+                case ${release:0:3} in
+                "4.1")
+                        adb shell "echo 1 > /sys/module/window/parameters/no_vsync"
+                        ;;
+                *)
+                        adb shell "echo 1 > /sys/module/dc/parameters/no_vsync"
+                        ;;
+                esac
+                _echo 1 "STATUS: VSYNC disabled"
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks vsync\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# tegrastatus
+#         Action: Start/stop tegrastats
+# SIDE EFFECT: kicks off a background adb process to keep tegrastats running
+#              Android doesn't let you background a process so this is all I got!
+#
+#################################
+function func_tegrastats()
+{
+        local state=$1
+        local PID
+
+        case ${state} in
+        "on")
+                adb shell tegrastats &
+                PID=$!
+                _echo 0 "STATUS: tegrastats logging enabled in background process ${PID}, use logcat to view output"
+                ;;
+        "off")
+                # find the process we launched and do it in
+                adbprocs=`ps -A | grep adb | awk '{print $1}'`
+                for PID in $adbprocs; do
+                        adbcmdline=`cat /proc/${PID}/cmdline | grep tegrastats`
+                        if [ -n "$adbcmdline" ]; then
+                                break;
+                        fi
+                done
+                kill -9 $PID
+                _echo 0 "STATUS: tegrastats logging disabled"
+                ;;
+        *)
+                _echo 0 "ERROR: \"clocks tegrastats\" requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+
+#################################
+# prepare
+#         Action: Make sure a device is attached and we can write to it
+#
+#################################
+function func_prepare()
+{
+        local deviceID
+
+        adbpath=`which adb`
+        if [ -z "$adbpath" ]; then
+                echo "Please add the \"adb\" utility to your path..."
+                exit
+        fi
+
+        deviceID=`adb devices | awk '{for(i=1;i<=NF;i++){if($1~/[0-9a-f]/){print $i; exit}}}'`
+        if [ -z "$deviceID" ]; then
+                echo "Please connect your devkit..."
+                adb wait-for-device
+        fi
+
+        adb remount >> /dev/null
+
+}
+
+#################################
+# cpuinfo
+#         Action: Query "cat /proc/cpuinfo"
+#        extract tegra model and # of processors
+#        i.e. processor        : 0
+#        i.e. Hardware        : tegra_enterprise
+#
+#################################
+function func_cpuinfo()
+{
+        local old_IFS=$IFS
+
+        IFS=$'\n'  #use for new delimiter
+
+        local output=( $(adb shell cat /proc/cpuinfo) )
+        IFS=${old_IFS}
+
+        CORECPU_COUNT=0
+        TEGRA_MODEL="Unknown"
+        CPU_VARIANT="Unknown"
+        CPU_PART="Unknown"
+        CPU_REVISION="Unknown"
+        local line
+
+        IsT114=0
+        IsT148=0
+        IsT124=0
+        for line in "${output[@]}"; do
+                if [[ $line =~ 'processor' ]]; then
+                        let CORECPU_COUNT++
+                elif [[ $line =~ "Hardware"[[:blank:]][:][[:space:]]([a-zA-Z_0-9]+) ]]; then
+                        TEGRA_MODEL=${BASH_REMATCH[1]}
+                elif [[ $line =~ "CPU variant"[[:blank:]][:][[:space:]]([a-zA-Z_0-9]+) ]]; then
+                        CPU_VARIANT=${BASH_REMATCH[1]}
+                elif [[ $line =~ "CPU part"[[:blank:]][:][[:space:]]([a-zA-Z_0-9]+) ]]; then
+                        CPU_PART=${BASH_REMATCH[1]}
+                elif [[ $line =~ "Revision"[[:blank:]][:][[:space:]]([0-9]+) ]]; then
+                        CPU_REVISION=${BASH_REMATCH[1]}
+                fi
+        done
+        _echo 1 "STATUS: total cpu count is $CORECPU_COUNT"
+        if [[ $CPU_PART =~ "0xc0f" && $CPU_VARIANT =~ "0x3" ]]; then
+                IsT124=1
+        elif [[ $CPU_PART =~ "0xc0f" && $CPU_VARIANT =~ "0x2" ]]; then
+                IsT114=1
+        elif [[ $CPU_PART =~ "0xc09" && $CPU_VARIANT =~ "0x4" ]]; then
+                IsT148=1
+        fi
+}
+
+#################################
+# get_kernel_version
+#         Action: Find kernel version
+#
+#################################
+function func_get_kernel_version()
+{
+        #parse the output from "adb shell cat /proc/sys/kernel/osrelease"
+        local kernel_version=`adb shell cat /proc/sys/kernel/osrelease`;
+        echo $kernel_version
+}
+
+#################################
+# get_android_release
+#         Action: Gets the Android OS release version
+#
+#################################
+function func_get_android_release()
+{
+        #parse the output from "adb shell getprop ro.build.version.release"
+        local android_release=`adb shell getprop ro.build.version.release`;
+        echo $android_release
+}
+
+#################################
+#
+# Configure the suspend status
+#    $1 = on,off
+#
+#################################
+function func_set_stayon()
+{
+        local state=$1
+
+        case ${state} in
+        "on")
+        adb shell "svc power stayon true && echo tempdisable > /sys/power/wake_lock"
+        _echo 1 "STATUS: system set to stayon"
+                ;;
+        "off")
+        adb shell svc power stayon false
+        _echo 1 "STATUS: system set to stayoff"
+                ;;
+        *)
+                _echo 0 "Set wake state requires an \"on\" or \"off\" argument"
+                ;;
+        esac
+}
+#################################
+# parse
+#         Action: Parse the command line arguments to define the following global variables
+#                $task, $argList, $_V
+#################################
+function func_parse()
+{
+        #### set the default verbose level
+        _V=0
+
+        #### define the task array
+        local taskArray=(autohotplug stayon cores cpu default gpu help get lowpower max mem shadow shared stats sys tegrastats tree turbo vsync thermal_sense version)
+
+        local token
+        local taskArg=0
+
+        #### loop thru to see what kind of args are passed in
+        for token in ${ARGV[@]}
+        do
+                taskArg=1
+                #### test if the given $i == task type
+                if [[ -z $task ]]; then
+
+                        local k
+                        for k in ${taskArray[@]}
+                        do
+                                if [[ $token =~ $k ]]; then
+                                        task=$k
+                                        taskArg=2
+                                        break
+                                fi
+                        done
+                        if [ $taskArg -eq 1 ] && [[ $token =~ -[vV] ]]; then
+                                _V=1 # increment the verbose level
+                        fi
+                else
+                        #### test verbose level
+                        if [[ $token =~ -[vV] ]]; then
+                                _V=1 # increment the verbose level
+
+                        #### else it's part of the arg list
+                        else
+                                # when task type is identified, then we pack arg list
+                                argList="$argList $token"
+                        fi
+                fi
+        done
+
+        ### handle the case where user types in invalid argument
+        if [ $_V -gt 0 ] && [ -z $task ]; then
+            task="verbose"
+        elif [ $taskArg -eq 1 ] && [ -z $task ]; then
+            task="invalid"
+        fi
+}
+
+#################################
+#
+# main program
+#
+#################################
+ARGV=( $@ )
+Version=1.00.11
+
+#### This defines $task, $argList, $_V, for further processing
+func_parse
+func_prepare
+func_cpuinfo
+
+
+if [ -z "$task" ]; then #True of the length of $1 is zero.
+        func_print_clocks
+else
+        case $task in
+
+        "autohotplug")
+                func_autohotplug $argList
+                ;;
+        "stayon")
+                func_set_stayon $argList
+                ;;
+        "cores")
+                # pass all args, func_cores will process them
+                func_cores $argList
+                ;;
+        "cpu")
+                func_set_cpu $argList
+                ;;
+        "default")
+                func_default
+                ;;
+        "gpu")
+                func_set_gpu $argList
+                ;;
+        "help")
+                func_print_usage
+                ;;
+        "get")
+                func_get_info $argList
+                ;;
+        "invalid")
+                echo "ERROR: ${ARGV[@]} is not supported. Please use help for more info "
+                ;;
+        "lowpower")
+                func_lowpower $argList
+                ;;
+        "max")
+                func_set_max_clocks
+                ;;
+        "mem")
+                func_set_mem $argList
+                ;;
+        "shadow")
+                func_shadow $argList
+                ;;
+        "shared")
+                func_shared_bus $argList
+                ;;
+        "stats")
+                adb shell tegrastats
+                ;;
+        "sys")
+                func_set_sys $argList
+                ;;
+        "tegrastats")
+                func_tegrastats $argList
+                ;;
+        "tree")
+                func_print_clock_tree
+                ;;
+        "turbo")
+                func_turbo
+                ;;
+        "verbose")
+                echo "Please use -v in conjunction with another argument"
+                ;;
+        "version")
+                echo "Version $Version"
+                ;;
+        "vsync")
+                func_vsync $argList
+                ;;
+        *)
+                func_print_usage
+                ;;
+        esac
+fi

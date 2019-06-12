@@ -1,0 +1,8 @@
+# Copyright (c) 2012 NVIDIA Corporation.  All rights reserved.
+# Uncomment all implemented functions
+NvOdmDispHdmiI2cTransaction
+NvOdmDispHdmiI2cOpen
+NvOdmDispHdmiI2cClose
+#NvOdmDispHdmiHdcpIsRevokedKsv
+#NvOdmDispHdmiHdcpInfo
+#NvOdmDispHdmiHdcpCkeySum

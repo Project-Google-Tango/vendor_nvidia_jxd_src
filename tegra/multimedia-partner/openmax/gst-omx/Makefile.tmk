@@ -1,0 +1,87 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# makefile for libgstomx.so build system
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+_source_dir                          := $(NV_SOURCE)/external/gstreamer/gst-omx
+_private_source_dir                  := $(_source_dir)/.nvtegra/pre-gen-source
+
+NV_COMPONENT_NAME                    := gstomx
+
+NV_COMPONENT_SOURCES                 := \
+	$(_source_dir)/omx/gstomx.c \
+	$(_source_dir)/omx/gstomxvideodec.c \
+	$(_source_dir)/omx/gstomxh264dec.c \
+	$(_source_dir)/omx/gstomxvp8dec.c \
+	$(_source_dir)/omx/gstomxh263dec.c \
+	$(_source_dir)/omx/gstomxmpeg2videodec.c \
+	$(_source_dir)/omx/gstomxmpeg4videodec.c \
+	$(_source_dir)/omx/gstomxwmvdec.c \
+	$(_source_dir)/omx/gstomxmjpegdec.c \
+	$(_source_dir)/omx/gstomxaudiodec.c \
+	$(_source_dir)/omx/gstomxaacdec.c \
+	$(_source_dir)/omx/gstomxmpegaudiodec.c \
+	$(_source_dir)/omx/gstomxamrnbdec.c \
+	$(_source_dir)/omx/gstomxamrwbdec.c \
+	$(_source_dir)/omx/gstomxh263enc.c \
+	$(_source_dir)/omx/gstomxh264enc.c \
+	$(_source_dir)/omx/gstomxvp8enc.c \
+	$(_source_dir)/omx/gstomxaacenc.c \
+	$(_source_dir)/omx/gstomxmpeg4videoenc.c \
+	$(_source_dir)/omx/gstomxaudioenc.c \
+	$(_source_dir)/omx/gstomxvideoenc.c \
+	$(_source_dir)/omx/gstomxvideosink.c \
+	$(_source_dir)/omx/gstnvoverlaysink.c \
+	$(_private_source_dir)/gstomx_config.c
+
+NV_COMPONENT_OWN_INTERFACE_DIR       := .
+
+NV_COMPONENT_INCLUDES                := \
+	$(_private_source_dir)/ \
+	$(_source_dir)/omx \
+	$(NV_SOURCE)/external/gstreamer/gst-omx/.nvtegra/pre-gen-header/usr/include/glib-2.0 \
+	$(NV_SOURCE)/external/gstreamer/gst-omx/.nvtegra/pre-gen-header/usr/include/gstreamer-1.0 \
+	$(NV_SOURCE)/external/gstreamer/gst-omx/.nvtegra/pre-gen-header/usr/include/libxml2 \
+	$(NV_SOURCE)/external/gstreamer/gst-omx/.nvtegra/pre-gen-header/usr/lib/glib-2.0/include \
+	$(NV_SOURCE)/multimedia-partner/openmax/include/openmax/il
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS   := \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstreamer-1.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/glib-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gobject-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gthread-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstvideo-1.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstaudio-1.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gmodule-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstbase-1.0
+
+NV_COMPONENT_CFLAGS                  := \
+	$(NV_TOOLCHAIN_X11_CFLAGS) \
+	-DHAVE_CONFIG_H \
+	-DUSE_OMX_TARGET_TEGRA
+
+NV_COMPONENT_SYSTEMIMAGE_NAME        := lib$(NV_COMPONENT_NAME).so
+NV_COMPONENT_SYSTEMIMAGE_DIR         := $(NV_SYSTEMIMAGE_GSTREAMER_DIR)/gstreamer-1.0
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

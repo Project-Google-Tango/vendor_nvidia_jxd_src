@@ -1,0 +1,69 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_sdio library component makefile
+#
+###############################################################################
+
+#------------------------------------------------------------------------------
+# Static library
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := libnvddk_sdio
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+
+NV_COMPONENT_SOURCES               := \
+	t30_sdio.c \
+	t1xx_sdio.c \
+	nvddk_sdio.c \
+	nvddk_sd_block_driver.c
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS += -DNV_EMBEDDED_BUILD
+endif
+
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_CFLAGS += -DNVDDK_SDMMC_T30=1
+else
+NV_COMPONENT_CFLAGS += -DNVDDK_SDMMC_T30=0
+endif
+
+NV_COMPONENT_CFLAGS += -DNV_IF_T148=0
+
+ifeq ($(NV_TARGET_SOC),t114)
+NV_COMPONENT_CFLAGS += -DNV_IF_T114=1
+else
+NV_COMPONENT_CFLAGS += -DNV_IF_T114=0
+endif
+
+ifeq ($(NV_TARGET_SOC),t124)
+NV_COMPONENT_CFLAGS += -DNVDDK_SDMMC_T124=1
+else
+NV_COMPONENT_CFLAGS += -DNVDDK_SDMMC_T124=0
+endif
+
+NV_COMPONENT_INCLUDES              := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY)
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := ../../nvrm
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

@@ -1,0 +1,55 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake component makefile for libnvos_aos_avp_testloader.
+#
+# This a simpler version of libnvos_aos_avp used only by testloader.
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvos_aos_avp_testloader
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+
+NV_COMPONENT_SOURCES := \
+	../bootloader.c \
+	../bootloader_$(NV_TARGET_SOC_FAMILY).c
+
+NV_COMPONENT_CFLAGS := \
+    -DNV_AOS_ENTRY_POINT=0x80108000 \
+    -DNV_TEST_LOADER \
+    -DPINMUX_INIT \
+    -DUSED_BY_RTAPI
+
+ifneq (, $(findstring _sim, $(NV_TARGET_BOARD)))
+# enable qt emulation logic
+NV_COMPONENT_CFLAGS += -DQT_EMUL
+endif
+
+NV_COMPONENT_INCLUDES := \
+	../.. \
+	../../../../../drivers/nvavpgpio \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	$(NV_SOURCE)/core/drivers/nvboot/$(NV_TARGET_SOC)/include
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+        $(NV_SOURCE)/core/drivers/nvavp/sdmmc
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

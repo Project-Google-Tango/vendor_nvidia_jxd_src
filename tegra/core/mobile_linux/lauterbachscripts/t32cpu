@@ -1,0 +1,3 @@
+#!/bin/bash
+export T32_INSTANCE=cpu
+t32marm -c $T32SYS/config_cpu.t32

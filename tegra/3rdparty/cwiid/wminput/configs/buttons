@@ -1,0 +1,78 @@
+#buttons
+
+# Wiimote can be extended with various additional controllers.
+# At this point, Nunchuk and Classic Controller are supported.
+# When adding new event codes and/or updating existing event codes,
+# please try to keep codes distinct.
+# Only exception may be allowed for events which are identical in nature.
+# At this point, even d-pads are made to report different codes.
+# All entries (including the commented ones) have been tested.
+
+# Wiimote Buttons
+Wiimote.Up    = KEY_UP
+Wiimote.Down  = KEY_DOWN
+Wiimote.Left  = KEY_LEFT
+Wiimote.Right = KEY_RIGHT
+Wiimote.A     = KEY_ENTER
+Wiimote.B     = KEY_BACK
+Wiimote.Minus = KEY_SELECT
+Wiimote.Plus  = KEY_FORWARD
+Wiimote.Home  = KEY_HOME
+Wiimote.1     = KEY_PROG1
+Wiimote.2     = KEY_PROG2
+
+# Wiimote Axes
+# Only axes on Wiimote are D-pad axes, which range from -1 to 1.
+# Hence, there is no point in using them.
+#Wiimote.Dpad.X = ABS_HAT1X
+#Wiimote.Dpad.Y = ABS_HAT1Y
+
+
+# Nunchuk Buttons
+Nunchuk.C = BTN_C
+Nunchuk.Z = BTN_Z
+
+# Nunchuk Axes
+Nunchuk.Stick.X = ABS_TILT_X
+Nunchuk.Stick.Y = ABS_TILT_Y
+
+
+# Classic Controller Buttons
+# Originally, Classic.Up/Down/Left/Right used KEY_UP/DOWN/LEFT/RIGHT values.
+# Since these values are also used by the WiiMote configuration, Classic gets
+# to use generic button codes, that get correctly translated via .kl file.
+# This way event codes are independent.
+# Hence, changes for WiiMote will not affect Classic's behavior and vice versa.
+# Moreover, Classic's codes will be similar to those of other gamepads.
+# However, since D-pad on Classic controller will be supported
+# via HAT_X and HAX_Y axes, do not send events for key presses.
+#Classic.Up    = BTN_1
+#Classic.Down  = BTN_2
+#Classic.Left  = BTN_3
+#Classic.Right = BTN_4
+Classic.Minus = BTN_SELECT
+Classic.Plus  = BTN_START
+Classic.Home  = BTN_MODE
+Classic.A     = BTN_A
+Classic.B     = BTN_B
+Classic.X     = BTN_X
+Classic.Y     = BTN_Y
+Classic.ZL    = BTN_TL2
+Classic.ZR    = BTN_TR2
+Classic.L     = BTN_TL
+Classic.R     = BTN_TR
+
+# Classic Controller Axes
+Classic.Dpad.X   = ABS_HAT0X
+# Report D-pad Y as inverted to mimic other controllers
+Classic.Dpad.Y   = -ABS_HAT0Y
+Classic.LStick.X = ABS_X
+# Report left Y as inverted to mimic other controllers
+Classic.LStick.Y = -ABS_Y
+Classic.RStick.X = ABS_Z
+# Report right Y as inverted to mimic other controllers
+Classic.RStick.Y = -ABS_RZ
+# Upper buttons provide trigger axes, but are only in range from 0 to 1.
+# Hence, there is no point in using them.
+#Classic.LAnalog  = ABS_RX
+#Classic.RAnalog  = ABS_RY

@@ -1,0 +1,631 @@
+##
+## Autocalibration
+## Sensor  :   sensor name 
+## Size    :   (width, height)
+## Version :   version number 
+## Generated : time to generate this file 
+## 
+
+# Notes for this calibration run
+## global configurations
+##
+global.configType = 1;
+global.configVersion = 0x100;
+
+## isp functionality attributes
+## - Some blocks have detailed control entries below.
+## - Turning a block's attribute to FALSE will cause corresponding control entries to be ignored. 
+##
+ap15Function.opticalBlack = TRUE;
+ap15Function.deknee = FALSE;
+ap15Function.lensShading = TRUE;
+ap15Function.badPixel = TRUE;
+ap15Function.noiseControl1 = TRUE;
+ap15Function.demosaic = TRUE;
+ap15Function.programmableDemosaic = FALSE;
+ap15Function.colorArtifactReduction = TRUE;
+ap15Function.noiseControl2 = FALSE;
+ap15Function.colorCorrection = TRUE;
+ap15Function.edgeEnhance = TRUE;
+ap15Function.gammaCorrection = TRUE;
+
+## deknee
+## - 16 segments for each color {R/Gr/Gb/B}
+##   Line definitions must be provided in ascending order (of input range).
+##   -- arg format: {inputStart,outPutStart,slope}
+##   -- inputStart/outputStart is integer value in [0,1023]
+##   -- slope in format U2.10
+##   First segment's input start must be 0.
+##
+deknee.curveR[0]   = { 0,   0,   1.0 };
+deknee.curveR[1]   = { 67,  67,  1.0 };
+deknee.curveR[2]   = { 134, 134, 1.0 };
+deknee.curveR[3]   = { 201, 201, 1.0 };
+deknee.curveR[4]   = { 268, 268, 1.0 };
+deknee.curveR[5]   = { 335, 335, 1.0 };
+deknee.curveR[6]   = { 402, 402, 1.0 };
+deknee.curveR[7]   = { 469, 469, 1.0 };
+deknee.curveR[8]   = { 536, 536, 1.0 };
+deknee.curveR[9]   = { 603, 603, 1.0 };
+deknee.curveR[10]  = { 670, 670, 1.0 };
+deknee.curveR[11]  = { 737, 737, 1.0 };
+deknee.curveR[12]  = { 804, 804, 1.0 };
+deknee.curveR[13]  = { 871, 871, 1.0 };
+deknee.curveR[14]  = { 938, 938, 1.0 };
+deknee.curveR[15]  = { 1005,1005,1.0 };
+deknee.curveGR[0]  = { 0,   0,   1.0 };
+deknee.curveGR[1]  = { 67,  67,  1.0 };
+deknee.curveGR[2]  = { 134, 134, 1.0 };
+deknee.curveGR[3]  = { 201, 201, 1.0 };
+deknee.curveGR[4]  = { 268, 268, 1.0 };
+deknee.curveGR[5]  = { 335, 335, 1.0 };
+deknee.curveGR[6]  = { 402, 402, 1.0 };
+deknee.curveGR[7]  = { 469, 469, 1.0 };
+deknee.curveGR[8]  = { 536, 536, 1.0 };
+deknee.curveGR[9]  = { 603, 603, 1.0 };
+deknee.curveGR[10] = { 670, 670, 1.0 };
+deknee.curveGR[11] = { 737, 737, 1.0 };
+deknee.curveGR[12] = { 804, 804, 1.0 };
+deknee.curveGR[13] = { 871, 871, 1.0 };
+deknee.curveGR[14] = { 938, 938, 1.0 };
+deknee.curveGR[15] = { 1005,1005,1.0 };
+deknee.curveGB[0]  = { 0,   0,   1.0 };
+deknee.curveGB[1]  = { 67,  67,  1.0 };
+deknee.curveGB[2]  = { 134, 134, 1.0 };
+deknee.curveGB[3]  = { 201, 201, 1.0 };
+deknee.curveGB[4]  = { 268, 268, 1.0 };
+deknee.curveGB[5]  = { 335, 335, 1.0 };
+deknee.curveGB[6]  = { 402, 402, 1.0 };
+deknee.curveGB[7]  = { 469, 469, 1.0 };
+deknee.curveGB[8]  = { 536, 536, 1.0 };
+deknee.curveGB[9]  = { 603, 603, 1.0 };
+deknee.curveGB[10] = { 670, 670, 1.0 };
+deknee.curveGB[11] = { 737, 737, 1.0 };
+deknee.curveGB[12] = { 804, 804, 1.0 };
+deknee.curveGB[13] = { 871, 871, 1.0 };
+deknee.curveGB[14] = { 938, 938, 1.0 };
+deknee.curveGB[15] = { 1005,1005,1.0 };
+deknee.curveB[0]   = { 0,   0,   1.0 };
+deknee.curveB[1]   = { 67,  67,  1.0 };
+deknee.curveB[2]   = { 134, 134, 1.0 };
+deknee.curveB[3]   = { 201, 201, 1.0 };
+deknee.curveB[4]   = { 268, 268, 1.0 };
+deknee.curveB[5]   = { 335, 335, 1.0 };
+deknee.curveB[6]   = { 402, 402, 1.0 };
+deknee.curveB[7]   = { 469, 469, 1.0 };
+deknee.curveB[8]   = { 536, 536, 1.0 };
+deknee.curveB[9]   = { 603, 603, 1.0 };
+deknee.curveB[10]  = { 670, 670, 1.0 };
+deknee.curveB[11]  = { 737, 737, 1.0 };
+deknee.curveB[12]  = { 804, 804, 1.0 };
+deknee.curveB[13]  = { 871, 871, 1.0 };
+deknee.curveB[14]  = { 938, 938, 1.0 };
+deknee.curveB[15]  = { 1005,1005,1.0 };
+
+## bad pixel concealment
+##
+## If a pixel value is highly deviated from its surrounding pixels, the pixel is considered
+## as a bad pixel.  The deviation is defined in terms of the percentage of the average value
+## of the pixel surrounding.  Two ratio coefficients are used: if the pixel is at flat area,
+## LT_COEF is used, otherwise if it's at edge region, UT_COEF is used.
+## If the average of pixel surround is lower than BP_DARK, it's considered at shadow region,
+## and BP_DARK instead of average value will be used to calculate deviation threshold.
+##
+## - darkLevel in U10.0
+## - upperThreshold: U1.3 ratio for Upper-threshold
+## - lowerThreshold: U1.3 ratio for Lower-threshold
+##
+badPixel.darkLevel = 0;
+badPixel.upperThreshold = 1.0;
+badPixel.lowerThreshold = 0.125;
+
+## edge enhancement
+##
+## Edge enhancement is done by (1) extracting high frequency component (HF) of the pixel,
+## (2) amplifying the HF if the extracted value is "large" (i.e., coring), and
+## (3) adding the amplified HF back to the Y channel of the pixel.
+##
+## - gCoreLimit: U6.0, specifies the minimum coring level.  The coring level increases when pixel surround's brightness level goes up
+## - gCoreScale: Scaling factor range of GCORELIMIT. 0 = range [1,4.5], 1 = range [1,8.5], 2 = range [1,16.5], 3 = range [1,32.5].
+##   0 = CORE4
+##   1 = CORE8
+##   2 = CORE16
+##   3 = CORE32
+## 'gCoreScale' specifies the influence of the brightness level to the coring level.
+## The higher the 'gCoreScale' is, the larger the coring level grows under the same brightness
+##
+## - enhCoef: Gain factor of edge enhancement Multiply this value to the edge signal.
+##            In U2.3; combined with a posible fixed gain value of 1 or 4, can go up to 4*3.875=15.5.
+##
+##
+edgeEnhance.enhCoef = 1.75;
+edgeEnhance.gCoreScale = 32;
+edgeEnhance.gCoreLimit = 8;
+
+## ae control
+##
+## - sensor gain value corresponding to ISO100
+## - sensor gain adjustments
+## - noise reduction table
+##   -- column-wise is higher lux to low lux;
+##   -- row-wise is small sensor gain to larger gain value
+##
+ae.noiseReduction[0] = { 3, 3, 3, 3, 3, 4, 4 };
+ae.noiseReduction[1] = { 3, 3, 3, 3, 3, 4, 4 };
+ae.noiseReduction[2] = { 3, 3, 3, 3, 4, 4, 4 };
+ae.noiseReduction[3] = { 3, 3, 3, 4, 4, 4, 4 };
+
+## optical black
+## - valid value for OB adjustments are integer value in [-1024,1023]
+##
+opticalBlack.mode = 0;
+opticalBlack.manualBiasR =  42;
+opticalBlack.manualBiasGR = 42;
+opticalBlack.manualBiasGB = 42;
+opticalBlack.manualBiasB =  42;
+
+
+
+# Lens shading data
+lensShading.leftPatchWidth = 128;
+lensShading.centerPatchWidth  = 128;
+## lensShading.rightPatchWidth   = 128; 
+lensShading.topPatchHeight = 128;
+lensShading.middlePatchHeight = 128;
+## lensShading.bottomPatchHeight = 128; 
+lensShading.leftPatchDeltaUMSB   = 0x0;
+lensShading.leftPatchDeltaULSB   = 0x10000000;
+lensShading.centerPatchDeltaUMSB = 0x0;
+lensShading.centerPatchDeltaULSB = 0x10000000;
+lensShading.rightPatchDeltaUMSB  = 0x0;
+lensShading.rightPatchDeltaULSB  = 0x10000000;
+lensShading.topPatchDeltaVMSB    = 0x0;
+lensShading.topPatchDeltaVLSB    = 0x10000000;
+lensShading.middlePatchDeltaVMSB = 0x0;
+lensShading.middlePatchDeltaVLSB = 0x10000000;
+lensShading.bottomPatchDeltaVMSB = 0x0;
+lensShading.bottomPatchDeltaVLSB = 0x10000000;
+lensShading.controlPointR[0][0]  = 1;
+lensShading.controlPointGR[0][0] = 1;
+lensShading.controlPointGB[0][0] = 1;
+lensShading.controlPointB[0][0]  = 1;
+lensShading.controlPointR[1][0]  = 1;
+lensShading.controlPointGR[1][0] = 1;
+lensShading.controlPointGB[1][0] = 1;
+lensShading.controlPointB[1][0]  = 1;
+lensShading.controlPointR[2][0]  = 1;
+lensShading.controlPointGR[2][0] = 1;
+lensShading.controlPointGB[2][0] = 1;
+lensShading.controlPointB[2][0]  = 1;
+lensShading.controlPointR[3][0]  = 1;
+lensShading.controlPointGR[3][0] = 1;
+lensShading.controlPointGB[3][0] = 1;
+lensShading.controlPointB[3][0]  = 1;
+lensShading.controlPointR[4][0]  = 1;
+lensShading.controlPointGR[4][0] = 1;
+lensShading.controlPointGB[4][0] = 1;
+lensShading.controlPointB[4][0]  = 1;
+lensShading.controlPointR[5][0]  = 1;
+lensShading.controlPointGR[5][0] = 1;
+lensShading.controlPointGB[5][0] = 1;
+lensShading.controlPointB[5][0]  = 1;
+lensShading.controlPointR[6][0]  = 1;
+lensShading.controlPointGR[6][0] = 1;
+lensShading.controlPointGB[6][0] = 1;
+lensShading.controlPointB[6][0]  = 1;
+lensShading.controlPointR[7][0]  = 1;
+lensShading.controlPointGR[7][0] = 1;
+lensShading.controlPointGB[7][0] = 1;
+lensShading.controlPointB[7][0]  = 1;
+lensShading.controlPointR[8][0]  = 1;
+lensShading.controlPointGR[8][0] = 1;
+lensShading.controlPointGB[8][0] = 1;
+lensShading.controlPointB[8][0]  = 1;
+lensShading.controlPointR[9][0]  = 1;
+lensShading.controlPointGR[9][0] = 1;
+lensShading.controlPointGB[9][0] = 1;
+lensShading.controlPointB[9][0]  = 1;
+lensShading.controlPointR[0][1]  = 1;
+lensShading.controlPointGR[0][1] = 1;
+lensShading.controlPointGB[0][1] = 1;
+lensShading.controlPointB[0][1]  = 1;
+lensShading.controlPointR[1][1]  = 1;
+lensShading.controlPointGR[1][1] = 1;
+lensShading.controlPointGB[1][1] = 1;
+lensShading.controlPointB[1][1]  = 1;
+lensShading.controlPointR[2][1]  = 1;
+lensShading.controlPointGR[2][1] = 1;
+lensShading.controlPointGB[2][1] = 1;
+lensShading.controlPointB[2][1]  = 1;
+lensShading.controlPointR[3][1]  = 1;
+lensShading.controlPointGR[3][1] = 1;
+lensShading.controlPointGB[3][1] = 1;
+lensShading.controlPointB[3][1]  = 1;
+lensShading.controlPointR[4][1]  = 1;
+lensShading.controlPointGR[4][1] = 1;
+lensShading.controlPointGB[4][1] = 1;
+lensShading.controlPointB[4][1]  = 1;
+lensShading.controlPointR[5][1]  = 1;
+lensShading.controlPointGR[5][1] = 1;
+lensShading.controlPointGB[5][1] = 1;
+lensShading.controlPointB[5][1]  = 1;
+lensShading.controlPointR[6][1]  = 1;
+lensShading.controlPointGR[6][1] = 1;
+lensShading.controlPointGB[6][1] = 1;
+lensShading.controlPointB[6][1]  = 1;
+lensShading.controlPointR[7][1]  = 1;
+lensShading.controlPointGR[7][1] = 1;
+lensShading.controlPointGB[7][1] = 1;
+lensShading.controlPointB[7][1]  = 1;
+lensShading.controlPointR[8][1]  = 1;
+lensShading.controlPointGR[8][1] = 1;
+lensShading.controlPointGB[8][1] = 1;
+lensShading.controlPointB[8][1]  = 1;
+lensShading.controlPointR[9][1]  = 1;
+lensShading.controlPointGR[9][1] = 1;
+lensShading.controlPointGB[9][1] = 1;
+lensShading.controlPointB[9][1]  = 1;
+lensShading.controlPointR[0][2]  = 1;
+lensShading.controlPointGR[0][2] = 1;
+lensShading.controlPointGB[0][2] = 1;
+lensShading.controlPointB[0][2]  = 1;
+lensShading.controlPointR[1][2]  = 1;
+lensShading.controlPointGR[1][2] = 1;
+lensShading.controlPointGB[1][2] = 1;
+lensShading.controlPointB[1][2]  = 1;
+lensShading.controlPointR[2][2]  = 1;
+lensShading.controlPointGR[2][2] = 1;
+lensShading.controlPointGB[2][2] = 1;
+lensShading.controlPointB[2][2]  = 1;
+lensShading.controlPointR[3][2]  = 1;
+lensShading.controlPointGR[3][2] = 1;
+lensShading.controlPointGB[3][2] = 1;
+lensShading.controlPointB[3][2]  = 1;
+lensShading.controlPointR[4][2]  = 1;
+lensShading.controlPointGR[4][2] = 1;
+lensShading.controlPointGB[4][2] = 1;
+lensShading.controlPointB[4][2]  = 1;
+lensShading.controlPointR[5][2]  = 1;
+lensShading.controlPointGR[5][2] = 1;
+lensShading.controlPointGB[5][2] = 1;
+lensShading.controlPointB[5][2]  = 1;
+lensShading.controlPointR[6][2]  = 1;
+lensShading.controlPointGR[6][2] = 1;
+lensShading.controlPointGB[6][2] = 1;
+lensShading.controlPointB[6][2]  = 1;
+lensShading.controlPointR[7][2]  = 1;
+lensShading.controlPointGR[7][2] = 1;
+lensShading.controlPointGB[7][2] = 1;
+lensShading.controlPointB[7][2]  = 1;
+lensShading.controlPointR[8][2]  = 1;
+lensShading.controlPointGR[8][2] = 1;
+lensShading.controlPointGB[8][2] = 1;
+lensShading.controlPointB[8][2]  = 1;
+lensShading.controlPointR[9][2]  = 1;
+lensShading.controlPointGR[9][2] = 1;
+lensShading.controlPointGB[9][2] = 1;
+lensShading.controlPointB[9][2]  = 1;
+lensShading.controlPointR[0][3]  = 1;
+lensShading.controlPointGR[0][3] = 1;
+lensShading.controlPointGB[0][3] = 1;
+lensShading.controlPointB[0][3]  = 1;
+lensShading.controlPointR[1][3]  = 1;
+lensShading.controlPointGR[1][3] = 1;
+lensShading.controlPointGB[1][3] = 1;
+lensShading.controlPointB[1][3]  = 1;
+lensShading.controlPointR[2][3]  = 1;
+lensShading.controlPointGR[2][3] = 1;
+lensShading.controlPointGB[2][3] = 1;
+lensShading.controlPointB[2][3]  = 1;
+lensShading.controlPointR[3][3]  = 1;
+lensShading.controlPointGR[3][3] = 1;
+lensShading.controlPointGB[3][3] = 1;
+lensShading.controlPointB[3][3]  = 1;
+lensShading.controlPointR[4][3]  = 1;
+lensShading.controlPointGR[4][3] = 1;
+lensShading.controlPointGB[4][3] = 1;
+lensShading.controlPointB[4][3]  = 1;
+lensShading.controlPointR[5][3]  = 1;
+lensShading.controlPointGR[5][3] = 1;
+lensShading.controlPointGB[5][3] = 1;
+lensShading.controlPointB[5][3]  = 1;
+lensShading.controlPointR[6][3]  = 1;
+lensShading.controlPointGR[6][3] = 1;
+lensShading.controlPointGB[6][3] = 1;
+lensShading.controlPointB[6][3]  = 1;
+lensShading.controlPointR[7][3]  = 1;
+lensShading.controlPointGR[7][3] = 1;
+lensShading.controlPointGB[7][3] = 1;
+lensShading.controlPointB[7][3]  = 1;
+lensShading.controlPointR[8][3]  = 1;
+lensShading.controlPointGR[8][3] = 1;
+lensShading.controlPointGB[8][3] = 1;
+lensShading.controlPointB[8][3]  = 1;
+lensShading.controlPointR[9][3]  = 1;
+lensShading.controlPointGR[9][3] = 1;
+lensShading.controlPointGB[9][3] = 1;
+lensShading.controlPointB[9][3]  = 1;
+lensShading.controlPointR[0][4]  = 1;
+lensShading.controlPointGR[0][4] = 1;
+lensShading.controlPointGB[0][4] = 1;
+lensShading.controlPointB[0][4]  = 1;
+lensShading.controlPointR[1][4]  = 1;
+lensShading.controlPointGR[1][4] = 1;
+lensShading.controlPointGB[1][4] = 1;
+lensShading.controlPointB[1][4]  = 1;
+lensShading.controlPointR[2][4]  = 1;
+lensShading.controlPointGR[2][4] = 1;
+lensShading.controlPointGB[2][4] = 1;
+lensShading.controlPointB[2][4]  = 1;
+lensShading.controlPointR[3][4]  = 1;
+lensShading.controlPointGR[3][4] = 1;
+lensShading.controlPointGB[3][4] = 1;
+lensShading.controlPointB[3][4]  = 1;
+lensShading.controlPointR[4][4]  = 1;
+lensShading.controlPointGR[4][4] = 1;
+lensShading.controlPointGB[4][4] = 1;
+lensShading.controlPointB[4][4]  = 1;
+lensShading.controlPointR[5][4]  = 1;
+lensShading.controlPointGR[5][4] = 1;
+lensShading.controlPointGB[5][4] = 1;
+lensShading.controlPointB[5][4]  = 1;
+lensShading.controlPointR[6][4]  = 1;
+lensShading.controlPointGR[6][4] = 1;
+lensShading.controlPointGB[6][4] = 1;
+lensShading.controlPointB[6][4]  = 1;
+lensShading.controlPointR[7][4]  = 1;
+lensShading.controlPointGR[7][4] = 1;
+lensShading.controlPointGB[7][4] = 1;
+lensShading.controlPointB[7][4]  = 1;
+lensShading.controlPointR[8][4]  = 1;
+lensShading.controlPointGR[8][4] = 1;
+lensShading.controlPointGB[8][4] = 1;
+lensShading.controlPointB[8][4]  = 1;
+lensShading.controlPointR[9][4]  = 1;
+lensShading.controlPointGR[9][4] = 1;
+lensShading.controlPointGB[9][4] = 1;
+lensShading.controlPointB[9][4]  = 1;
+lensShading.controlPointR[0][5]  = 1;
+lensShading.controlPointGR[0][5] = 1;
+lensShading.controlPointGB[0][5] = 1;
+lensShading.controlPointB[0][5]  = 1;
+lensShading.controlPointR[1][5]  = 1;
+lensShading.controlPointGR[1][5] = 1;
+lensShading.controlPointGB[1][5] = 1;
+lensShading.controlPointB[1][5]  = 1;
+lensShading.controlPointR[2][5]  = 1;
+lensShading.controlPointGR[2][5] = 1;
+lensShading.controlPointGB[2][5] = 1;
+lensShading.controlPointB[2][5]  = 1;
+lensShading.controlPointR[3][5]  = 1;
+lensShading.controlPointGR[3][5] = 1;
+lensShading.controlPointGB[3][5] = 1;
+lensShading.controlPointB[3][5]  = 1;
+lensShading.controlPointR[4][5]  = 1;
+lensShading.controlPointGR[4][5] = 1;
+lensShading.controlPointGB[4][5] = 1;
+lensShading.controlPointB[4][5]  = 1;
+lensShading.controlPointR[5][5]  = 1;
+lensShading.controlPointGR[5][5] = 1;
+lensShading.controlPointGB[5][5] = 1;
+lensShading.controlPointB[5][5]  = 1;
+lensShading.controlPointR[6][5]  = 1;
+lensShading.controlPointGR[6][5] = 1;
+lensShading.controlPointGB[6][5] = 1;
+lensShading.controlPointB[6][5]  = 1;
+lensShading.controlPointR[7][5]  = 1;
+lensShading.controlPointGR[7][5] = 1;
+lensShading.controlPointGB[7][5] = 1;
+lensShading.controlPointB[7][5]  = 1;
+lensShading.controlPointR[8][5]  = 1;
+lensShading.controlPointGR[8][5] = 1;
+lensShading.controlPointGB[8][5] = 1;
+lensShading.controlPointB[8][5]  = 1;
+lensShading.controlPointR[9][5]  = 1;
+lensShading.controlPointGR[9][5] = 1;
+lensShading.controlPointGB[9][5] = 1;
+lensShading.controlPointB[9][5]  = 1;
+lensShading.controlPointR[0][6]  = 1;
+lensShading.controlPointGR[0][6] = 1;
+lensShading.controlPointGB[0][6] = 1;
+lensShading.controlPointB[0][6]  = 1;
+lensShading.controlPointR[1][6]  = 1;
+lensShading.controlPointGR[1][6] = 1;
+lensShading.controlPointGB[1][6] = 1;
+lensShading.controlPointB[1][6]  = 1;
+lensShading.controlPointR[2][6]  = 1;
+lensShading.controlPointGR[2][6] = 1;
+lensShading.controlPointGB[2][6] = 1;
+lensShading.controlPointB[2][6]  = 1;
+lensShading.controlPointR[3][6]  = 1;
+lensShading.controlPointGR[3][6] = 1;
+lensShading.controlPointGB[3][6] = 1;
+lensShading.controlPointB[3][6]  = 1;
+lensShading.controlPointR[4][6]  = 1;
+lensShading.controlPointGR[4][6] = 1;
+lensShading.controlPointGB[4][6] = 1;
+lensShading.controlPointB[4][6]  = 1;
+lensShading.controlPointR[5][6]  = 1;
+lensShading.controlPointGR[5][6] = 1;
+lensShading.controlPointGB[5][6] = 1;
+lensShading.controlPointB[5][6]  = 1;
+lensShading.controlPointR[6][6]  = 1;
+lensShading.controlPointGR[6][6] = 1;
+lensShading.controlPointGB[6][6] = 1;
+lensShading.controlPointB[6][6]  = 1;
+lensShading.controlPointR[7][6]  = 1;
+lensShading.controlPointGR[7][6] = 1;
+lensShading.controlPointGB[7][6] = 1;
+lensShading.controlPointB[7][6]  = 1;
+lensShading.controlPointR[8][6]  = 1;
+lensShading.controlPointGR[8][6] = 1;
+lensShading.controlPointGB[8][6] = 1;
+lensShading.controlPointB[8][6]  = 1;
+lensShading.controlPointR[9][6]  = 1;
+lensShading.controlPointGR[9][6] = 1;
+lensShading.controlPointGB[9][6] = 1;
+lensShading.controlPointB[9][6]  = 1;
+lensShading.controlPointR[0][7]  = 1;
+lensShading.controlPointGR[0][7] = 1;
+lensShading.controlPointGB[0][7] = 1;
+lensShading.controlPointB[0][7]  = 1;
+lensShading.controlPointR[1][7]  = 1;
+lensShading.controlPointGR[1][7] = 1;
+lensShading.controlPointGB[1][7] = 1;
+lensShading.controlPointB[1][7]  = 1;
+lensShading.controlPointR[2][7]  = 1;
+lensShading.controlPointGR[2][7] = 1;
+lensShading.controlPointGB[2][7] = 1;
+lensShading.controlPointB[2][7]  = 1;
+lensShading.controlPointR[3][7]  = 1;
+lensShading.controlPointGR[3][7] = 1;
+lensShading.controlPointGB[3][7] = 1;
+lensShading.controlPointB[3][7]  = 1;
+lensShading.controlPointR[4][7]  = 1;
+lensShading.controlPointGR[4][7] = 1;
+lensShading.controlPointGB[4][7] = 1;
+lensShading.controlPointB[4][7]  = 1;
+lensShading.controlPointR[5][7]  = 1;
+lensShading.controlPointGR[5][7] = 1;
+lensShading.controlPointGB[5][7] = 1;
+lensShading.controlPointB[5][7]  = 1;
+lensShading.controlPointR[6][7]  = 1;
+lensShading.controlPointGR[6][7] = 1;
+lensShading.controlPointGB[6][7] = 1;
+lensShading.controlPointB[6][7]  = 1;
+lensShading.controlPointR[7][7]  = 1;
+lensShading.controlPointGR[7][7] = 1;
+lensShading.controlPointGB[7][7] = 1;
+lensShading.controlPointB[7][7]  = 1;
+lensShading.controlPointR[8][7]  = 1;
+lensShading.controlPointGR[8][7] = 1;
+lensShading.controlPointGB[8][7] = 1;
+lensShading.controlPointB[8][7]  = 1;
+lensShading.controlPointR[9][7]  = 1;
+lensShading.controlPointGR[9][7] = 1;
+lensShading.controlPointGB[9][7] = 1;
+lensShading.controlPointB[9][7]  = 1;
+lensShading.controlPointR[0][8]  = 1;
+lensShading.controlPointGR[0][8] = 1;
+lensShading.controlPointGB[0][8] = 1;
+lensShading.controlPointB[0][8]  = 1;
+lensShading.controlPointR[1][8]  = 1;
+lensShading.controlPointGR[1][8] = 1;
+lensShading.controlPointGB[1][8] = 1;
+lensShading.controlPointB[1][8]  = 1;
+lensShading.controlPointR[2][8]  = 1;
+lensShading.controlPointGR[2][8] = 1;
+lensShading.controlPointGB[2][8] = 1;
+lensShading.controlPointB[2][8]  = 1;
+lensShading.controlPointR[3][8]  = 1;
+lensShading.controlPointGR[3][8] = 1;
+lensShading.controlPointGB[3][8] = 1;
+lensShading.controlPointB[3][8]  = 1;
+lensShading.controlPointR[4][8]  = 1;
+lensShading.controlPointGR[4][8] = 1;
+lensShading.controlPointGB[4][8] = 1;
+lensShading.controlPointB[4][8]  = 1;
+lensShading.controlPointR[5][8]  = 1;
+lensShading.controlPointGR[5][8] = 1;
+lensShading.controlPointGB[5][8] = 1;
+lensShading.controlPointB[5][8]  = 1;
+lensShading.controlPointR[6][8]  = 1;
+lensShading.controlPointGR[6][8] = 1;
+lensShading.controlPointGB[6][8] = 1;
+lensShading.controlPointB[6][8]  = 1;
+lensShading.controlPointR[7][8]  = 1;
+lensShading.controlPointGR[7][8] = 1;
+lensShading.controlPointGB[7][8] = 1;
+lensShading.controlPointB[7][8]  = 1;
+lensShading.controlPointR[8][8]  = 1;
+lensShading.controlPointGR[8][8] = 1;
+lensShading.controlPointGB[8][8] = 1;
+lensShading.controlPointB[8][8]  = 1;
+lensShading.controlPointR[9][8]  = 1;
+lensShading.controlPointGR[9][8] = 1;
+lensShading.controlPointGB[9][8] = 1;
+lensShading.controlPointB[9][8]  = 1;
+lensShading.controlPointR[0][9]  = 1;
+lensShading.controlPointGR[0][9] = 1;
+lensShading.controlPointGB[0][9] = 1;
+lensShading.controlPointB[0][9]  = 1;
+lensShading.controlPointR[1][9]  = 1;
+lensShading.controlPointGR[1][9] = 1;
+lensShading.controlPointGB[1][9] = 1;
+lensShading.controlPointB[1][9]  = 1;
+lensShading.controlPointR[2][9]  = 1;
+lensShading.controlPointGR[2][9] = 1;
+lensShading.controlPointGB[2][9] = 1;
+lensShading.controlPointB[2][9]  = 1;
+lensShading.controlPointR[3][9]  = 1;
+lensShading.controlPointGR[3][9] = 1;
+lensShading.controlPointGB[3][9] = 1;
+lensShading.controlPointB[3][9]  = 1;
+lensShading.controlPointR[4][9]  = 1;
+lensShading.controlPointGR[4][9] = 1;
+lensShading.controlPointGB[4][9] = 1;
+lensShading.controlPointB[4][9]  = 1;
+lensShading.controlPointR[5][9]  = 1;
+lensShading.controlPointGR[5][9] = 1;
+lensShading.controlPointGB[5][9] = 1;
+lensShading.controlPointB[5][9]  = 1;
+lensShading.controlPointR[6][9]  = 1;
+lensShading.controlPointGR[6][9] = 1;
+lensShading.controlPointGB[6][9] = 1;
+lensShading.controlPointB[6][9]  = 1;
+lensShading.controlPointR[7][9]  = 1;
+lensShading.controlPointGR[7][9] = 1;
+lensShading.controlPointGB[7][9] = 1;
+lensShading.controlPointB[7][9]  = 1;
+lensShading.controlPointR[8][9]  = 1;
+lensShading.controlPointGR[8][9] = 1;
+lensShading.controlPointGB[8][9] = 1;
+lensShading.controlPointB[8][9]  = 1;
+lensShading.controlPointR[9][9]  = 1;
+lensShading.controlPointGR[9][9] = 1;
+lensShading.controlPointGB[9][9] = 1;
+lensShading.controlPointB[9][9]  = 1;
+
+# Calibration for the Gain, per Channel for this sensor, for optimal linear response
+ae.gainForISO100 = 1.00;          # ISO100 equates to this gain
+ae.PerChannelGainAdjustment = {1.0, 1.0, 1.0, 1.0};
+
+# Data for AWB and Color Correction
+#
+# entries for 3 X 3 color correction matrix. Row
+#   colorCorrection.srgbMatrix[0] = 
+#   colorCorrection.srgbMatrix[1] 
+#   colorCorrection.srgbMatrix[2]
+#
+# entries for line fitting through white point colors
+#   awb.GrayLineSlope
+#   awb.GrayLineIntercept
+#   awb.GrayLineThickness
+# 
+# entries for transfer function polynomial that goes between CCT and color coordinate U 
+#   awb.CCTtoU
+#   awb.UtoCCT
+#
+# entries for soft clamping function. Piece-wise line segments.
+#   awb.GrayLineSoftClampSlopeBeforeFirstPoint
+#   awb.GrayLineSoftClampSlopeAfterLastPoint
+#   awb.NumGrayLineSoftClampPoints = <n>;
+#   awb.GrayLineSoftClamp[0] = {U, U'}
+#   ...
+#   awb.GrayLineSoftClamp[n-1] = {U, U'}
+#
+#
+colorCorrection.srgbMatrix[0] = {1.0, 0.0, 0.0};
+colorCorrection.srgbMatrix[1] = {0.0, 1.0, 0.0};
+colorCorrection.srgbMatrix[2] = {0.0, 0.0, 1.0};
+awb.GrayLineSlope = -1.26813098991;
+awb.GrayLineIntercept = 2.15997525187;
+awb.GrayLineThickness = 2.0;
+awb.CCTtoU = {0.000108199278008, 0.164565613404};
+awb.UtoCCT = {8911.05417001, -1279.76149889};
+awb.GrayLineSoftClampSlopeBeforeFirstPoint = 0.0;
+awb.GrayLineSoftClampSlopeAfterLastPoint = 0.5;
+awb.NumGrayLineSoftClampPoints = 3;
+awb.GrayLineSoftClamp[0] = {0.489163447428, 0.489163447428 }; # Tungsten limit
+awb.GrayLineSoftClamp[1] = {0.867860920457, 0.867860920457 }; # Daylight limit
+awb.GrayLineSoftClamp[2] = {1.24655839349, 1.24655839349}; # Deep blue limit

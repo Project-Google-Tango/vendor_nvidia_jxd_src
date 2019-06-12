@@ -1,0 +1,42 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvrm: AOS AVP/CPU static library implementation
+#
+###############################################################################
+#
+# NOTE: there should be no need to use conditionals in this makefile!
+#
+###############################################################################
+
+NV_COMPONENT_SOURCES               += \
+	$(_libnvrm_src_aos) \
+	core/common/nvrm_avp_service.c \
+	core/common/nvrm_avp_cpu_rpc.c \
+	core/common/nvrm_moduleloader.c
+NV_COMPONENT_CFLAGS                += \
+	-DNVRM_TRANSPORT_IN_KERNEL=0 \
+	-DNV_SHMOO_DATA_INIT=1 \
+	-DPLATFORM_EMULATION=1
+
+# distinguish between AVP and CPU build
+ifeq ($(NV_TARGET_ARCH),rvds_armv4)
+NV_COMPONENT_CFLAGS                += -DNV_IS_AVP=1
+else
+NV_COMPONENT_CFLAGS                += -DNV_USE_AOS=1
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

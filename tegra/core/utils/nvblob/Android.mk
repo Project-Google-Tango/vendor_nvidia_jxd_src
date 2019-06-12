@@ -1,0 +1,7 @@
+LOCAL_PATH := $(call my-dir)
+include $(NVIDIA_DEFAULTS)
+
+LOCAL_PREBUILT_EXECUTABLES := nvblob
+LOCAL_MODULE_TAGS := optional
+
+include $(NVIDIA_HOST_PREBUILT)

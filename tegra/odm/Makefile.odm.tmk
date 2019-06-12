@@ -1,0 +1,222 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# ODM: board specific component chooser
+#
+###############################################################################
+_odm_board_basename :=
+
+ifeq ($(NV_TARGET_BOARD),e1853)
+#
+# Board: e1853 (T30)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/hdmi \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),m2601)
+#
+# Board: m2601 (T30)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/hdmi \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),p1852)
+#
+# Board: p1852 (T30)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/hdmi \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),vcm30t30)
+#
+# Board: vcm30t30 (T30)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/hdmi \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),vcm30-t124)
+#
+# Board: vcm30-t124 (T124)
+#
+# TODO: delete this section as soon as vcm30-t124 is replaced
+_odm_board_components :=
+
+else ifeq ($(NV_TARGET_BOARD),dalmore)
+#
+# Board: dalmore (T114)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/keyboard \
+	odm-partner/misc \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),pluto)
+#
+# Board: pluto (T114)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/misc \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),e1859_t114)
+#
+# Board: e1859_t114 (T114)
+#
+# TODO: delete this section as soon as e1859_t114 is replaced
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/keyboard \
+	odm-partner/misc \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),vcm30t114)
+#
+# Board: vcm30t114 (T114)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/keyboard \
+	odm-partner/misc \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),ardbeg)
+#
+# Board: ardbeg (T124)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/keyboard \
+	odm-partner/misc \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),laguna)
+#
+# Board: laguna (T124)
+#
+_odm_board_basename   := ardbeg
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/keyboard \
+	odm-partner/misc \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),loki)
+#
+# Board: loki (T124)
+#
+_odm_board_components := \
+	odm-partner/disp \
+	odm-partner/keyboard \
+	odm-partner/led \
+	odm-partner/misc \
+	odm-partner/query
+
+else ifeq ($(NV_TARGET_BOARD),vcm30t124)
+#
+# Board: vcm30t124 (T124)
+#
+_odm_board_components :=
+
+###############################################################################
+#
+# CUSTOMERS: insert your board configuration here, e.g.
+#
+# else ifeq ($(NV_TARGET_BOARD),customer_board_1)
+# _odm_board_components := \
+#       ...
+#
+###############################################################################
+
+else ifndef NV_CUSTOMER_BUILD
+#
+# Otherwise must be a Nvidia development board
+#
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-private/Makefile.odm.tmk
+else
+$(error unsupported board configuration '$(NV_TARGET_BOARD)' for nvodm)
+endif
+
+#
+# List of all ODM components and their paths
+#
+_odm_component_map := \
+	audiocodec=odm_kit/adaptations/audiocodec \
+	charging=odm_kit/adaptations/charging \
+	disp=odm_kit/adaptations/disp \
+	dtvtuner=odm_kit/adaptations/dtvtuner \
+	extfs=os/linux/system/extfs \
+	extfsmgr=os/linux/system/nvextfsmgr \
+	fuelgaugefwupgrade=odm_kit/platform/fuelgaugefwupgrade \
+	gpio_ext=odm_kit/adaptations/gpio_ext \
+	hdmi=odm_kit/adaptations/hdmi \
+	imager=odm_kit/adaptations/imager \
+	keyboard=odm_kit/platform/keyboard \
+	misc=odm_kit/adaptations/misc \
+	query=odm_kit/query \
+	pmu=odm_kit/adaptations/pmu \
+	system_update=odm_kit/platform/ota \
+	tmon=odm_kit/adaptations/tmon \
+	touch=odm_kit/platform/touch \
+	led=odm_kit/adaptations/led
+
+#
+# Select board specific components
+#
+# $(1): variable with the component list request by calling makefile
+_odm_select = $(foreach _c, $($(strip $(1))), \
+	$(eval _pc := $(filter %$(_c), $(_odm_board_components))) \
+	$(addprefix $(NV_SOURCE)/bootloader/nvbootloader/, \
+	$(addprefix $(if $(_pc), $(dir $(_pc))$(if $(_odm_board_basename),$(_odm_board_basename),$(NV_TARGET_BOARD))/, odm-partner/template/), \
+	$(word 2, $(subst =, , $(filter $(_c)=%, $(_odm_component_map)))))))
+
+#
+# Error check
+#
+$(foreach _c, $(NV_COMPONENT_ODM_STATIC) $(NV_COMPONENT_ODM_WHOLE_STATIC), \
+	$(if $(filter $(_c)=%, $(_odm_component_map)), , \
+		$(error unknown ODM component '$(_c)' selected)))
+
+#
+# Select board specific components
+#
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS       += \
+	$(call _odm_select, NV_COMPONENT_ODM_STATIC)
+NV_COMPONENT_NEEDED_WHOLE_STATIC_INTERFACE_DIRS += \
+	$(call _odm_select, NV_COMPONENT_ODM_WHOLE_STATIC)
+_c  :=
+_pc :=
+
+# variable cleanup
+_odm_board_basename   :=
+_odm_board_components :=
+_odm_component_map    :=
+_odm_select           :=
+
+# input parameter cleanup
+NV_COMPONENT_ODM_STATIC       :=
+NV_COMPONENT_ODM_WHOLE_STATIC :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

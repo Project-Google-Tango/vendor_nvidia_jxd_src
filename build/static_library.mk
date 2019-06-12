@@ -1,0 +1,9 @@
+LOCAL_MODULE_CLASS := STATIC_LIBRARIES
+
+# Do not include default libc etc
+LOCAL_SYSTEM_SHARED_LIBRARIES :=
+
+include $(NVIDIA_BASE)
+include $(NVIDIA_WARNINGS)
+include $(NVIDIA_COVERAGE)
+include $(BUILD_STATIC_LIBRARY)

@@ -1,0 +1,33 @@
+; Lauterbach TRACE32 debugger script to attach to the AVP with FASTBOOT debugging symbols loaded.
+
+; NOTE: This script will work only up to the point where the AVP starts the CPU. After that
+;       the JTAG scan chain will have been reconfigured and this script will be unable to
+;       attach to the AVP.
+
+; Setup JTAG for AVP-only.
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_jtag_setup.cmm
+
+; Tell the debugger not to access non-existent memory locations.
+do physical_setup.cmm
+
+sYmbol.RESet
+
+print "Loading &FASTBOOT symbols"
+data.load.elf &FASTBOOT /NOCODE
+
+; Attach to the target without resetting it
+system.mode.attach
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+IF ("&LOAD_SAVED_AVP_WINDOWS"=="TRUE")
+(
+  ; Restore saved window configuration (this is always saved in the $T32SYS directory -- don't change the path)
+  do &T32SYS/windows.cmm
+)
+
+ENDDO
+

@@ -1,0 +1,11 @@
+; Lauterbach TRACE32 debugger script to start to CPU from the AVP.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+; Enable the CPU clock and clear the CPU flow controller
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_clock_enable.cmm
+
+ENDDO
+

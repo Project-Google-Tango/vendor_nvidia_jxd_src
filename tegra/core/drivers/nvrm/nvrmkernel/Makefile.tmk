@@ -1,0 +1,289 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvrm: shared & static library (common entry point)
+#
+###############################################################################
+#
+# NvRM implementation comes in several different variants which need to be
+# compiled correctly to ensure correct functionality. This Makefile.tmk is
+# the central entry point for all implementations.
+#
+# It includes:
+#
+#   - component entry point for static & shared library
+#   - common source file lists used by the different implementations
+#   - settings which apply to *ALL* implementation
+#   - conditionals which apply to *ALL* implementations
+#   - conditional switch to include implementation specific makefile
+#
+###############################################################################
+#
+# Source files for *ALL* implementation variants
+_libnvrm_src_all := \
+	core/common/nvrm_hwmap.c \
+	core/common/nvrm_chip.c \
+	core/common/nvrm_surface.c \
+	core/common/nvrm_surface_debug.c
+
+# Source files for static library variant
+_libnvrm_src_static := \
+	core/common/nvrm_clocks_limits.c \
+	core/common/nvrm_configuration.c \
+	core/common/nvrm_hwintf.c \
+	core/common/nvrm_keylist.c \
+	core/common/nvrm_module.c \
+	core/common/nvrm_pinmux.c \
+	core/common/nvrm_pmu.c \
+	core/common/nvrm_power.c \
+	core/common/nvrm_power_dfs.c \
+	core/common/nvrm_relocation_table.c \
+	core/common/nvrm_rmctrace.c \
+	core/common/nvrm_init.c \
+	core/common/nvrm_memctrl.c \
+	io/common/nvrm_gpioi2c.c \
+	io/common/nvrm_i2c.c \
+	io/common/nvrm_owr.c \
+	core/ap15/ap15rm_clock_config.c \
+	core/ap15/ap15rm_clock_misc.c \
+	core/ap15/ap15rm_init.c \
+	core/ap15/ap15rm_interrupt.c \
+	core/ap15/ap15rm_interrupt_generic.c \
+	core/ap15/ap15rm_power.c \
+	core/ap15/ap15rm_power_dfs.c \
+	core/ap15/ap15rm_power_utils.c \
+	core/ap15/nvrm_clocks.c \
+	core/ap15/nvrm_diag.c \
+	io/ap15/ap15rm_analog.c \
+	io/ap15/ap15rm_dma_hw_private.c \
+	io/ap15/ap15rm_dma_intr.c \
+	io/ap15/ap15rm_gpio_vi.c \
+	io/ap15/ap15rm_pwm.c \
+	io/ap15/nvrm_dma.c \
+	io/ap15/nvrm_gpio.c \
+	io/ap15/nvrm_gpio_private.c \
+	io/ap15/nvrm_gpio_stub_helper.c \
+	io/ap15/rm_common_slink_hw_private.c \
+	io/ap15/rm_dma_hw_private.c \
+	io/ap15/rm_spi_hw_private.c \
+	io/ap15/rm_spi_slink.c \
+	core/ap20/ap20rm_power_dfs.c \
+	io/ap20/ap20rm_i2c.c \
+	io/ap20/ap20rm_slink_hw_private.c \
+	io/t30/t30rm_dma_hw_private.c \
+	io/t30/t30rm_i2c_slave.c \
+	io/t30/t30rm_owr.c \
+	io/t30/t30rm_slink_hw_private.c \
+	core/$(NV_TARGET_SOC_FAMILY)/$(NV_TARGET_SOC_FAMILY)rm_reloctable.c \
+	core/$(NV_TARGET_SOC_FAMILY)/$(NV_TARGET_SOC_FAMILY)rm_fuse.c \
+	core/$(NV_TARGET_SOC_FAMILY)/$(NV_TARGET_SOC_FAMILY)rm_pinmux_tables.c \
+	core/$(NV_TARGET_SOC_FAMILY)/$(NV_TARGET_SOC_FAMILY)rm_clocks.c \
+	core/$(NV_TARGET_SOC_FAMILY)/$(NV_TARGET_SOC_FAMILY)rm_clocks_info.c \
+	../nvlimits/$(NV_TARGET_SOC_FAMILY)rm_clocks_limits.c
+
+# Source files for AOS static library variant
+_libnvrm_src_aos := \
+	core/common/nvrm_heap_carveout.c \
+	core/common/nvrm_heap_secure.c \
+	core/common/nvrm_heap_iram.c \
+	core/common/nvrm_heap_simple.c \
+	core/common/nvrm_memmgr.c \
+	core/common/nvrm_transport.c \
+	core/ap15/ap15rm_xpc.c \
+	core/ap15/ap15rm_xpc_hw_private.c \
+	core/t30/t30rm_smmu.c \
+	core/t30/t30rm_smmu_clients.c
+
+# Source files for linux shared library variants
+_libnvrm_src_shared_linux := \
+	core/common/nvrm_avp_service.c \
+	core/common/nvrm_avp_cpu_rpc.c \
+	core/common/nvrm_moduleloader_linux.c \
+	core/common/nvrm_stub_helper_linux.c \
+	core/common/nvrm_stub_helper_linux_nvmap.c \
+	core/common/nvrm_stub_helper_linux_ion.c \
+	core/common/nvrpc_helper.c
+
+# Source files common to Linux and QNX shared library variants
+_libnvrm_src_shared_common := \
+	core/common/nvrm_stub_helper.c \
+	null_stubs/nvrm_analog_stub.c \
+	null_stubs/nvrm_diag_stub.c \
+	null_stubs/nvrm_gpio_stub.c \
+	null_stubs/nvrm_i2c_stub.c \
+	null_stubs/nvrm_init_stub.c \
+	null_stubs/nvrm_keylist_stub.c \
+	null_stubs/nvrm_module_stub.c \
+	null_stubs/nvrm_owr_stub.c \
+	null_stubs/nvrm_pinmux_stub.c \
+	null_stubs/nvrm_pmu_stub.c \
+	null_stubs/nvrm_power_stub.c \
+	null_stubs/nvrm_pwm_stub.c \
+	null_stubs/nvrm_spi_stub.c
+
+###############################################################################
+#
+# Compilation defines for *ALL* implementation variants
+_libnvrm_cflags :=
+
+ifeq ($(NV_TARGET_SOC_FAMILY), t30)
+_libnvrm_cflags += -DCHIP_T30
+endif
+
+ifeq ($(NV_TARGET_SOC_FAMILY), t11x)
+_libnvrm_cflags += -DTARGET_SOC_T11X
+endif
+
+ifeq ($(NV_TARGET_SOC_FAMILY), t12x)
+_libnvrm_cflags += -DTARGET_SOC_T12X
+endif
+
+###############################################################################
+#
+# Include directories for *ALL* implementation variants
+_libnvrm_includes_all := \
+	core \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY)
+
+# Include directories for static library variant
+_libnvrm_includes_static := \
+	io \
+	../../../utils/nvos/aos/nvap \
+	$(NV_SOURCE)/hwinc-private \
+	$(NV_SOURCE)/hwinc-private/$(NV_TARGET_SOC_FAMILY)
+
+###############################################################################
+#
+# Compiler error suppression for *ALL* implementation variants
+_libnvrm_broken_code := \
+	missing-field-initializers
+
+###############################################################################
+#
+# Static library
+#
+###############################################################################
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := libnvrm_impl
+NV_COMPONENT_OWN_INTERFACE_DIR     := ..
+NV_COMPONENT_SOURCES               := \
+	$(_libnvrm_src_all) \
+	$(_libnvrm_src_static)
+
+#FIX IT BUG 920412:DSI is bondout on 7.2
+NV_COMPONENT_CFLAGS                := \
+	$(_libnvrm_cflags) \
+	-DNV_IS_DYNAMIC=0 \
+	-DUPDATE_DSI_BONDOUT
+
+NV_COMPONENT_INCLUDES              := \
+	$(_libnvrm_includes_all) \
+	$(_libnvrm_includes_static)
+
+NV_COMPONENT_HAS_BROKEN_CODE       := $(_libnvrm_broken_code)
+
+#
+# Include implementation variant or fail for unsupported configuration
+#
+# OS-independent non-userspace variants
+#
+ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+include $(NV_COMPONENT_DIR)/Makefile.static_aos.tmk
+else ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_BOOTING),1)
+include $(NV_COMPONENT_DIR)/Makefile.static_bootloader.tmk
+else ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AVP_IRAM),1)
+$(error libnvrm static library must not be used in microboot/miniloader)
+#
+# OS-dependent userspace variants
+#
+else ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_LINUX),1)
+$(error libnvrm static library must not be used in Linux userspace)
+else ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+$(error libnvrm static library must not be used in QNX userspace)
+else
+$(error libnvrm static library used in unknown build configuration)
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+###############################################################################
+#
+# Shared library
+#
+###############################################################################
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := nvrm
+NV_COMPONENT_OWN_INTERFACE_DIR     := ..
+NV_COMPONENT_SOURCES               := $(_libnvrm_src_all)
+
+NV_COMPONENT_CFLAGS                := \
+	$(_libnvrm_cflags) \
+	-DNV_IS_DYNAMIC=1 \
+	-DPLATFORM_EMULATION=0
+
+NV_COMPONENT_INCLUDES              := $(_libnvrm_includes_all)
+NV_COMPONENT_HAS_BROKEN_CODE       := $(_libnvrm_broken_code)
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS        := ../../../utils/nvos
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := ../../../utils/md5
+
+#
+# Include implementation variant or fail for unsupported configuration
+#
+# OS-independent non-userspace variants
+#
+ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+$(error libnvrm shared library must not be used in AOS)
+else ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_BOOTING),1)
+$(error libnvrm shared library must not be used in bootloader)
+else ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AVP_IRAM),1)
+$(error libnvrm shared library must not be used in microboot/miniloader)
+#
+# OS-dependent userspace variants
+#
+else ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+include $(NV_COMPONENT_DIR)/Makefile.shared_android.tmk
+else ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_LINUX),1)
+include $(NV_COMPONENT_DIR)/Makefile.shared_linux.tmk
+else ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+include $(NV_COMPONENT_DIR)/Makefile.shared_qnx.tmk
+else
+$(error libnvrm shared library used in unknown build configuration)
+endif
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+###############################################################################
+#
+# variable leanup
+_libnvrm_broken_code              :=
+_libnvrm_cflags_all               :=
+_libnvrm_includes_all             :=
+_libnvrm_includes_static          :=
+_libnvrm_src_all                  :=
+_libnvrm_src_aos                  :=
+_libnvrm_src_shared_linux         :=
+_libnvrm_src_static               :=
+_libnvrm_src_shared_common        :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">NvwfdServiceAPP</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">NvwfdServiceActivity</string>
+    <string name="menu_refresh">Refresh Sinks</string>
+    <string name="notification_text">MiracastServiceEnabler</string>
+</resources>

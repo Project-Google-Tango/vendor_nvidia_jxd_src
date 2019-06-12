@@ -1,0 +1,13 @@
+; Lauterbach TRACE32 debugger script to display useful SOC registers.
+
+; Open useful data windows.
+WINPOS 183.43 61.077 87. 25. 15. 1. W007
+data.dump a:0x60006000--0x6006C4FF /spotlight /noascii
+
+WINPOS 183.43 32.692 87. 24. 15. 1. W006
+data.dump a:0x7000E400--0x7000E71F /spotlight /noascii
+
+WINPOS 183.43 24.308 87. 4. 15. 1. W005
+data.dump a:0x60007000--0x6000703F /spotlight /noascii
+
+ENDDO

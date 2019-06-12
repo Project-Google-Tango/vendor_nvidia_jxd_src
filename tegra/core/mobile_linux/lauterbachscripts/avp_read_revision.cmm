@@ -1,0 +1,64 @@
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+local &APB_MISC_GP_HIDREV
+local &APB_MISC_GP_EMU_REVID
+&APB_MISC_GP_HIDREV=data.long(a:0x70000804)
+&APB_MISC_GP_EMU_REVID=data.long(a:0x70000860)
+print "APB_MISC_GP_HIDREV:    " format.hex(8,&APB_MISC_GP_HIDREV)
+print "APB_MISC_GP_EMU_REVID: " format.hex(8,&APB_MISC_GP_EMU_REVID)
+
+local &CHIPID
+local &MAJORREV
+local &MINORREV
+&CHIPID=(&APB_MISC_GP_HIDREV>>8.)&0xff
+&MAJORREV=format.decimal(1,(&APB_MISC_GP_HIDREV>>4.)&0xf)
+&MINORREV=format.decimal(1,(&APB_MISC_GP_HIDREV>>16.)&0xf)
+;print "&CHIPID"
+;print "&MAJORREV"
+;print "&MINORREV"
+
+local &NETLIST
+local &CORE
+local &PATCH
+local &BOARD
+&NETLIST= format.decimal(1,((&APB_MISC_GP_EMU_REVID>>0.)&0xff))
+&CORE=    format.decimal(1,((&APB_MISC_GP_EMU_REVID>>16.)&0xff))
+&PATCH=   format.decimal(1,((&APB_MISC_GP_EMU_REVID>>8.)&0xff))
+&BOARD=   format.decimal(1,((&APB_MISC_GP_EMU_REVID>>24.)&0xff))
+;print "&NETLIST"
+;print "&CORE"
+;print "&PATCH"
+;print "&BOARD"
+
+local &CHIPNAME
+&CHIPNAME="<unknown>"
+if (&CHIPID==0x30)
+    &CHIPNAME="T30"
+if (&CHIPID==0x35)
+    &CHIPNAME="T114"
+if (&CHIPID==0x14)
+    &CHIPNAME="T148"
+if (&CHIPID==0x40)
+    &CHIPNAME="T124"
+
+if (&MAJORREV>0)
+(
+    print "[&CHIPNAME silicon] rev&MAJORREV.&MINORREV"
+    title "AVP [&CHIPNAME silicon] rev&MAJORREV.&MINORREV"
+)
+
+if (&MAJORREV==0)&&(&MINORREV==0)
+(
+    print "[&CHIPNAME QT] net&NETLIST core&CORE (patch&PATCH board&BOARD)"
+    title "AVP [&CHIPNAME QT] net&NETLIST core&CORE (patch&PATCH board&BOARD)"
+)
+
+if (&MAJORREV==0)&&(&MINORREV>0)
+(
+    print "[&CHIPNAME FPGA] net&NETLIST core&CORE (patch&PATCH board&BOARD)"
+    title "AVP [&CHIPNAME FPGA] net&NETLIST core&CORE (patch&PATCH board&BOARD)"
+)
+
+enddo

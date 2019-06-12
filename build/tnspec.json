@@ -1,0 +1,176 @@
+{
+    "copyright" : "Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.",
+    "family" : "tn8",
+    "version" : "1.0",
+    "specs" : {
+        "tn8-p1761" : {
+            "desc" : "P1761/AUO 19x12 panel/4GB",
+            "sku" : "0x1f",
+            "sn" : "",
+            "proc" : {
+                "id"  : "1761",
+                "sku" : "0",
+                "fab" : "0"
+            },
+            "pmu" : {
+                "id"  : "1936",
+                "sku" : "0",
+                "fab" : "0"
+            },
+            "disp" : {
+                "id"  : "1937",
+                "sku" : "1000"
+            },
+            "gps" : "0",
+            "odm" : "0x9c008",
+            "cfg" : "tn8_flash.cfg",
+            "dtb" : "tegra124-tn8-p1761-1470-a00.dtb",
+            "bct" : "flash_e1761_4gb_792.cfg"
+        },
+        "tn8-p1761-battery" : {
+            "desc" : "P1761/AUO 19x12 panel/4GB/Battery",
+            "base" : "tn8-p1761",
+            "odm" : "0x49c008",
+            "dtb" : "tegra124-tn8-p1761-1470-a00-battery.dtb"
+        },
+        "tn8-p1761-2gb" : {
+            "desc" : "P1761/AUO 19x12 panel/2GB",
+            "base" : "tn8-p1761",
+            "dtb" : "tegra124-tn8-p1761-1270-a00.dtb",
+            "bct" : "flash_e1761_2gb_792.cfg"
+        },
+        "tn8diag-p1761-2gb" : {
+            "desc" : "P1761/AUO 19x12 panel/2GB MfgDiag",
+            "base" : "tn8-p1761",
+            "dtb"  : "tegra124-tn8-p1761-1270-a00-battery.dtb",
+            "bct"  : "flash_e1761_2gb_792.cfg",
+            "cfg"  : "tn8diag_flash.cfg"
+        },
+        "tn8diag-p1761-a02" : {
+            "desc" : "P1761/A02/AUO 19x12/2GB/Battery MfgDiag",
+            "base" : "tn8-p1761-2gb-battery",
+            "bct" : "flash_e1761_2gb_924.cfg",
+            "odm" : "0x49c008",
+            "dtb" : "tegra124-tn8-p1761-1270-a02-battery.dtb",
+            "cfg"  : "tn8diag_flash.cfg"
+        },
+        "tn8-p1761-2gb-battery" : {
+            "desc" : "P1761/AUO 19x12 panel/2GB/Battery",
+            "base" : "tn8-p1761-2gb",
+            "odm" : "0x49c008",
+            "dtb" : "tegra124-tn8-p1761-1270-a00-battery.dtb"
+        },
+        "tn8-p1761-12x8" : {
+            "desc" : "P1761/AUO 12x8 panel/4GB",
+            "base" : "tn8-p1761",
+            "disp" : {
+                "id"  : "1807",
+                "sku" : "0"
+            }
+        },
+        "tn8-p1761-2gb-12x8" : {
+            "desc" : "P1761/AUO 12x8 panel/2GB",
+            "base" : "tn8-p1761-2gb",
+            "disp" : {
+                "id"  : "1807",
+                "sku" : "0"
+            }
+        },
+        "tn8-p1761-2gb-12x8-battery" : {
+            "desc" : "P1761/AUO 12x8 panel/2GB/Battery",
+            "base" : "tn8-p1761-2gb-12x8",
+            "odm" : "0x49c008",
+            "dtb" : "tegra124-tn8-p1761-1270-a00-battery.dtb"
+        },
+        "tn8-p1761-a02" : {
+            "desc" : "P1761/A02/AUO 19x12/2GB/Battery",
+            "base" : "tn8-p1761-2gb-battery",
+            "bct" : "flash_e1761_2gb_924.cfg",
+            "odm" : "0x49c008",
+            "dtb" : "tegra124-tn8-p1761-1270-a02-battery.dtb"
+        },
+        "tn8-p1761-a02-no-batt" : {
+            "desc" : "P1761/A02/AUO 19x12/2GB/No Battery",
+            "base" : "tn8-p1761-a02",
+            "odm" : "0x9c008",
+            "dtb" : "tegra124-tn8-p1761-1270-a02.dtb"
+        },
+        "tn8-e1784" : {
+            "desc" : "ERS of P1761/AUO 19x12/4GB",
+            "base" : "tn8-p1761",
+            "proc" : {
+                "id"  : "1784"
+            }
+        },
+        "tn8-e1784-2gb" : {
+            "desc" : "ERS of P1761/AUO 19x12/2GB",
+            "base" : "tn8-p1761-2gb",
+            "dtb"  : "tegra124-tn8-e1784-1101-a00.dtb",
+            "proc" : {
+                "id"  : "1784"
+            }
+        },
+        "tn8-e1784-924" : {
+            "desc" : "ERS of P1761/AUO 19x12/2GB/924MHz",
+            "base" : "tn8-e1784-2gb",
+            "bct" : "flash_e1761_2gb_924.cfg"
+        },
+        "tn8-e1784-12x8" : {
+            "desc" : "ERS of P1761/AUO 12x8/4GB",
+            "base" : "tn8-p1761-12x8",
+            "proc" : {
+                "id"  : "1784"
+            }
+        },
+        "tn8-e1784-12x8-battery" : {
+            "desc" : "ERS of P1761/AUO 12x8/4GB/battery",
+            "base" : "tn8-e1784-12x8",
+            "odm" : "0x498008",
+            "dtb" : "tegra124-tn8-p1761-1470-a00-battery.dtb"
+        },
+        "tn8-e1784-2gb-12x8" : {
+            "desc" : "ERS of P1761/AUO 12x8/2GB",
+            "base" : "tn8-p1761-2gb-12x8",
+            "dtb"  : "tegra124-tn8-e1784-1101-a00.dtb",
+            "proc" : {
+                "id"  : "1784"
+            }
+        },
+        "tn8-e1922" : {
+            "desc" : "POP version of TN8/AUO 19x12/3GB",
+            "base" : "tn8-p1761",
+            "proc" : {
+                "id"  : "1922"
+            },
+            "dtb" : "tegra124-tn8-e1922-1100-a00.dtb",
+            "bct" : "flash_e1922_3gb_924.cfg"
+        },
+        "tn8-e1922-12x8" : {
+            "desc" : "POP version of TN8/LG 12x8/3GB",
+            "base" : "tn8-e1922",
+            "disp" : {
+                "id" : "1549",
+                "sku" : "1100"
+            }
+        },
+        "tn8-e1922-hynix-pop-2gb" : {
+            "desc" : "POP version of TN8/AUO Hynix 19x12/2GB",
+            "base" : "tn8-p1761",
+            "proc" : {
+                "id"  : "1922"
+            },
+            "dtb" : "tegra124-tn8-e1922-1100-a00-hynix-pop-2gb.dtb",
+            "bct" : "flash_e1922_hynix_pop_2gb_924.cfg"
+        },
+        "tn8-e1780" : {
+            "desc" : "Equivalent to the old nct_tn8.txt. Should be deprecated.",
+            "sn" : "",
+            "cm" : "0",
+            "lbh": "0",
+            "factory_mode": "0",
+            "ramdump": "0",
+            "gps_id" : "0",
+            "skip_board_info" : true
+        }
+    }
+}

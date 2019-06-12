@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2013 NVIDIA CORPORATION.  All Rights Reserved.
+ *
+ * NVIDIA Corporation and its licensors retain all intellectual property and
+ * proprietary rights in and to this software and related documentation.  Any
+ * use, reproduction, disclosure or distribution of this software and related
+ * documentation without an express license agreement from NVIDIA CORPORATION
+ * is strictly prohibited.
+ */
+
+------------------------------------------
+Title : NvBDKTest Framework Documentation
+------------------------------------------
+
+Description:
+------------
+This package consists sources, headers and other necessary
+files for the NvBDKTest framework for running Bootloader
+tests for modules such as SD, SE, DSI, PWM, FUSES, etc.
+
+Directory Structure:
+--------------------
+nvbdktest
+ |-framework           => contains all framework APIs and their sources
+   |-registerer        => contains test and suite registration APIs
+   |-error_handler     => contains all failure log and error handling functions
+   |-runner            => contains all APIs for running a registry/module/test/
+ |-server              => a CPU side  client to intercept RunBDKTest command
+ |-testsources         => directory containing module wise sources
+   |-sd
+   |-se
+   |-dsi
+   |-..
+   |-..
+
+
+Instructions/Steps for porting a test module to the framework:
+--------------------------------------------------------------
+To add/port  a test module ( here for eg: sd ) , users need to follow these steps:
+
+1) Add test source files to core/system/nvbdktest/testsources/<test_module>
+2) Update Android.mk/Makefile/Makefile.tmk  in core/system/nvbdktest/testsources.
+3) Create an init function("module_init_reg()" for registering the test functions
+   to the framework and add "Nv" prefix to all test names
+4) Add the created init function to default registration of NvBDKTest framework i.e.
+   in function NvBDKTest_CreateDefaultRegistration in file nvbdktest/framework/registerer/registerer.c
+5) Use NvBDKTest error macros to post error logs in your test source code
+   (check available macros at : core/system/nvbdktest/framework/error_handler/error_handler.h)
+6) Test locally
+
+   Refer : http://git-master/r/#change,112856
+
+
+Build and Running Instructions:
+-------------------------------
+1) Create a testplan file in $OUT directory with test entries of format:
+   <arg:"suite_name";instance:"value";filename:"txt or bin";mem_add:"memory address">
+   <suite:"suite_name or all";test:"test-name or test-type or all">
+
+   For e.g.,
+   Environmental settings for running the suite.
+   If the environment is not set then by default 0 will be taken for expected args.
+
+   <arg:se;instance:0;filename:se.txt>
+   <arg:sd;instance:0>
+   <arg:pwm;mem_add:0x400;filename:dsi.bin>
+
+   For specifying the suites to run:
+
+   1)For all suites with all tests
+     <suite:all;test:all>
+   2)For all suites with performance tests
+     <suite:all;test:performance>
+   3)For one suite with all tests
+     <suite:dsi;test:all>
+   4)For one suite with basic tests
+     <suite:sd;test:basic>
+   5)For one suite with specific test
+     <suite:sd;test:NvBasicReadTest>
+
+   For Illustration
+   <arg:sd;instance:0>
+   <suite:sd;test:basic> //uses instance as 0
+
+   <arg:sd;instance:3>
+   <suite:sd;test:basic> //uses instance as 3
+
+   <arg:sd;instance:2> //no use if no suite line later
+
+   Refer: testplan_sample.txt
+
+
+2) Build nvbdktestbl  & nvflash by :
+    $mp nvbdktestbl
+    $mp nvflash
+
+3) Run tests by :
+   For o/p into a file : ./nvflash --runbdktest testplan.txt output.txt --bl nvbdktestbl.bin --go
+   or
+   For o/p onto host : ./nvflash --runbdktest testplan.txt hostdisplay --bl nvbdktestbl.bin --go
+
+   Refer: output.txt
+
+
+Contact:
+-------
+For any framework/porting issues please contact NvFlash Team.

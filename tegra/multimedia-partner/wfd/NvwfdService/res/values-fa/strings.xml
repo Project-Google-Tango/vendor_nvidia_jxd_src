@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">خدمات UI صفحه نمایش بی‌سیم NVIDIA</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">به دلیل فعال بودن Miracast، در دسترس نیست.</string>
+    <string name="miracast_hdcp_title">تأیید اعتبار ناموفق HDCP با %1$s </string>
+    <string name="miracast_hdcp_failure_text">محتوای برتر قابل نمایش نیست.</string>
+    <string name="miracast_connection_status_discovery">جستجوی\u0020</string>
+    <string name="miracast_connection_status_progress">اتصال به\u0020</string>
+    <string name="miracast_connection_status_connected">اکنون پخش همزمان در\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">\u0020 یافت نشد</string>
+    <string name="miracast_connection_status_warning_conn_lost">اتصال به \u0020 قطع شد</string>
+    <string name="miracast_connection_status_warning_auth_failed">مشکل تأیید اعتبار با \u0020</string>
+    <string name="miracast_access_settings_title">دسترسی به تنظیمات Miracast</string>
+</resources>

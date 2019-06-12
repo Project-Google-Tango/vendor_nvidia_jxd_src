@@ -1,0 +1,53 @@
+; Lauterbach TRACE32 debugger script to configure JTAG for the CPU.
+
+local &QT_EMU
+&QT_EMU=os.env(QT_EMU)
+
+do &(TARGET_SOC)/&(TARGET_SOC)_detect_cpu.cmm
+
+;system.reset
+IF "&QT_EMU"==""
+(
+   system.jtagclock 300khz
+   ;system.jtagclock rtck
+)
+ELSE
+(
+   ;system.jtagclock 5000hz
+   system.jtagclock 7khz
+)
+
+IF "&HAS_CORTEX_A15"=="1"
+(
+  system.cpu CORTEXA15
+)
+ELSE
+(
+  system.cpu CORTEXA9
+)
+
+system.option enreset off
+
+system.config corebase apb:0x80010000
+
+system.config irpre 0.
+system.config irpost 0.
+system.config drpre 0.
+system.config drpost 0.
+
+system.config DAPIRPOST 4
+system.config DAPDRPOST 1
+system.config DAPIRPRE 0
+system.config DAPDRPRE 0
+
+trace.disable
+
+system.mode.attach
+
+IF "&USE_ONCHIP_BRKPT"=="TRUE"
+(
+  break.select program onchip
+)
+
+enddo
+

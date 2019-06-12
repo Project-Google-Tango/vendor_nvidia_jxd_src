@@ -1,0 +1,27 @@
+; Lauterbach TRACE32 debugger script to power the up the CPU from the AVP.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+; NOTE: THIS SCRIPT WILL WORK ONLY ON UN-FUSED PARTS.
+
+; Setup JTAG for AVP-only.
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_jtag_setup.cmm
+
+; Tell the debugger not to access non-existent memory locations.
+do physical_setup.cmm
+
+system.mode.up
+
+; Open useful data windows.
+do soc_reg.cmm
+
+; Initialize the memory controller.
+do &(TARGET_SOC)/&(TARGET_CONFIG)_init_sdram.cmm
+
+; Power up the CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_power_cpu.cmm
+
+ENDDO
+

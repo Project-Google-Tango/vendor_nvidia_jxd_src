@@ -1,0 +1,12 @@
+--ExifEnable 1
+--ImageDescription AshokM
+--Make NvidiaGraphics
+--Model APX2500
+--Copyright NvidiaCopyRight@
+--Artist NvArtist
+--Software NvSoftware
+--DateTime 2008:05:27 16:09:10
+--DateTimeOriginal 2008:05:27 16:09:10
+--DateTimeDigitized 2008:05:27 16:09:10
+--filesource 1
+--UserComment GOODImage

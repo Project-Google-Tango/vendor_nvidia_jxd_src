@@ -1,0 +1,52 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnv3p target static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnv3p_t30
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	../nv3p.c \
+	../nv3p_transport_device.c \
+	../nv3p_transport_usb_descriptors.c \
+	../nvboot_misc_t30.c \
+	../nvml_usbf_t30.c
+
+NV_COMPONENT_INCLUDES          := \
+	../../../drivers/nvboot \
+	../../../drivers/nvboot/t30 \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/t30
+
+NV_COMPONENT_CFLAGS            := \
+	-DNV_IS_AVP=1 \
+	-DNVODM_BOARD_IS_FPGA=0 \
+	-DENABLE_TXX \
+	-DENABLE_T30
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS += -DNV_EMBEDDED_BUILD
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif #NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

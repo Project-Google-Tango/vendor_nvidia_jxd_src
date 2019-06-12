@@ -1,0 +1,14 @@
+; Lauterbach TRACE32 debugger script to attach to CPU but otherwise do not change the system state.
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_jtag_setup.cmm
+wait 100.ms
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+system.mode.attach
+
+ENDDO

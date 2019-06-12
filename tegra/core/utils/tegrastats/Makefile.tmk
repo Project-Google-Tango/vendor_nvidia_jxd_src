@@ -1,0 +1,42 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# tegrastats executable component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_DYNAMIC_EXECUTABLE_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := tegrastats
+NV_COMPONENT_SOURCES               := main.c
+NV_COMPONENT_FLAG_IS_TEST          := 1
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../drivers/nvrm/graphics
+
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_CFLAGS                := -DNV_IS_LDK=0
+NV_COMPONENT_NEEDED_INTERFACE_DIRS += \
+	$(NV_SOURCE)/tmake/external/android/log
+else
+NV_COMPONENT_CFLAGS                := -DNV_IS_LDK=1
+endif
+
+include $(NV_BUILD_DYNAMIC_EXECUTABLE)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

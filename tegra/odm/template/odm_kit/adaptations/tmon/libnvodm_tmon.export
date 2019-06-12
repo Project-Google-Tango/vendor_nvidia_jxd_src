@@ -1,0 +1,12 @@
+NvOdmTmonDeviceOpen
+NvOdmTmonDeviceClose
+NvOdmTmonSuspend
+NvOdmTmonResume
+
+NvOdmTmonTemperatureGet
+NvOdmTmonCapabilitiesGet
+NvOdmTmonParameterCapsGet
+NvOdmTmonParameterConfig
+
+NvOdmTmonIntrRegister
+NvOdmTmonIntrUnregister

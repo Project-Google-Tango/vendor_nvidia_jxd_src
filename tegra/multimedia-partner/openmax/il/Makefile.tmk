@@ -1,0 +1,197 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvomx shared library component makefile fragment
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := nvomx
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	libomxil.c \
+	core/NvxCore.c \
+	components/common/NvxComponent.c \
+	components/common/NvxResourceManager.c \
+	components/common/NvxPort.c \
+	components/common/simplecomponentbase.c \
+	components/NvxClockComponent.c \
+	components/NvxMp4FileWriter.c \
+	components/NvxVideoScheduler.c \
+	components/NvxRawFileReader.c \
+	components/NvxRawFileWriter.c \
+	common/NvxTrace.c \
+	common/NvxMutex.c \
+	common/nvxjitter.c \
+	common/nvxlist.c \
+	components/common/NvxScheduler.c \
+	nvmm/components/common/NvxCompReg.c \
+	nvmm/components/common/nvmmtransformbase.c \
+	nvmm/components/common/NvxCompMisc.c \
+	nvmm/common/NvxHelpers.c \
+	nvmm/components/nvxaudiodecoder.c \
+	nvmm/components/nvxbypassdecoder.c \
+	nvmm/components/nvxvideodecoder.c \
+	nvmm/components/nvxvideorenderer.c \
+	nvmm/components/nvxloopbackrenderer.c \
+	nvmm/components/nvxcamera.c \
+	nvmm/components/nvximageencoder.c \
+	nvmm/components/nvximagedecoder.c \
+	nvmm/components/nvxaudioencoder.c \
+	nvmm/components/nvxvideoextractor.c \
+	nvmm/common/nvxcrccheck.c \
+	nvmm/components/nvxparser.c \
+	nvmm/common/nvxeglimage.c \
+	nvmm/common/nvxegl.c \
+	nvmm/components/nvxliteaudioencoder.c \
+	nvmm/components/nvxliteimagedecoder.c \
+	nvmm/components/nvxliteimageencoder.c \
+	nvmm/components/nvxliteaudiodecoder.c \
+	nvmm/components/nvxlitevideodecoder.c \
+	nvmm/components/nvxlitevideoencoder.c \
+	nvmm/components/common/nvxlitechooser.c \
+	nvmm/components/common/nvmmlitetransformbase.c \
+	nvmm/components/common/nvmmlitevideo_profile_level.c \
+	nvmm/components/common/nvxaudiocapability.c \
+	nvmm/common/nvxwinmanagerstub.c
+
+NV_COMPONENT_CFLAGS            := \
+	-D__OMX_EXPORTS \
+	-DOMXVERSION=2 \
+	-DUSE_NVOS_AND_NVTYPES
+
+ifeq ($(NV_TARGET_SOC), t124)
+	NV_COMPONENT_CFLAGS += -DCAMERA_T124
+else
+ifeq ($(NV_TARGET_SOC), t114)
+	NV_COMPONENT_CFLAGS += -DCAMERA_T114
+else
+ifeq ($(NV_TARGET_SOC), t148)
+	NV_COMPONENT_CFLAGS += -DCAMERA_T148
+else
+ifeq ($(NV_TARGET_SOC), t30)
+	NV_COMPONENT_CFLAGS += -DCAMERA_WESTON
+else
+	NV_COMPONENT_CFLAGS += -DCAMERA_WESTON
+endif
+endif
+endif
+endif
+
+NV_COMPONENT_INCLUDES          := \
+	common \
+	components \
+	components/common \
+	nvmm \
+	nvmm/common \
+	nvmm/components/common \
+	$(NV_SOURCE)/camera/core/include \
+	$(NV_SOURCE)/camera-partner/imager/include
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(NV_SOURCE)/multimedia/tvmr/tvmr \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmm \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmm/contentpipe \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmm/utils \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmmlite \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmmlite/utils \
+	$(NV_SOURCE)/core/drivers/nvodm/query \
+	$(NV_SOURCE)/core/drivers/nvrm \
+	$(NV_SOURCE)/core/drivers/nvrm/graphics \
+	$(NV_SOURCE)/core/utils/nvos \
+	$(NV_INTERFACE_GRAPHICS_DDK2D_V2)
+
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+	$(NV_INTERFACE_GPU_GRAPHICS_EGL)
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/utils/md5 \
+	$(NV_SOURCE)/core/utils/nvfxmath \
+	$(NV_SOURCE)/camera/utils/camerautil
+
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_SOURCES           += \
+	nvmm/common/nvxandroidbuffer.cpp \
+	nvmm/common/nvxhelpers_anw.cpp \
+	nvmm/common/nvxhelpers_camera.cpp \
+	nvmm/common/nvxliteandroidbuffer.cpp \
+	nvmm/components/nvxaudiorenderer_opensles.c
+NV_COMPONENT_CFLAGS            += \
+	-DUSE_ANDROID_NATIVE_WINDOW=1 \
+	-DUSE_ANDROID_CAMERA_PREVIEW \
+	-DUSE_FULL_FRAME_MODE=1
+NV_COMPONENT_HAS_BROKEN_CODE   := ignore-all
+ifneq ($(NV_ANDROID_RELEASE),ics)
+NV_COMPONENT_INCLUDES          += \
+	$(NV_ANDROID_TOP)/frameworks/av/include \
+	$(NV_ANDROID_TOP)/frameworks/native/include/media/hardware
+endif
+NV_COMPONENT_NEEDED_INTERFACE_DIRS   += \
+	../al/OpenSLES \
+	$(NV_SOURCE)/graphics-partner/android/libnvgr \
+	$(NV_SOURCE)/tmake/external/android/cutils \
+	$(NV_SOURCE)/tmake/external/android/hardware \
+	$(NV_SOURCE)/tmake/external/android/media \
+	$(NV_SOURCE)/tmake/external/android/sync \
+	$(NV_SOURCE)/tmake/external/android/utils
+else
+NV_COMPONENT_SOURCES           += \
+	components/nvxalsacapture.c \
+	components/nvxalsarenderer.c \
+	nvmm/common/nvxhelpers_dc.c
+NV_COMPONENT_CFLAGS            += \
+	-DUSE_DC_DRIVER \
+	-DUSE_ANDROID_NATIVE_WINDOW=0 \
+	-DUSE_NVMM_LITE=0 \
+	-DUSE_FULL_FRAME_MODE=0
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS            += \
+	-DNV_RECEIVE_HEADER_AFTER_ABORT \
+	-DNV_DEF_USE_PITCH_MODE
+endif
+
+NV_COMPONENT_INCLUDES          += \
+	$(NV_SOURCE)/3rdparty/alsa/alsa-lib-1.0.18/include
+NV_COMPONENT_NEEDED_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core/drivers/libnvdc \
+	$(NV_SOURCE)/l4t/3rdpartystub/asound
+endif
+
+_versioned_sonames :=
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+# no versioned SONAME in Embedded builds
+else ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_L4T),1)
+_versioned_sonames := 1
+else ifeq ($(NV_BUILD_CONFIGURATION_IS_DESKTOPGL),1)
+_versioned_sonames := 1
+else
+# no versioned SONAME by default
+endif
+ifdef _versioned_sonames
+NV_COMPONENT_CFLAGS += \
+	-DLIBEGL_DSO=\"libEGL.so.1\"
+else
+NV_COMPONENT_CFLAGS += \
+	-DLIBEGL_DSO=\"libEGL\"
+endif
+_versioned_sonames :=
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

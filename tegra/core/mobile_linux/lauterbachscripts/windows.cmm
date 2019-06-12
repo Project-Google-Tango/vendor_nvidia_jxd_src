@@ -1,0 +1,34 @@
+// TC1 Fri Apr 27 17:42:55 2007
+
+ B::
+
+ TOOLBAR ON
+ STATUSBAR ON
+ WINPAGE.RESET
+
+ WINCLEAR
+
+ WINPOS 150. 16.5 53. 35. 0. 0. W001
+ Register
+
+ WINPOS 99. 78. 120. 6. 23. 1. W002
+ WINTABS 13. 16. 0. 0. 0. 0. 20.
+ Break.List
+
+ WINPOS 150. 68. 80. 26. 23. 1. W003
+ WINTABS 13. 16. 0. 0. 0. 0. 20.
+ Var.Local
+
+IF "&ENABLE_DCC_WINDOW"=="TRUE"
+(
+ WINPOS 0. 60. 128. 25. 0. 0. W004
+ term.gate
+)
+
+ WINPOS 0. 16.5 144. 53. 13. 1. W000
+ WINTABS 16. 10. 25. 62.
+ Data.List
+
+; WINPAGE.SELECT W000
+
+ ENDDO

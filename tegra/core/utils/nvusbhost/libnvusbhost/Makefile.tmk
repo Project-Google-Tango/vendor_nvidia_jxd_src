@@ -1,0 +1,79 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake component makefile for libnvusbhost.
+#
+###############################################################################
+
+ifeq ($(NV_HOST_OS), linux)
+_common_sources              := \
+	linux/nvusbhost_linux.c
+
+_common_includes             := \
+	/usr/include
+
+else ifeq ($(NV_HOST_OS), darwin)
+_common_sources              := \
+	darwin/nvusbhost_darwin.c \
+	darwin/usb_osx.c
+
+else ifeq ($(NV_HOST_OS),windows)
+_common_sources              := \
+	win32/nvusbhost.c
+
+_common_includes             := \
+	$(NV_TOOLS)/tools/ddk/nt6/6000/inc/api \
+	$(NV_TOOLS)/tools/ddk/nt6/6000/inc/crt \
+	$(NV_TOOLS)/tools/ddk/nt6/6000/inc/ddk
+endif
+
+###############################################################################
+# Static lib
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME            := libnvusbhost
+NV_COMPONENT_SOURCES         := $(_common_sources)
+NV_COMPONENT_INCLUDES        := $(_common_includes)
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+###############################################################################
+# Shared lib
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := nvusbhost
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_sources)
+NV_COMPONENT_INCLUDES	       := $(_common_includes)
+
+ifeq ($(NV_HOST_OS),windows)
+NV_COMPONENT_SYSTEM_STATIC_LIBRARIES := \
+	setupapi \
+	strsafe
+endif
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/utils/nvos
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Reset local variable
+_common_sources  :=
+_common_includes :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

@@ -1,0 +1,17 @@
+NvTestInitialize
+NvTestTerminate
+NvTestError
+NvTestSubtestBegin
+NvTestSubtestFail
+NvTestSubtestSkip
+NvTestGetFailureCount
+NvTestSetRunFunction
+NvTestWrite
+NvTestWriteString
+NvTestPrintf
+NvTestVprintf
+NvTestReadline
+NvTestSetSubtestFilter
+NvTestGetHwStrings
+NvTestResultsForREST
+NvTestWriteFTrace

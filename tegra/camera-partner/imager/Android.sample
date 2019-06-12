@@ -1,0 +1,38 @@
+NV_TOP_PATH := $(call my-dir)
+LOCAL_PATH := $(NV_TOP_PATH)
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := libnvodm_imager
+LOCAL_PRELINK_MODULE := false
+
+LOCAL_ARM_MODE := arm
+LOCAL_CFLAGS += -march=armv6 -mtune=mpcore -mfpu=vfp
+
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/configs
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../query/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../../../../../hardware/tegra/include
+
+LOCAL_SRC_FILES += imager_hal.c
+LOCAL_SRC_FILES += imager_util.c
+LOCAL_SRC_FILES += sensor_bayer.c
+LOCAL_SRC_FILES += sensor_yuv_soc380.c
+LOCAL_SRC_FILES += sensor_bayer_ov5630.c
+LOCAL_SRC_FILES += sensor_bayer_ov5650.c
+LOCAL_SRC_FILES += focuser.c
+LOCAL_SRC_FILES += flash.c
+
+LOCAL_SHARED_LIBRARIES += libnvrm
+LOCAL_SHARED_LIBRARIES += libnvrm_graphics
+LOCAL_SHARED_LIBRARIES += libnvos
+LOCAL_SHARED_LIBRARIES += libnvodm_query
+LOCAL_STATIC_LIBRARIES += libnvodm_services
+
+LOCAL_CFLAGS += -DNV_DEBUG=0
+LOCAL_CFLAGS += -DNDEBUG
+LOCAL_CFLAGS += -D__STDC_VERSION__=199901L
+LOCAL_CFLAGS += -DANDROID
+LOCAL_CFLAGS += -DNV_IS_AVP=0
+LOCAL_CFLAGS += -DNV_OAL=0
+include $(BUILD_SHARED_LIBRARY)
+
+include $(call all-makefiles-under,$(NV_TOP_PATH))

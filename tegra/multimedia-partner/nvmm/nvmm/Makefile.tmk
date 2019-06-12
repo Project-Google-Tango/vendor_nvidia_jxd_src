@@ -1,0 +1,68 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2012, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake component makefile for libnvmm.
+#
+###############################################################################
+
+_nvmm_common_name     := nvmm
+_nvmm_common_sources  := \
+	nvmm.c
+_nvmm_common_includes := \
+	include \
+	../include
+
+###############################################################################
+# Shared library.
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := $(_nvmm_common_name)
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_SOURCES               := \
+	$(_nvmm_common_sources) \
+	transport/nvmm_transport_client.c
+NV_COMPONENT_INCLUDES              := $(_nvmm_common_includes)
+NV_COMPONENT_CFLAGS                += \
+	-DNVMM_BUILT_DYNAMIC=1
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	utils \
+	$(NV_SOURCE)/core/utils/nvos
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/drivers/nvrm
+NV_COMPONENT_NEEDED_WHOLE_STATIC_INTERFACE_DIRS := \
+	transport
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif # NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+
+###############################################################################
+# Static library.
+# Used by AOS builds.
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME          := lib$(_nvmm_common_name)
+NV_COMPONENT_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES       := $(_nvmm_common_sources)
+NV_COMPONENT_INCLUDES      := $(_nvmm_common_includes)
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif # NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+
+# Local variable clean-up.
+_nvmm_common_name :=
+_nvmm_common_sources :=
+_nvmm_common_includes :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

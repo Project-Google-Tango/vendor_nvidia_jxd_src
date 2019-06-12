@@ -1,0 +1,58 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvmm_writer: shared library
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := nvmm_writer
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../utils \
+	../../contentpipe \
+	$(NV_SOURCE)/core/drivers/nvrm \
+	$(NV_SOURCE)/core/utils/nvos
+NV_COMPONENT_NEEDED_WHOLE_STATIC_INTERFACE_DIRS := \
+	../common \
+	../writer_common
+
+# NvMM configurable components (here nvmm blocks)
+#
+# ../Makefile.components.tmk makefile fragment reads in nvmm "enabled"
+# and "locale=[AVP|CPU|ALL]" related configuration settings and based
+# on that information decides if particular component should be
+# included in build.
+#
+# NVMM_CONFIGURABLE_PATH contains the relative root directory of
+# individual codec components.
+#
+# NVMM_CONFIGURABLE_TYPE contains information about the "category of
+# codecs" being processed at a time. Makefile fragment processes one
+# category at a time, and adds components from that category to list
+# NVMM_CONFIGURABLE_COMPONENTS.
+#
+NVMM_CONFIGURABLE_PATH       := ..
+NVMM_CONFIGURABLE_TYPE       := writer
+include $(NV_COMPONENT_DIR)/../Makefile.components.tmk
+NV_COMPONENT_NEEDED_WHOLE_STATIC_INTERFACE_DIRS += $(NVMM_CONFIGURABLE_COMPONENTS)
+NVMM_CONFIGURABLE_COMPONENTS :=
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

@@ -1,0 +1,39 @@
+; Lauterbach TRACE32 debugger script to boot AVP with miniloader loaded into IRAM by this script.
+
+; NOTE: THIS SCRIPT WILL WORK ONLY ON UN-FUSED PARTS.
+
+winclear
+
+; Setup JTAG for AVP-only.
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_jtag_setup.cmm
+
+; This should be set to "auto" if the symbol information
+; is built with the correct labeling of "arm" vs. "thumb"
+; mode code areas.
+;system.option.dismode.auto
+system.option.dismode.access
+
+; Tell the debugger not to access non-existent memory locations.
+do physical_setup.cmm
+
+sYmbol.RESet
+
+; Load Miniloader
+print "Loading &MINILOADER symbols"
+data.load.elf &MINILOADER /nocode /GNU
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+; Attach to the target without resetting it
+system.mode.attach
+
+IF ("&LOAD_SAVED_AVP_WINDOWS"=="TRUE")
+(
+  ; Restore saved window configuration (this is always saved in the $T32SYS directory -- don't change the path)
+  do &T32SYS/windows.cmm
+)
+
+enddo

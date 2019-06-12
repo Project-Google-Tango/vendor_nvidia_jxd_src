@@ -1,0 +1,8 @@
+NvmmGetFileContentPipe
+NvMMGetContentPipe
+
+NvRegisterProtocol
+NvFreeAllProtocols
+
+NvGetProtocolForFile
+

@@ -1,0 +1,18 @@
+;---------------------------------------------------------------
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;---------------------------------------------------------------
+; This file is called from load_ramdump.cmm to change core
+; Trace32 simulator doesn't support SMP debugging.
+; We should change core manually.
+;---------------------------------------------------------------
+
+B::
+
+ENTRY &CORE_NUMBER
+
+CORE &CORE_NUMBER
+do MMU_CORE&(CORE_NUMBER).cmm
+wait 10.ms
+do REG_CORE&(CORE_NUMBER).cmm
+
+ENDDO

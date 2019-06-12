@@ -1,0 +1,199 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2014, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvodm_imager shared library
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := nvodm_imager
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_SOURCES               := \
+	../imager_hal.c \
+	../imager_det.c \
+	../imager_static.c \
+	../imager_nvc.c \
+	../imager_util.c \
+	../sensor_yuv_ov5640.c \
+	../sensor_yuv_soc380.c \
+	../sensor_bayer_ov5650.c \
+	../sensor_bayer_ov5693.c \
+	../sensor_bayer_ov9726.c \
+	../nvc_bayer_imx091.c \
+	../sensor_bayer_ov14810.c \
+	../sensor_bayer_ov2710.c \
+	../sensor_bayer_ar0832.c \
+	../nvc_bayer_ov9772.c \
+	../sensor_bayer_imx179.c \
+	../sensor_null.c \
+	../sensor_host.c \
+	../focuser_ad5820.c \
+	../focuser_ad5823.c \
+	../focuser_ar0832.c \
+	../focuser_nvc.c \
+	../torch_nvc.c \
+	../sensor_bayer_imx135.c \
+	../sensor_bayer_imx132.c \
+	../sensor_yuv_ov7695.c \
+	../sensor_bayer_ar0833.c \
+	../focuser_dw9718.c \
+	../sensor_bayer_ar0261.c \
+	../sensor_yuv_mt9m114.c \
+	../nvpcl_controller.c \
+	../nvpcl_controller_funcs.c \
+	../nvpcl_hw_translator.c \
+	../nvpcl_nvodm_tools.c \
+	../nvpcl_prints.c \
+	../nvpcl_api.c \
+	$(CURDIR)/nvodm_imager_build_date.c
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),t132ref)
+PLATFORM_PATH                      := camera-partner/imager/platform/ardbeg
+else
+PLATFORM_PATH                      := camera-partner/imager/platform/$(NV_TARGET_REFERENCE_BOARD)
+endif
+#ifeq ($(wildcard $(PLATFORM_PATH)/nvodm_query_camera.c),$(PLATFORM_PATH)/nvodm_query_camera.c)
+ifneq (,$(filter $(NV_TARGET_REFERENCE_BOARD),ardbeg t132ref))
+    NV_COMPONENT_SOURCES += ../platform/ardbeg/nvodm_query_camera.c
+else
+    NV_COMPONENT_SOURCES += ../platform/template/nvodm_query_camera.c
+endif
+
+# Note that we have added core/include below to make sure its included before
+# kernel/include which also contains same headers with diffrent content
+NV_COMPONENT_INCLUDES              := \
+	../configs \
+	../include \
+	$(NV_SOURCE)/core/include \
+	$(NV_SOURCE)/bootloader/nvbootloader/odm-partner/template/odm_kit/query/include \
+	$(NV_SOURCE)/customers/nvidia-partner/template/odm_kit/query/include \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmm/include \
+	$(NV_SOURCE)/multimedia-partner/nvmm/include \
+	$(NV_SOURCE)/camera/core_v3/include \
+	$(NV_SOURCE)/camera/utils/include
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/drivers/nvodm/query \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmm/utils \
+	$(NV_SOURCE)/core/utils/nvos
+
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/drivers/nvrm
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	$(NV_SOURCE)/camera/core_v3/nvdata \
+	$(NV_SOURCE)/camera/core_v3/frame_data_framework \
+	$(NV_SOURCE)/core/drivers/nvodm/services
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),cardhu)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core/drivers/nvddk/fuses/read \
+	$(NV_SOURCE)/core/drivers/nvddk/fuses/write
+endif
+
+NV_COMPONENT_CFLAGS                += \
+	-DBUILD_FOR_AOS=0 \
+	-DSET_KERNEL_PINMUX
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS                += \
+	-DNV_EMBEDDED_BUILD
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),cardhu)
+NV_COMPONENT_CFLAGS            += -DBUILD_FOR_CARDHU=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),ardbeg_t114)
+NV_COMPONENT_CFLAGS            += -DBUILD_FOR_ARDBEG=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),ardbeg)
+NV_COMPONENT_CFLAGS            += -DBUILD_FOR_ARDBEG=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),t132ref)
+NV_COMPONENT_CFLAGS            += -DBUILD_FOR_ARDBEG=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),bonaire)
+NV_COMPONENT_CFLAGS            += -DBUILD_FOR_BONAIRE=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),bonaire_sim)
+NV_COMPONENT_CFLAGS            += -DBUILD_FOR_BONAIRE_SIM=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),ceres)
+NV_COMPONENT_CFLAGS            += -DBUILD_FOR_CERES=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),curacao)
+NV_COMPONENT_SOURCES           :=
+NV_COMPONENT_ODM_WHOLE_STATIC  := imager
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-partner/Makefile.odm.tmk
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),curacao_sim)
+NV_COMPONENT_SOURCES           :=
+NV_COMPONENT_ODM_WHOLE_STATIC  := imager
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-partner/Makefile.odm.tmk
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),dolak)
+NV_COMPONENT_SOURCES           :=
+NV_COMPONENT_ODM_WHOLE_STATIC  := imager
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-partner/Makefile.odm.tmk
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),dolak_sim)
+NV_COMPONENT_SOURCES           :=
+NV_COMPONENT_ODM_WHOLE_STATIC  := imager
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-partner/Makefile.odm.tmk
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),laguna_t114)
+# TBD
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),laguna)
+# TBD
+endif
+endif
+#
+###############################################################################
+
+NV_COMPONENT_HAS_BROKEN_CODE   := ignore-all
+
+###############################################################################
+#
+# generated files
+#
+$(CURDIR)/nvodm_imager_build_date.c:
+	@echo Generating $@
+	( \
+		echo "// GENERATED FILE"; \
+		echo "const char *g_BuildDate = \""$$($(DATE))"\";"; \
+	) >$@
+
+NV_COMPONENT_DISTCLEAN_FILES   += \
+	nvodm_imager_build_date.c
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

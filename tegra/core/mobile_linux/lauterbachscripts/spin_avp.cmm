@@ -1,0 +1,22 @@
+; Lauterbach Trace32 script to enable and spin the AVP at a fixed IRAM address
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+; Stuff a "B ." instruction into IRAM
+D.S ASD:0x40009FFC %LE %LONG 0xEAfffffE
+
+; Change the AVP reset vector to point to the stuffed "B ." instruction
+D.S ASD:0x6000F200 %LE %LONG 0x40009FFC
+
+; Force the AVP into reset.
+D.S ASD:0x60006300 %LE %LONG 0x00000002
+
+; Un-halt the AVP at the flow controller
+D.S ASD:0x60007004 %LE %LONG 0x00000000
+
+; Release AVP reset.
+D.S ASD:0x60006304 %LE %LONG 0x00000002
+
+ENDDO

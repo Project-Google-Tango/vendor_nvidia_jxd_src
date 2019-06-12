@@ -1,0 +1,62 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# adaptor makefile for libnvvidconv.so build system
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+_source_dir                          := $(NV_SOURCE)/multimedia/gstreamer/gst-nvvidconv
+_private_source_dir                  := $(_source_dir)/.nvtegra/pre-gen-source
+
+NV_COMPONENT_NAME                    := gstnvvidconv
+
+NV_COMPONENT_SOURCES                 := \
+  $(_source_dir)/src/gstnvvconv.c
+
+NV_COMPONENT_OWN_INTERFACE_DIR       := .
+
+NV_COMPONENT_INCLUDES                := \
+  $(_private_source_dir) \
+  $(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/glib-2.0 \
+  $(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/gstreamer-0.10 \
+  $(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/libxml2 \
+  $(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/lib/glib-2.0/include \
+  $(NV_SOURCE)/kernel/drivers/video/tegra/nvmap \
+  $(NV_SOURCE)/core-private/include \
+  $(NV_SOURCE)/multimedia-partner/nvmm/include
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS   += \
+  $(NV_SOURCE)/l4t/3rdpartystub/gstreamer-0.10 \
+  $(NV_SOURCE)/l4t/3rdpartystub/glib-2.0 \
+  $(NV_SOURCE)/l4t/3rdpartystub/gobject-2.0 \
+  $(NV_SOURCE)/l4t/3rdpartystub/gstvideo-0.10 \
+  $(NV_SOURCE)/core/drivers/nvrm \
+  $(NV_INTERFACE_GRAPHICS_DDK2D_V2) \
+  $(NV_SOURCE)/core/utils/nvos
+
+NV_COMPONENT_CFLAGS                  += \
+  $(NV_TOOLCHAIN_X11_CFLAGS) \
+  -DHAVE_CONFIG_H -DG_THREADS_MANDATORY -DG_DISABLE_DEPRECATED
+
+NV_COMPONENT_SYSTEMIMAGE_DIR         := $(NV_SYSTEMIMAGE_GSTREAMER_DIR)/gstreamer-0.10
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

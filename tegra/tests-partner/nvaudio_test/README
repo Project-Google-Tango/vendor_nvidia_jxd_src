@@ -1,0 +1,42 @@
+To run the test, type the following from the adb shell prompt:
+
+nvaudio_test [usecase] [platform]
+Currently supported usecase is voice_call, headset_detection
+and loopback
+Currently supported platforms are pluto and enterprise
+Return Value: 0 for success and negative value for failure
+
+Examples:
+
+Eg 1:
+nvaudio_test voice_call pluto
+command will test the voice call for pluto board
+
+The test simulates voice call and compares the audio cluster
+register dump with a reference golden dump and if the register
+dump matches then the test is successfull and return value is 0
+else the test fails and returns negative value
+
+Eg 2:
+nvaudio_test headset_detection pluto
+command will test headset detection for pluto board
+
+This test triggers an alsa control to set switch state to
+headset available, and then it starts the Music Player and
+checks via an alsa control whether audio is routed to headset.
+If test is successfull return value is 0 else return value
+is negative.
+
+Eg 3:
+nvaudio_test loopback pluto
+command will test loopback for pluto board
+
+This test starts recoding using tinycap, sets the ahub level
+loopback and then launches the Music Player. So the playback data
+get recorderd via the tinycap app since loopback is set. The
+recorded data is compared with a golden snippet of Music which
+is taken from the played back data. Comparison is carried out using
+a moving window and calculating sum of absolute difference (SAD) at
+every point. A minimum SAD of 0 is the matching criteria i.e bit-exact
+matching since we are doing a digital loopback.
+

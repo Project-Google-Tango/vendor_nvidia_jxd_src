@@ -1,0 +1,375 @@
+/*
+ * Copyright (c) 2009-2013, NVIDIA CORPORATION.  All rights reserved.
+ *
+ * NVIDIA CORPORATION and its licensors retain all intellectual property
+ * and proprietary rights in and to this software, related documentation
+ * and any modifications thereto.  Any use, reproduction, disclosure or
+ * distribution of this software and related documentation without an express
+ * license agreement from NVIDIA CORPORATION is strictly prohibited
+ */
+
+#define ASSEMBLY_SOURCE_FILE 1
+#include "nvbl_assembly.h"
+
+        TEXT
+        P2ALIGN(2)
+        PRESERVE8
+
+/*******
+ *  NvU32 NvAbootPrivVaToPa(void* va)
+ *
+ *  NOTE: This function drops the upper 32 bits of the PA on LPAE-enabled
+ *        cores since AOS/NVABOOT do not support and will not map memory
+ *        beyond the 4GB boundary.
+ *******/
+        EXPORT  NvAbootPrivVaToPa
+NvAbootPrivVaToPa LABEL
+        mov     r1, #0x1000
+        sub     r1, r1, #1              // 0x00000FFF
+        bic     r2, r0, r1              // VA & 0xFFFFF000
+        mrc     p15, 0, r3, c0, c1, 4   // MMFR0
+        and     r3, r3, #0xF            // MMFR0.VMSA
+        cmp     r3, #5                  // LPAE present?
+        mcr     p15, 0, r2, c7, c8, 0   // V2PPRPC
+        mrclt   p15, 0, r2, c7, c4, 0   // PAR: non-LPAE version
+        mrrcge  p15, 0, r2, r3, c7      // PAR: LPAE version
+        tst     r2, #1                  // translation fault?
+        movne   r0, #0                  // Yes, return NULL
+        bxne    lr
+        bic     r2, r2, r1              // PA & 0xFFFFF000
+        and     r0, r0, r1              // VA & 0x00000FFF
+        orr     r0, r0, r2              // (PA & 0xFFFFF000) | (VA & 0x00000FFF)
+        bx      lr
+
+/*******
+ *  NvU32 NvAbootPrivDoJump(NvU32 *, NvU32, NvUPtr)
+ *******/
+        IMPORT  nvaosCpuCacheSetWayOps
+        EXPORT  NvAbootPrivDoJump
+NvAbootPrivDoJump LABEL
+
+        // Load up to 4 registers from pKernelRegs into registers 0..n
+        mov     r7, r0   // preserve pKernelRegs
+        mov     r8, r1   // preserve NumKernelRegs
+        mov     r9, r2   // preserve KernelStartAddr
+        cmp     r8, #0
+        ldrgt   r0, [r7]
+        cmp     r8, #1
+        ldrgt   r1, [r7, #4]
+        cmp     r8, #2
+        ldrgt   r2, [r7, #8]
+        cmp     r8, #3
+        ldrgt   r3, [r7, #12]
+
+        // Disable the MMU, and AFE. Defer disabling of the instruction
+        // cache and branch predictor until just before the hand-off
+        // to the OS in order to benefit from the increased performance
+        // they provide.
+        mov     r6, #0
+        mcr     p15, 0, r6, c7, c10, 4      // DSB
+        mrc     p15, 0, r4, c1, c0, 0       // SCTLR
+        bic     r4, r4, #(1<<0)             // SCTLR.M: MMU
+        bic     r4, r4, #(1<<29)            // SCTLR.AFE: Access Flag Enable
+#if (__ARM_ERRATA_784420__ || __ARM_ERRATA_794073__)
+        bic     r4, r4, #(1<<11)            // SCTLR.Z: Branch Predictor
+#endif
+        mcr     p15, 0, r4, c1, c0, 0       // SCTLR
+
+        // For Cortex-A9, disable SMP mode. Also disable cache/TLB
+        // broadcast and L1/L2 prefetch if the CPU supports it controls
+        // for them.
+
+        // For Cortex-A15, the meaning of 3 LSB bits of ACTLR is different,
+        // but since 0 is the reset value for them, we can always clear them
+        // irrespective of A9 or A15.
+
+        mrc     p15, 0, r4, c1, c0, 1       // ACTLR
+        bic     r4, r4, #(1<<6)             // SMP
+        mrc     p15, 0, r5, c0, c1, 4       // MMFR0
+        and     r5, r5, #0xF                // MMFR0.VMSA
+        cmp     r5, #5                      // LPAE present?
+        biclt   r4, r4, #7                  // no, clear FW, L1/L2 prefetch
+        mcr     p15, 0, r4, c1, c0, 1       // ACTLR
+        mcr     p15, 0, r6, c7, c10, 4      // DSB
+
+        // Disable VFP
+        // If we ever enable the SCU in the future, make sure to disable it here
+        stmfd   sp!, {r0-r3}
+        bl      AbootPrivDisableVfp
+        ldmfd   sp!, {r0-r3}
+
+        // Disable L1 instruction cache and branch predictor.
+        mrc     p15, 0, r4, c1, c0, 0       // SCTLR
+        bic     r4, r4, #(1<<12)            // SCTLR.I: Instruction cache
+        bic     r4, r4, #(1<<11)            // SCTLR.Z: Branch predictor
+        mcr     p15, 0, r4, c1, c0, 0       // SCTLR
+
+        // Invalidate the instruction and TLBs.
+        mcr     p15, 0, r6, c7, c5, 0       // instruction cache invalidate
+        mcr     p15, 0, r6, c7, c5, 4       // ISB
+        mcr     p15, 0, r6, c8, c7, 0       // invalidate TLBs
+        mcr     p15, 0, r6, c7, c10, 4      // DSB
+
+        // Switch to supervisor mode with interrupts disabled
+        msr     cpsr_fsxc, #0xd3
+        mov     r4, r9
+
+        EXPORT  NvAbootToKernelHandoff
+NvAbootToKernelHandoff LABEL    // Export handoff point for JTAG debugger support
+
+        // Jump to the kernel's start address
+        bx      r4
+        b       .
+
+
+#if defined(CONFIG_TRUSTED_FOUNDATIONS) || defined(CONFIG_TRUSTED_LITTLE_KERNEL)
+/*
+ * NvAbootPrepareBoot_TF
+ *        r0-r3 kernel params
+ *        r8 : num kernel regs
+ *        r9 : tfsw params
+ */
+NvAbootPrepareBoot_TF LABEL
+        stmfd   sp!, {r0-r5, r8-r10}
+
+        // Copy Trusted Foundations binary/keys to secure memory
+        mov     r0, r9
+        bl      NvAbootCopyTFImageAndKeys
+        ldmfd   sp!, {r0-r5, r8-r10}
+
+        // set r0 to ColdBoot
+        mov     r0, #1
+
+        // set r1 to TF_BOOT_PARAMS
+        adr     r1, TFSW_Params_BootParams
+        ldr     r1, [r1]
+
+        // set r10 to size of the SecureOs carveout
+        adr     r10, TFSW_Params_CarveoutSize
+        ldr     r10, [r10]
+
+        // jump to secureos start address
+        adr     r9, TFSW_Params_StartAddr
+        ldr     r9, [r9]
+        bx      r9
+        b       .
+
+/*
+ * Holds pointers to the BootParams and the SecureOS entry
+ * point, and the size of the SecureOS carveout, filled in
+ * during NvAbootTFPrepareBootParams.
+ */
+        EXPORT TFSW_Params_BootParams
+TFSW_Params_BootParams LABEL
+        .word 0x0
+        EXPORT TFSW_Params_StartAddr
+TFSW_Params_StartAddr LABEL
+        .word 0x0
+        EXPORT TFSW_Params_CarveoutSize
+TFSW_Params_CarveoutSize LABEL
+        .word 0x0
+
+/*******
+ * void NvAbootPrivDoJump_TF( NvU32 *pKernelRegs,
+                            NvU32 NumKernelRegs, TFSW_PARAMS *pTfswParams);
+ * r0 : pKernelRegs
+ * r1 : NumKernelRegs
+ * r2 : pTfswParams
+ *******/
+        IMPORT  nvaosCpuCacheSetWayOps
+        EXPORT NvAbootPrivDoJump_TF
+NvAbootPrivDoJump_TF LABEL
+
+        //  Load up to 4 registers from pKernelRegs into registers 0..n
+        mov r7, r0   // preserve pKernelRegs
+        mov r8, r1   // preserve NumKernelRegs
+        mov r9, r2   // preserve pTfswParams
+        cmp r8, #0
+        ldrgt r0, [r7]
+        cmp r8, #1
+        ldrgt r1, [r7, #4]
+        cmp r8, #2
+        ldrgt r2, [r7, #8]
+        cmp r8, #3
+        ldrgt r3, [r7, #12]
+
+        // Disable the MMU, L1 data caches, and AFE. Defer disabling of the
+        // instruction cache and branch predictor until just before the
+        // hand-off to the OS in order to benefit from the increased
+        // performance they provide.
+        mov     r6, #0
+        mcr     p15, 0, r6, c7, c10, 4      // DSB
+        mrc     p15, 0, r4, c1, c0, 0       // SCTLR
+        bic     r4, r4, #(1<<0) | (1<<2)    // SCTLR.M: MMU
+                                            // SCTLR.C: Data cache
+        bic     r4, r4, #(1<<29)            // SCTLR.AFE: Access Flag Enable
+        mcr     p15, 0, r4, c1, c0, 0       // SCTLR
+
+        // Disable SMP mode, cache/TLB broadcast, and L1/L2 prefetch.
+        mrc     p15, 0, r4, c1, c0, 1       // ACTLR
+        bic     r4, r4, #(1<<6)             // SMP
+        bic     r4, r4, #7                  // ACTLR.FW | ACTLR.L1 | ACTLR.L2
+        mcr     p15, 0, r4, c1, c0, 1       // ACTLR
+        mcr     p15, 0, r6, c7, c10, 4      // DSB
+
+        // Disable VFP and invalidate the data cache.
+        // If we ever enable the SCU in the future, make sure to disable it here
+        stmfd   sp!, {r0-r3,r9}
+        bl      AbootPrivDisableVfp
+        mvn     r0, #0                      // ~0 = invalidate caches
+        bl      nvaosCpuCacheSetWayOps
+        ldmfd   sp!, {r0-r3,r9}
+
+        // Disable L1 instruction cache and branch predictor.
+        mrc     p15, 0, r4, c1, c0, 0       // SCTLR
+        bic     r4, r4, #(1<<11) | (1<<12)  // SCTLR.Z: Branch predictor
+                                            // SCTLR.I: Instruction cache
+        mcr     p15, 0, r4, c1, c0, 0       // SCTLR
+
+        // Invalidate the instruction and TLBs.
+        mcr     p15, 0, r6, c7, c5, 0       // instruction cache invalidate
+        mcr     p15, 0, r6, c7, c5, 4       // ISB
+        mcr     p15, 0, r6, c8, c7, 0       // invalidate TLBs
+        mcr     p15, 0, r6, c7, c10, 4      // DSB
+
+        // Switch to supervisor mode with interrupts disabled
+        msr     cpsr_fsxc, #0xd3
+
+        EXPORT  NvAbootToKernelHandoff_TF
+NvAbootToKernelHandoff_TF LABEL    // Export handoff point for JTAG debugger support
+
+        // jump to the kernel's start address
+        /*
+         r0-r3 kernel params
+         r8 : num kernel regs
+         r9 : tfsw params
+         */
+        adr     r4, NvAbootPrepareBoot_TF
+        b       NvAbootToKernelHandoff
+#endif
+
+
+/*******
+ *  void NvAbootPrivDisableVfp(void) (not exported)
+ *******/
+#if defined(__GNUC__)
+#define FPSCR cr1
+#define FPEXC cr8
+#define FMXR(_reg_, _vreg_) mcr p10, 7, _reg_, _vreg_, cr0, 0
+#else
+/*  RVDS 2.2 doesn't like the cp15-based syntax. */
+#define FPSCR fpscr
+#define FPEXC fpexc
+#define FMXR(_reg_, _vreg_) fmxr _vreg_, _reg_
+#endif
+
+AbootPrivDisableVfp LABEL
+#if !NO_FPU
+        mov     r0, #0
+        FMXR(r0, FPSCR)
+        mov     r0, #0
+        FMXR(r0, FPEXC)
+#endif
+        bx      lr
+
+NvAbootFlushInnerCacheLoC LABEL
+        mrc     p15, 1, r6, c0, c0, 1   // CLIDR
+        ands    r3, r6, #0x07000000
+        mov     r3, r3, lsr #23         // R3 = num of cache level * 2
+        mov     r9, #0                  // R9 = current cache level
+loop1   LABEL
+        add     r2, r9, r9, lsr #1      // R2 = current cache level * 3
+        mov     r1, r6, lsr r2
+        and     r1, r1, #7              // R1: cache type
+        cmp     r1, #2
+        blt     skip
+
+        mcr     p15, 2, r9, c0, c0, 0   // CSSELR
+#ifdef  ANDROID
+        isb
+#else
+#if __GNUC__
+        .word   0xF57FF06F
+#else
+        dcd     0xF57FF06F
+#endif
+#endif
+        mrc     p15, 1, r1, c0, c0, 0   // CCIDR
+        and     r2, r1, #7
+        add     r2, r2, #4
+#ifdef ANDROID
+        movw    r4, #0x3FF
+#else
+        mov     r4, #0x3F
+        lsl     r4, r4, #4
+        orr     r4, r4, #0xf
+#endif
+        ands    r4, r4, r1, lsr #3      // R4 = max way number
+        clz     r5, r4                  // R5 = bit position of way size incr
+#ifdef ANDROID
+        movw    r7, #0x7FFF
+#else
+        mov     r7, #0x7f
+        lsl     r7, r7, #8
+        orr     r7, r7, #0xff
+#endif
+        ands    r7, r7, r1, lsr #13
+loop2   LABEL
+        mov     r8, r4
+loop3   LABEL
+        orr     r1, r9, r8, lsl r5      // R1 = Way number and cache number
+        orr     r1, r1, r7, lsl r2      // R1 = Way, Set, cache numbers
+        cmp     r0, #0
+        mcr     p15, 0, r1, c7, c14, 2
+        subs    r8, r8, #1
+        bge     loop3
+        subs    r7, r7, #1
+        bge     loop2
+skip    LABEL
+        add     r9, r9, #2
+        cmp     r3, r9
+        bgt     loop1
+
+        mov     r9, #0
+        mcr     p15, 2, r9, c0, c0, 0
+#ifdef ANDROID
+        dsb
+#else
+#if __GNUC__
+        .word   0xF57FF04F
+#else
+        dcd     0xF57FF04F
+#endif
+#endif
+        bx      lr
+
+
+/*******
+ *  void NvAbootPrivSanitizeUniverse(NvAbootHandle)
+ *******/
+        IMPORT  AbootPrivGicDisableInterrupts
+        IMPORT  nvaosPl310InvalidateDisable
+        IMPORT  NvOsDataCacheWritebackInvalidate
+        EXPORT  NvAbootPrivSanitizeUniverse
+NvAbootPrivSanitizeUniverse LABEL
+        stmfd   sp!, {r0-r9, lr}
+
+        //  put the CPU into atomic mode -- interrupts disabled
+        msr     cpsr_fsxc, #0xdf
+
+        // Disable the interrupt controller
+        bl      AbootPrivGicDisableInterrupts
+
+        // Disable data cache before flushing
+        mrc   p15, 0, r0, c1, c0, 0       // SCTLR
+        bic     r0, r0, #(1<<2)             // SCTLR.C
+        mcr   p15, 0, r0, c1, c0, 0       // SCTLR
+
+        // Flush inner cache up to level of coherency
+        bl      NvAbootFlushInnerCacheLoC
+
+        // Invalidate and disable the L2 data cache
+        bl      nvaosPl310InvalidateDisable
+        ldmfd   sp!, {r0-r9, pc}
+
+    END

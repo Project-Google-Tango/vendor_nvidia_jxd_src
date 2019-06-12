@@ -1,0 +1,4 @@
+EXPORTS
+    NvAesExpandKey
+    NvAesEncrypt
+    NvAesDecrypt

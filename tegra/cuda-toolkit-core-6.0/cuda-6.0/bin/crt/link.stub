@@ -1,0 +1,108 @@
+#include <stddef.h> /* for size_t */
+#include "host_defines.h"
+
+static void **__cudaFatCubinHandle;
+extern "C" {
+extern void** CUDARTAPI __cudaRegisterFatBinary(
+  void *fatCubin
+);
+extern void CUDARTAPI __cudaUnregisterFatBinary(
+  void **fatCubinHandle
+);
+static void __cudaUnregisterBinaryUtil(void)
+{
+  __cudaUnregisterFatBinary(__cudaFatCubinHandle);
+}
+#if defined(__GNUC__) && !defined(__ANDROID__)
+
+extern int atexit(void(*)(void)) throw();
+
+#else /* __GNUC__ && !__ANDROID__ */
+
+extern int __cdecl atexit(void(__cdecl *)(void));
+
+#endif /* __GNUC__ && !__ANDROID__ */
+
+}
+
+#include <fatBinaryCtl.h>
+
+static inline void __cudaRegisterLinkedBinary (const __fatBinC_Wrapper_t *prelinked_fatbinc, void (*callback_fp)(void **), void *);
+
+#define __REGISTERFUNCNAME_CORE(X) __cudaRegisterLinkedBinary##X
+#define __REGISTERFUNCNAME(X) __REGISTERFUNCNAME_CORE(X)
+#define __DEFSTRNAME_CORE(X) def_module_id_str##X
+#define __DEFSTRNAME(X) __DEFSTRNAME_CORE(X)
+#define __TO_STRING_CORE(X) #X
+#define __TO_STRING(X) __TO_STRING_CORE(X)
+#define __FATIDNAME_CORE(X) __fatbinwrap##X
+#define __FATIDNAME(X) __FATIDNAME_CORE(X)
+
+#if defined(_WIN32)
+#define DEFINE_REGISTER_FUNC(id) \
+extern const __fatBinC_Wrapper_t __FATIDNAME(id); \
+static const __declspec(align(1)) __declspec(allocate("__nv_module_id")) unsigned char __DEFSTRNAME(id) [] = "def " __TO_STRING(id); \
+void __REGISTERFUNCNAME(id) (void (*callback_fp)(void **), void *prelinked_fatbinc, void *, void (*dummy_ref)(void *)) \
+{ \
+  volatile static const unsigned char *__p; \
+  __p = __DEFSTRNAME(id); \
+  dummy_ref((void *)&__p); \
+  __cudaRegisterLinkedBinary(&__FATIDNAME(id), callback_fp, (void *)&__DEFSTRNAME(id)); \
+}
+#elif defined(__APPLE__)
+#define DEFINE_REGISTER_FUNC(id) \
+extern const __fatBinC_Wrapper_t __FATIDNAME(id); \
+static const unsigned char __DEFSTRNAME(id) [] __attribute__((aligned(1))) __attribute__((section ("__NV_CUDA,__nv_module_id"))) = "def " __TO_STRING(id); \
+void __REGISTERFUNCNAME(id) (void (*callback_fp)(void **), void *prelinked_fatbinc, void *, void (*dummy_ref)(void *)) \
+{ \
+  volatile static const unsigned char *__p __attribute__((unused)); \
+  __p = __DEFSTRNAME(id); \
+  dummy_ref((void *)&__p); \
+ __cudaRegisterLinkedBinary(&__FATIDNAME(id), callback_fp, (void *)&__DEFSTRNAME(id)); \
+}
+#else /* linux */
+#define DEFINE_REGISTER_FUNC(id) \
+extern const __fatBinC_Wrapper_t __FATIDNAME(id); \
+static const unsigned char __DEFSTRNAME(id) [] __attribute__((aligned(1))) __attribute__((section ("__nv_module_id"))) = "def " __TO_STRING(id); \
+void __REGISTERFUNCNAME(id) (void (*callback_fp)(void **), void *prelinked_fatbinc, void *, void (*dummy_ref)(void *)) \
+{ \
+  volatile static const unsigned char *__p __attribute__((unused)); \
+  __p = __DEFSTRNAME(id); \
+  dummy_ref((void *)&__p); \
+  __cudaRegisterLinkedBinary(&__FATIDNAME(id), callback_fp, (void *)&__DEFSTRNAME(id)); \
+}
+#endif
+
+extern "C" {
+#if defined(_WIN32)
+#pragma data_seg("__nv_module_id")
+#endif /* _WIN32 */
+#include REGISTERLINKBINARYFILE
+#if defined(_WIN32)
+#pragma data_seg()
+#endif /* _WIN32 */
+}
+
+static void* __cudaPrelinkedFatbins[NUM_PRELINKED_OBJECTS+1];
+
+#include FATBINFILE
+
+static inline void __cudaRegisterLinkedBinary (
+  const __fatBinC_Wrapper_t *prelinked_fatbinc,
+  void (*callback_fp)(void **),
+  void *)
+{
+  static void (*__callback_array[NUM_PRELINKED_OBJECTS+1])(void **);
+  static int __i = 0;
+  __cudaPrelinkedFatbins[__i] = (void*)prelinked_fatbinc->data;
+  __callback_array[__i] = callback_fp;
+  ++__i;
+  if (__i == NUM_PRELINKED_OBJECTS) {
+    __cudaPrelinkedFatbins[__i] = NULL;
+    __cudaFatCubinHandle = __cudaRegisterFatBinary((void*)&__fatDeviceText);
+    atexit(__cudaUnregisterBinaryUtil);
+    for (__i = 0; __i < NUM_PRELINKED_OBJECTS; ++__i) {
+      (*(__callback_array[__i]))(__cudaFatCubinHandle);
+    }
+  }
+}

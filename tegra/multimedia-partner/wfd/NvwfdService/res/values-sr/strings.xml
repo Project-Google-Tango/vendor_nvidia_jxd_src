@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">UI услуге NVIDIA  бежичног екрана</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Недоступан због тога што је Miracast активан.</string>
+    <string name="miracast_hdcp_title">HDCP потврда идентитета није успела за %1$s </string>
+    <string name="miracast_hdcp_failure_text">Премијум садржај не може бити приказан.</string>
+    <string name="miracast_connection_status_discovery">Претраживање\u0020</string>
+    <string name="miracast_connection_status_progress">Повезивање на\u0020</string>
+    <string name="miracast_connection_status_connected">Сада прослеђује садржај на\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Није пронађено\u0020</string>
+    <string name="miracast_connection_status_warning_conn_lost">Прекинута веза са\u0020</string>
+    <string name="miracast_connection_status_warning_auth_failed">Проблем са потврдом идентитета\u0020</string>
+    <string name="miracast_access_settings_title">Приступ Miracast подешавањима</string>
+</resources>

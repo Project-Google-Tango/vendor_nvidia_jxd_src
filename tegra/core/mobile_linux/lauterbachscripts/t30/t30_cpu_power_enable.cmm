@@ -1,0 +1,16 @@
+; Lauterbach TRACE32 debugger script to enable the power and clocks for the CPU.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+; Enable the CPU clocks and take it out of reset.
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_clock_enable.cmm
+
+; Turn on power to the CPU
+;D.S SD:0x7000E434  %LE %LONG  0x00000001    ;// REMOVE_CLAMPING_CMD
+;D.S SD:0x7000E430  %LE %LONG  0x00000100    ;// PWRGATE_TOGGLE
+
+; NOTE: THE JTAG CONNECTION TO THE AVP WILL BE LOST AT THIS POINT!
+
+ENDDO

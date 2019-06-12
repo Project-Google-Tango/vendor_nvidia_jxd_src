@@ -1,0 +1,4 @@
+debian/tmp/usr/include
+debian/tmp/usr/lib/libcwiid*.so
+debian/tmp/usr/lib/libcwiid.a
+debian/tmp/usr/lib/pkgconfig/cwiid.pc

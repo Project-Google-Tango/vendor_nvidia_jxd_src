@@ -1,0 +1,595 @@
+/*
+ * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+ *
+ * NVIDIA Corporation and its licensors retain all intellectual property
+ * and proprietary rights in and to this software, related documentation
+ * and any modifications thereto.  Any use, reproduction, disclosure or
+ * distribution of this software and related documentation without an express
+ * license agreement from NVIDIA Corporation is strictly prohibited.
+ */
+
+#define ASSEMBLY_SOURCE_FILE 1
+#include "nvbl_assembly.h"
+
+        TEXT
+        P2ALIGN(2)
+        PRESERVE8
+
+/*
+ * Debug context contains:
+ * 8 CP14 registers
+ * 16x2 CP14 breakpoint registers (maximum)
+ * 16x2 CP14 watchpoint registers (maximum)
+ */
+#define cpu_debug_suspend_size (4 * (8 + (16 * 2) + (16 * 2)))
+
+#define cpu_suspend_size (4 * 17) + cpu_debug_suspend_size
+
+/*
+ * NvAbootSwitchCluster
+ *
+ * Switches the cluster by executing WFI.
+ */
+    EXPORT NvAbootSwitchCluster
+NvAbootSwitchCluster LABEL
+    stmfd sp!, {r0-r12, lr}    // save R0 - R12, LR on stack
+
+    // Create space on the stack for cpu context save
+    ldr r3, =cpu_suspend_size
+    sub sp, sp, r3
+    mov r0, sp
+
+    // CPU context save starts from here
+    mrc p15, 0, r4, c13, c0, 0   //FCSE/PID
+    mrc p15, 0, r5, c13, c0, 3   // User r/o thread ID
+    mrc p15, 0, r6, c15, c0, 1   // diag
+    stmia r0!, {r4 - r6}
+
+    mrc p15, 0, r4, c9, c14, 2   // PMINTENCLR
+    mrc p15, 0, r5, c9, c14, 0   // PMUSEREN
+    mrc p15, 0, r6, c9, c12, 5   // PMSELR, event counter selection
+    mrc p15, 0, r7, c9, c13, 2   // PMXEVCNTR, event counter
+    mrc p15, 0, r8, c9, c13, 1   // PMXEVTYPER or PMCCFILTR
+    mrc p15, 0, r9, c9, c13, 0   // PMCCNTR, cycle counter
+    mrc p15, 0, r10, c9, c12, 0  // PMCR, control register
+    mrc p15, 0, r11, c9, c12, 1  // PMCNTENSET, counter enable set
+    stmia r0!, {r4 - r11}
+
+    mrc p15, 0, r6, c3, c0, 0    // Domain ID
+    mrc p15, 0, r7, c2, c0, 1    // TTB 1
+    mrc p15, 0, r11, c2, c0, 2   // TTB control register
+    mrc p15, 0, r8, c1, c0, 0    // Control register
+    mrc p15, 0, r9, c1, c0, 1    // Auxiliary control register
+    mrc p15, 0, r10, c1, c0, 2   // Co-processor access control
+    stmia r0!, {r6 - r11}
+
+    // ARM debug context save starts from here.
+    // If Debug Architecture v7.1 or later, set OS lock.
+    mrc p15, 0, r11, c0, c1, 2   // ID_DFR0
+    and r11, r11, #0xF           // coprocessor debug model
+    cmp r11, #5                  // debug arch >= v7.1?
+    ldrge r4, =0xC5ACCE55        // Lock value
+    mcrge p14, 0, r4, c1, c0, 4  // DBGOSLAR
+#ifdef COMPILE_ARCH_V7
+    isb
+#else
+#if __GNUC__
+    .word 0xF57FF06F
+#else
+    dcd 0xF57FF06F
+#endif
+#endif
+
+    // Save CP14 debug controller context.
+    mrc p14, 0, r4, c0, c2, 2    // DBGDSCRext
+    mrc p14, 0, r5, c0, c6, 0    // DBGWFAR
+    mrc p14, 0, r6, c0, c7, 0    // DBGVCR
+    mrc p14, 0, r7, c7, c9, 6    // DBGCLAIMCLR
+    stmia r0!, {r4-r7}
+
+    mrclt p14, 0, r4, c0, c10, 0 // DBGDSCCR (debug arch v7 only)
+    mrclt p14, 0, r5, c0, c11, 0 // DBGDSMCR (debug arch v7 only)
+    stmltia r0!, {r4-r5}         // (debug arch v7 only)
+
+    tst r4, #(1 << 29)           // DBGDSCRext.TXfull
+    mrcne p14, 0, r4, c0, c3, 2  // DBGDTRTXext
+    strne r4, [r0], #4
+
+    tst r4, #(1 << 30)           // DBGDSCRext.RXfull
+    mrcne p14, 0, r4, c0, c0, 2  // DBGDTRRXext
+    strne r4, [r0], #4
+
+    mrc p14, 0, r8, c0, c0, 0    // read IDR
+    mov r3, r8, lsr #24
+    and r3, r3, #0xf             // r3 has the number of breakpoint registers
+    rsb r3, r3, #0xf
+
+    // r3 = (15 - #of breakpoint registers)
+    // switch offset = r3*12 - 4 = (r3*3 - 1)<<2
+    add r3, r3, r3, lsl #1
+    sub r3, r3, #1
+    // PC shifts depending on the # of breakpoint registers
+    add pc, pc, r3, lsl #2
+
+    // Breakpoint register save
+    // Maximum: 16 x 2 Registers
+    mrc p14, 0, r4, c0, c15, 4
+    mrc p14, 0, r5, c0, c15, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c14, 4
+    mrc p14, 0, r5, c0, c14, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c13, 4
+    mrc p14, 0, r5, c0, c13, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c12, 4
+    mrc p14, 0, r5, c0, c12, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c11, 4
+    mrc p14, 0, r5, c0, c11, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c10, 4
+    mrc p14, 0, r5, c0, c10, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c9, 4
+    mrc p14, 0, r5, c0, c9, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c8, 4
+    mrc p14, 0, r5, c0, c8, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c7, 4
+    mrc p14, 0, r5, c0, c7, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c6, 4
+    mrc p14, 0, r5, c0, c6, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c5, 4
+    mrc p14, 0, r5, c0, c5, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c4, 4
+    mrc p14, 0, r5, c0, c4, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c3, 4
+    mrc p14, 0, r5, c0, c3, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c2, 4
+    mrc p14, 0, r5, c0, c2, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c1, 4
+    mrc p14, 0, r5, c0, c1, 5
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c0, 4
+    mrc p14, 0, r5, c0, c0, 5
+    stmia r0!, {r4 - r5}
+
+    mov r3, r8, lsr #28  // r3 has the number of watchpoint registers
+    rsb r3, r3, #0xf
+
+    // r3 = (15 - #of watchpoint registers) ;
+    // switch offset = r3*12 - 4 = (r3*3 - 1)<<2
+    add r3, r3, r3, lsl #1
+    sub r3, r3, #1
+    // PC shifts depending on the # of watchpoint registers
+    add pc, pc, r3, lsl #2
+
+    // Watchpoint register save
+    // Maximum: 16 x 2 Registers
+    mrc p14, 0, r4, c0, c15, 6
+    mrc p14, 0, r5, c0, c15, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c14, 6
+    mrc p14, 0, r5, c0, c14, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c13, 6
+    mrc p14, 0, r5, c0, c13, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c12, 6
+    mrc p14, 0, r5, c0, c12, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c11, 6
+    mrc p14, 0, r5, c0, c11, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c10, 6
+    mrc p14, 0, r5, c0, c10, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c9, 6
+    mrc p14, 0, r5, c0, c9, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c8, 6
+    mrc p14, 0, r5, c0, c8, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c7, 6
+    mrc p14, 0, r5, c0, c7, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c6, 6
+    mrc p14, 0, r5, c0, c6, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c5, 6
+    mrc p14, 0, r5, c0, c5, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c4, 6
+    mrc p14, 0, r5, c0, c4, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c3, 6
+    mrc p14, 0, r5, c0, c3, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c2, 6
+    mrc p14, 0, r5, c0, c2, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c1, 6
+    mrc p14, 0, r5, c0, c1, 7
+    stmia r0!, {r4 - r5}
+    mrc p14, 0, r4, c0, c0, 6
+    mrc p14, 0, r5, c0, c0, 7
+    stmia r0!, {r4 - r5}
+    // ARM debug context save done.
+    // CPU context save done.
+
+    // store SP
+    adr r5, stack_ptr_save
+    stmia r5!, {sp}
+
+#ifdef COMPILE_ARCH_V7
+    dsb
+    wfi
+#else
+#if __GNUC__
+    .word  0xF57FF04F
+    .word  0xE320F003
+#else
+    dcd  0xF57FF04F
+    dcd  0xE320F003
+#endif
+#endif
+    b . // Shouldn't reach here
+
+/*
+ * NvAbootCpuResetVector
+ *
+ * CPU reset vector after switching the cluster.
+ */
+    IMPORT __end__
+    IMPORT initFpu
+    IMPORT nvaos_ConfigureCpu
+    IMPORT nvaos_ConfigureA15
+    IMPORT nvaos_GetFirstLevelPageTableAddr
+    EXPORT NvAbootCpuResetVector
+NvAbootCpuResetVector LABEL
+
+/* Do not place any code before the block below.
+ * It must be the first code to execute after cluster switch.
+ */
+    mrc     p15, 0, r0, c0, c1, 2     // ID_DFR0
+    and     r0, r0, #0xF              // coprocessor debug model
+    cmp     r0, #5                    // debug arch >= v7.1?
+    movge   r0, #0                    // yes, unlock debug
+    mcrge   p14, 0, r0, c1, c0, 4     // DBGOSLAR
+
+    // Make sure we are in system mode with interrupts disabled
+    msr cpsr_fsxc, #0xdf
+
+    //Set the stack pointer
+    ldr r0, =__end__
+    add sp, r0, #0x400
+
+    // Blow away any stale state that may exist in the processor
+    cpsid aif, #0x13
+    msr spsr_fsxc, #0
+    cpsid aif, #0x11
+    msr spsr_fsxc, #0
+    cpsid aif, #0x12
+    msr spsr_fsxc, #0
+    cpsid aif, #0x17
+    msr spsr_fsxc, #0
+    cpsid aif, #0x1B
+    msr spsr_fsxc, #0
+    cpsid aif, #0x1f
+
+    // Set up system control register
+    mrc  p15, 0, r4, c1, c0, 0
+    bic  r4, r4, #(1<<12)
+    bic  r4, r4, #(1<<11)
+    bic  r4, r4, #(1<<2)
+    bic  r4, r4, #(1<<0)
+    mcr  p15, 0, r4, c1, c0, 0
+
+    bl nvaosInvalidateL1DataCache
+
+    // Enable co-processor access
+    mvn r0, #0
+    mcr p15, 0, r0, c1, c0, 2
+#ifdef COMPILE_ARCH_V7
+    isb
+#else
+#if __GNUC__
+    .word 0xF57FF06F
+#else
+    dcd 0xF57FF06F
+#endif
+#endif
+    bl  initFpu
+
+    mrc  p15, 0, r1, c1, c0, 0 // Read SCTLR
+    orr  r1, r1, #(1<<11)      // Enable branch predictor
+    orr  r1, r1, #(1<<1)       // Turn on strict alignment checking
+    mcr  p15, 0, r1, c1, c0, 0 // Write SCTLR
+
+    bl nvaos_ConfigureCpu
+    bl nvaos_ConfigureA15
+
+    //  Set the Translation Table Base Register (TTBR0)
+    bl nvaos_GetFirstLevelPageTableAddr
+    mcr  p15, 0, r0, c2, c0, 0
+
+    // Set Domain Access Control Register (DACR) to client
+    mov r4, #1
+    mcr p15, 0, r4, c3, c0, 0   // DACR
+
+    // Enable MMU.
+    mrc  p15, 0, r4, c1, c0, 0  // SCTLR
+    orr  r4, r4, #(1<<0)
+    mcr  p15, 0, r4, c1, c0, 0  // SCTLR
+
+    // do not place any code after stack restoration
+    adr r5, stack_ptr_save
+    ldmia r5!, {sp}         // Restore SP
+
+    // CPU context restore starts from here
+    mov r0, sp
+    ldr r3, =cpu_suspend_size
+    add sp, sp, r3
+
+    mov ip, #0
+    mcr p15, 0, ip, c8, c7, 0  // invalidate TLBs
+    mcr p15, 0, ip, c7, c5, 0  // invalidate I cache
+    mcr p15, 0, ip, c13, c0, 1 // set reserved context ID
+
+    ldmia r0!, {r4 - r6}
+    mcr p15, 0, r4, c13, c0, 0 // FCSE/PID
+    mcr p15, 0, r5, c13, c0, 3 // User r/o thread ID
+    mcr p15, 0, r6, c15, c0, 1 // diag
+
+    ldmia r0!, {r4 - r11}
+    mcr p15, 0, r4, c9, c14, 2  // PMINTENCLR
+    mcr p15, 0, r5, c9, c14, 0  // PMUSEREN
+    mcr p15, 0, r6, c9, c12, 5  // PMSELR, event counter selection
+    mcr p15, 0, r7, c9, c13, 2  // PMXEVCNTR, event counter
+    mcr p15, 0, r8, c9, c13, 1  // PMXEVTYPER or PMCCFILTR
+    mcr p15, 0, r9, c9, c13, 0  // PMCCNTR, cycle counter
+    mcr p15, 0, r10, c9, c12, 0 // PMCR, control register
+    mcr p15, 0, r11, c9, c12, 1 // PMCNTENSET, counter enable set
+
+    ldmia r0!, {r6 - r11}
+    mcr p15, 0, r6, c3, c0, 0   // Domain ID
+    mcr p15, 0, r7, c2, c0, 1   // TTB 1
+    mcr p15, 0, r11, c2, c0, 2  // TTB control register
+
+    mrc p15, 0, r4, c1, c0, 1   // Read Auxiliary control register
+    teq r4, r9                  // Is it already set?
+    mcrne p15, 0, r9, c1, c0, 1 // No, so write it
+
+    mcr p15, 0, r10, c1, c0, 2  // Co-processor access control
+    ldr r4, =0xeeaa4400         // PRRR
+    ldr r5, =0xff000004         // NMRR
+    mcr p15, 0, r4, c10, c2, 0  // write PRRR
+    mcr p15, 0, r5, c10, c2, 1  // write NMRR
+#ifdef COMPILE_ARCH_V7
+    isb
+#else
+#if __GNUC__
+    .word 0xF57FF06F
+#else
+    dcd 0xF57FF06F
+#endif
+#endif
+
+    // ARM debug context restoration starts from here.
+    // If Debug Architecture v7.1 or later, set OS lock.
+    mrc p15, 0, r11, c0, c1, 2  // ID_DFR0
+    and r11, r11, #0xF          // coprocessor debug model
+    cmp r11, #5                 // debug arch >= v7.1?
+    ldrge r4, =0xC5ACCE55       // Lock value
+    mcrge p14, 0, r4, c1, c0, 4 // DBGOSLAR
+#ifdef COMPILE_ARCH_V7
+    isb
+#else
+#if __GNUC__
+    .word 0xF57FF06F
+#else
+    dcd 0xF57FF06F
+#endif
+#endif
+
+    // Restore CP14 debug controller context
+    ldmia r0!, {r2 - r5}
+    mcr p14, 0, r3, c0, c6, 0   // DBGWFAR
+    mcr p14, 0, r4, c0, c7, 0   // DBGVCR
+    mcr p14, 0, r5, c7, c8, 6   // DBGCLAIMSET
+
+    ldmltia r0!, {r4-r5}         // (debug arch v7 only)
+    mcrlt p14, 0, r4, c0, c10, 0 // DBGDSCCR (debug arch v7 only)
+    mcrlt p14, 0, r5, c0, c11, 0 // DBGDSMCR (debug arch v7 only)
+
+    tst r2, #(1 << 29)          // DBGDSCRext.TXfull
+    ldrne r4, [r0], #4
+    mcrne p14, 0, r4, c0, c3, 2 // DBGDTRTXext
+
+    tst r2, #(1 << 30)          // DBGDSCRext.RXfull
+    ldrne r4, [r0], #4
+    mcrne p14, 0, r4, c0, c0, 2 // DBGDTRRXext
+
+    mrc p14, 0, r5, c0, c0, 0   // read IDR
+    mov r3, r5, lsr #24
+    and r3, r3, #0xf            // r3 has the number of brkpt
+    rsb r3, r3, #0xf
+
+    // r3 = (15 - #of breakpoint registers)
+    // switch offset = r3*12 - 4 = (r3*3 - 1)<<2
+    add r3, r3, r3, lsl #1
+    sub r3, r3, #1
+    // PC shifts depending on the # of breakpoint registers
+    add pc, pc, r3, lsl #2
+
+    // Breakpoint register restore
+    // Maximum: 16 x 2 Registers
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c15, 4
+    mcr p14, 0, r5, c0, c15, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c14, 4
+    mcr p14, 0, r5, c0, c14, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c13, 4
+    mcr p14, 0, r5, c0, c13, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c12, 4
+    mcr p14, 0, r5, c0, c12, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c11, 4
+    mcr p14, 0, r5, c0, c11, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c10, 4
+    mcr p14, 0, r5, c0, c10, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c9, 4
+    mcr p14, 0, r5, c0, c9, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c8, 4
+    mcr p14, 0, r5, c0, c8, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c7, 4
+    mcr p14, 0, r5, c0, c7, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c6, 4
+    mcr p14, 0, r5, c0, c6, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c5, 4
+    mcr p14, 0, r5, c0, c5, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c4, 4
+    mcr p14, 0, r5, c0, c4, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c3, 4
+    mcr p14, 0, r5, c0, c3, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c2, 4
+    mcr p14, 0, r5, c0, c2, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c1, 4
+    mcr p14, 0, r5, c0, c1, 5
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c0, 4
+    mcr p14, 0, r5, c0, c0, 5
+
+    mov r3, r5, lsr #28         // r3 has the number of watchpoint registers
+    rsb r3, r3, #0xf
+
+    // r3 = (15 - #of watchpoint registers)
+    // switch offset = r3*12 - 4 = (r3*3 - 1)<<2
+    add r3, r3, r3, lsl #1
+    sub r3, r3, #1
+    // PC shifts depending on the # of watchpoint registers
+    add pc, pc, r3, lsl #2
+
+    // Watchpoint register restore
+    // Maximum: 16 x 2 Registers
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c15, 6
+    mcr p14, 0, r5, c0, c15, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c14, 6
+    mcr p14, 0, r5, c0, c14, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c13, 6
+    mcr p14, 0, r5, c0, c13, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c12, 6
+    mcr p14, 0, r5, c0, c12, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c11, 6
+    mcr p14, 0, r5, c0, c11, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c10, 6
+    mcr p14, 0, r5, c0, c10, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c9, 6
+    mcr p14, 0, r5, c0, c9, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c8, 6
+    mcr p14, 0, r5, c0, c8, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c7, 6
+    mcr p14, 0, r5, c0, c7, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c6, 6
+    mcr p14, 0, r5, c0, c6, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c5, 6
+    mcr p14, 0, r5, c0, c5, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c4, 6
+    mcr p14, 0, r5, c0, c4, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c3, 6
+    mcr p14, 0, r5, c0, c3, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c2, 6
+    mcr p14, 0, r5, c0, c2, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c1, 6
+    mcr p14, 0, r5, c0, c1, 7
+    ldmia r0!, {r4 - r5}
+    mcr p14, 0, r4, c0, c0, 6
+    mcr p14, 0, r5, c0, c0, 7
+#ifdef COMPILE_ARCH_V7
+    isb
+#else
+#if __GNUC__
+    .word 0xF57FF06F
+#else
+    dcd 0xF57FF06F
+#endif
+#endif
+
+    mcr p14, 0, r2, c0, c2, 2   // DSCR
+#ifdef COMPILE_ARCH_V7
+    isb
+#else
+#if __GNUC__
+    .word 0xF57FF06F
+#else
+    dcd 0xF57FF06F
+#endif
+#endif
+
+    // If Debug Architecture v7.1 or later, unlock.
+    mov r4, #0                  // non-lock value
+    cmp r11, #5                 // debug arch >= v7.1?
+    mcrge p14, 0, r4, c1, c0, 4 // DBGOSLAR
+#ifdef COMPILE_ARCH_V7
+    isb
+    dsb
+#else
+#if __GNUC__
+    .word 0xF57FF06F
+    .word 0xF57FF04F
+#else
+    dcd 0xF57FF06F
+    dcd 0xF57FF04F
+#endif
+#endif
+    // ARM debug context restore done.
+    // CPU context restore done.
+
+    ldmfd sp!, {r0-r12, pc}         // Restore R0 - R12, LR to PC
+
+
+/**
+ * SP will be stored here before cluster switch.
+ */
+stack_ptr_save LABEL
+#if __GNUC__
+    .word 0x00000000
+#else
+    dcd 0x00000000
+#endif

@@ -1,0 +1,50 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake makefile for nvodm_charging static library
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvodm_charging
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	battery-basic.c \
+	charging.c \
+	charger-usb.c
+NV_COMPONENT_INCLUDES          := \
+	. \
+	$(NV_SOURCE)/core/system/nvaboot
+
+ifneq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+# FPGA and simulation platforms can never support USB charging
+NV_COMPONENT_CFLAGS            += \
+	-DLPM_BATTERY_CHARGING=1
+endif
+ifeq ($(NV_TARGET_REFERENCE_BOARD),ardbeg)
+NV_COMPONENT_CFLAGS            += \
+	-DREAD_BATTERY_SOC=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),loki)
+NV_COMPONENT_CFLAGS            += \
+	-DREAD_BATTERY_SOC=1
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

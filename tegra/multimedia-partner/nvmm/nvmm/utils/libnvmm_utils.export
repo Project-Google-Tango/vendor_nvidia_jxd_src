@@ -1,0 +1,140 @@
+# Copyright (c) 2007-2013 NVIDIA Corporation.  All rights reserved.
+#
+# NVIDIA Corporation and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an
+# express license agreement from NVIDIA Corporation is strictly prohibited.
+
+NvMMUtilAllocateBuffer
+NvMMUtilDeallocateBuffer
+NvMMUtilDeallocateBlockSideBuffer
+NvMMUtilAllocateVideoBuffer
+NvMMUtilDeallocateVideoBuffer
+NvmmSetOffsetListStatus
+NvmmPushToOffsetList
+NvmmPopFromOffsetList
+NvmmUpdateOffsetList
+NvmmSetBaseAddress
+NvmmGetBaseAddress
+NvmmSetMaxOffsets
+NvmmResetOffsetList
+NvmmGetNumOfOffsets
+NvmmGetOffsetListStatus
+NvmmGetReadBuffBaseAddress
+NvmmGetNumOfBuffMgrIndexs
+NvmmSetReadBuffBaseAddress
+NvmmGetNumOfValidOffsets
+cpu_only NvmmUlpSetKpiMode
+cpu_only NvmmUlpGetKpiMode
+cpu_only NvmmUlpKpiLoggerInit
+cpu_only NvmmUlpKpiLoggerDeInit
+cpu_only NvmmUlpKpiSetLogger
+cpu_only NvmmUlpKpiGetLogger
+cpu_only NvmmUlpKpiSetSongDuration
+cpu_only NvmmUlpKpiSetReadStartTime
+cpu_only NvmmUlpKpiSetReadEndTime
+cpu_only NvmmUlpKpiSetParseStartTime
+cpu_only NvmmUlpKpiSetParseEndTime
+cpu_only NvmmUlpKpiSetIdleStartTime
+cpu_only NvmmUlpKpiSetIdleEndTime
+cpu_only NvmmUlpKpiGetParseTimeIdleTimeRatio
+cpu_only NvmmUlpKpiGetAverageTimeBwReadRequests
+cpu_only NvmmUlpKpiGetTotalReadRequests
+cpu_only NvmmUlpKpiPrintAllKpis
+cpu_only NvmmUlpKpiGetSongDuration
+cpu_only NvmmUlpKpiGetTotalTimeSpent
+cpu_only NvmmUlpKpiGetTotalIdleTime
+cpu_only NvmmUlpKpiGetTotalParseTime
+cpu_only NvmmUlpKpiGetTotalReadTime
+cpu_only NvmmUlpKpiGetTotalTimeBwReads
+cpu_only NvmmUlpUpdateKpis
+cpu_only NvMMUtilAllocateSurfaces
+cpu_only NvMMUtilDestroySurfaces
+NvMMBufMgrInit
+NvMMBufMgrDeinit
+NvMMBufMgrAlloc
+NvMMBufMgrFree
+NvMMBufMgrGetTotalFreeMemoryAvailable
+NvMMBufMgrGetLargestFreeChunkAvailable
+NvMMUtilAddBufferProfilingEntry
+NvMMUtilDumpBufferProfilingData
+
+NvMMQueueEnQ
+NvMMQueueDeQ
+NvMMQueueCreate
+NvMMQueueDestroy
+NvMMQueueGetNumEntries
+NvMMQueuePeek
+NvMMQueuePeekEntry
+
+NvMMInitMediaClocks
+NvMMDeInitMediaClocks
+NvMMCreateMediaClock
+NvMMDestroyMediaClock
+NvMMRegisterClockCallback
+NvMMSupplyReferenceTime
+NvMMSetReference
+NvMMGetTime
+NvMMGetTimeUntilMediaTime
+NvMMWaitUntilMediaTime
+NvMMSetClockRate
+NvMMGetClockRate
+NvMMSetStartTime
+NvMMStartClock
+NvMMStopClock
+NvMMWaitForVideoToStart
+NvMMSetWaitForAudio
+NvMMSetWaitForVideo
+NvMMUnblockWaitUntilMediaTime
+
+NvMMCreateSock
+NvMMDestroySock
+NvMMSetNonBlocking
+NvMMReadSock
+NvMMWriteSock
+NvMMOpenTCP
+NvMMCloseTCP
+NvMMOpenUDP
+NvMMSetUDPPort
+NvMMCloseUDP
+NvMMNToHL
+NvMMSplitURL
+NvMMSockReadFullBuffer
+NvMMSockGetReply
+NvMMSockGetLine
+NvMMSockConnectHTTP
+NvMMSockGetHTTPFile
+
+NvMMUtilFilenameToParserType
+NvMMUtilConvertNvMMParserCoreType
+
+NvMMReadSockMultiple
+NvMMQueueInsertHead
+NvMMHToNL
+
+NvMMUtilGuessFormatFromFile
+
+NvMetaFileParserOpen
+NvMetaFileParserClose
+NvGetMetaFileInfo
+NvMemAlloc
+NvMemFree
+
+NvMMSockPOSTHTTPFile
+NvMMSockConnectHTTPPOST
+
+NvMMGetUserAgentString
+
+NvLoggerPrint
+NvLoggerGetLevel
+
+NvMMSetUserAgentString
+NvMMSockSetBlockActivity
+NvMMSockGetBlockActivity
+NvMMGetUAProfAgentString
+NvMMSetUAProfAgentString
+
+NvMMIsUsingNewAVP
+NvMMVP8Support
+NvMMGetHwChipId

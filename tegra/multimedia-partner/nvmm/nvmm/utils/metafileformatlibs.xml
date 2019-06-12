@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- refer to nvmetafile_parser.h for uasge of this file -->
+<MetaFileParserRegister>
+  <MetaFileType>
+    <Ext>asx</Ext>
+        <Lib>asxparser</Lib>
+   </MetaFileType>
+  <MetaFileType>
+    <Ext>pls</Ext>
+        <Lib>plsparser</Lib>
+  </MetaFileType>
+</MetaFileParserRegister>

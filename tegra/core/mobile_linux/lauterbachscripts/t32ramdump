@@ -1,0 +1,6 @@
+#!/bin/bash
+# ---------------------------------------------------------------
+#  Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+# ---------------------------------------------------------------
+export T32_INSTANCE=ramdump
+t32marm -c $T32SYS/config_ramdump.t32

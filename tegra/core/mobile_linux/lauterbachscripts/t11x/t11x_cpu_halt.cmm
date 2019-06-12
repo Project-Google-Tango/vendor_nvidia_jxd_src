@@ -1,0 +1,4 @@
+; Lauterbach TRACE32 debugger script to halt the CPU.
+
+D.S SR:0x60007000 0x40000000
+ENDDO

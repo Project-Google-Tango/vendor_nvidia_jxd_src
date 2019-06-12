@@ -1,0 +1,118 @@
+#
+# Copyright (c) 2013-2014 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+"eks_encrypt_keys.py" is for creating encrypted key storage(EKS) which is a
+separate partition in device.
+The output of the script is "eks.dat" which should be copied to $OUT to be
+flashed.
+
+This version of the EKS partition file eliminates the hexadecimal encoding of
+the previous version.
+
+It includes functionality for the encryption algorithm and permissions
+information.
+Each key is mapped to 1 encryption algorithm as well as 1 UUID.
+This offers flexibility for different keys to be encrpyted with different
+algorithms and accessible to different users.
+The key is encrypted with the algorithm specified.
+The encrypted key is bundled with the algorithm information as well as
+the user ID which is permitted to access it together into one keyslot.
+A second layer of encryption is applied to each complete keyslot which is
+again encrypted with the aes-128-cbc algorithm.
+
+The algorithms can be encoded by the following digits into a file whose pathname
+is passed as an argument.
+1 :- aes-128-cbc
+3 :- aes-128-ebc
+
+Each algorithm is denoted by just the digit correspnding to it. Each is of size
+1 byte (regular chars).
+The characters are supposed to be written one after the other. The first digit
+is assumed to denote the encryption algorithm for the first keyslot, the second
+digit for the second one and so forth.
+The total number of characters in this file has to equal the number of keyslots
+(keys encoded) or else an error is returned.
+== E.g. A file with contents "11111311" denotes that the 6th keyslot is encrypted
+with aes-128-ecb, and the rest with aes-128-cbc.
+
+The UUIDs of each user are similarly passed in a file whose pathname is passed
+as an argument.
+Each UUID is denoted is passed as one line of a 32 character string in the file.
+The 32 hexadecimal digits are the literal ASCII represenatation of the 16 byte
+UUID of type te_service_id_t.
+Ex: The string "90784f2a21486f4aa1f103aa9b05f9ee" is used to denote UUID which
+has first byte 0x90, second byte 0x78, third byte 0x4f and so on.
+It is case-insensitive.
+Each UUID occupies one line, the first UUID is assumed to denote the first keyslot,
+the second UUID for the second keyslot and so forth.
+The total number of UUIDs has to be equal to the number of keyslots or else an error
+is returned.
+
+Differences from previous version:
+    The binary to hex encoding for the encrypted data has been removed.
+    Encrypted data is directly written to the .dat file
+    All keys are encrypted with the aes-128-cbc algorithm by default but can be
+    set to any algorithm required.
+    Algorithm and permissions information has been added to the keyslot itself
+    and is wrapped in a separate layer of encryption.
+
+NOTE: The new version of the script does not support partition files generated
+by the old version of the script.
+
+USE CASE:
+
+If SBK is:
+secure_boot_key_0 0x0c0d0e0f
+secure_boot_key_1 0x08090a0b
+secure_boot_key_2 0x04050607
+secure_boot_key_3 0x00010203
+
+== Example 1. Creating EKS partition which has wmdrm, playready, hdcp and
+widevine keys ==
+python eks_encrypt_keys.py
+--wmdrmpd_cert=../keys/data/wmdrm/wmdrm_model_certificate.der
+--wmdrmpd_key=../keys/data/wmdrm/wmdrm_model_key.dat
+--prdy_cert=../keys/data/playready/NvTegra3ModelCert.dat
+--prdy_key=../keys/data/playready/NvTegra3ModelKey.dat
+--sbk=0f0e0d0c0b0a09080706050403020100
+--hdcp_key=../keys/data/hdcp/struct.txt
+--widevine_key=../keys/data/widevine/wv_good_key.dat
+
+== Example 2. Creating EKS partition which has hdcp and widevine keys along
+with two files which specify the owner and a list of user IDs which have the
+required permissions to access the file respectively ==
+python eks_encrypt_keys.py
+--sbk=0f0e0d0c0b0a09080706050403020100
+--hdcp_key=../keys/data/hdcp/struct.txt
+--widevine_key=../keys/data/widevine/wv_good_key.dat
+--algo_file=algo_file.dat
+--perm_file=perm_file.dat
+
+== Example 3. Creating EKS partition which has no key in it ==
+python eks_encrypt_keys.py
+--sbk=0f0e0d0c0b0a09080706050403020100
+
+== Example 4. Creating EKS partition which has hdcp 2.x receiver key along
+with two files which specify the owner and a list of user IDs which have the
+required permissions to access the file respectively ==
+python eks_encrypt_keys.py
+--sbk=0f0e0d0c0b0a09080706050403020100
+--hdcp2_sink_key=hdcp20_r2.bin
+--algo_file=algo_file.dat
+--perm_file=perm_file.dat
+
+== Example 5. Creating EKS partition which has hdcp 2.x receiver key and
+widevine keys along with two files which specify the owner and a list of
+user IDs which have required permissions to access the file respectively ==
+python eks_encrypt_keys.py
+--sbk=0f0e0d0c0b0a09080706050403020100
+----hdcp2_sink_key=hdcp22_r1.bin
+--widevine_key=../keys/data/widevine/wv_good_key.dat
+--algo_file=algo_file.dat
+--perm_file=perm_file.dat

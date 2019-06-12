@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">NVIDIA 무선 디스플레이 UI 서비스</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Miracast가 사용 중이어서 실행할 수 없습니다.</string>
+    <string name="miracast_hdcp_title">%1$s로 인해 HDCP 인증이 실패했습니다. </string>
+    <string name="miracast_hdcp_failure_text">유료 컨텐츠를 표시할 수 없습니다.</string>
+    <string name="miracast_connection_status_discovery">\u0020 검색</string>
+    <string name="miracast_connection_status_progress">\u0020로 연결</string>
+    <string name="miracast_connection_status_connected">\u0020로 스트리밍</string>
+    <string name="miracast_connection_status_warning_conn_failed">\u0020을 찾지 못했습니다.</string>
+    <string name="miracast_connection_status_warning_conn_lost">\u0020로의 연결이 끊어졌습니다.</string>
+    <string name="miracast_connection_status_warning_auth_failed">\u0020 관련 인증 문제</string>
+    <string name="miracast_access_settings_title">Miracast 설정 액세스</string>
+</resources>

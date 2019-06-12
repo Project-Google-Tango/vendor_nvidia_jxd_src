@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">NVIDIAn langattoman näytön käyttöliittymäpalvelut</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Ei käytettävissä, koska Miracast on aktiivinen.</string>
+    <string name="miracast_hdcp_title">HDCP-todennus epäonnistui kohteelle %1$s </string>
+    <string name="miracast_hdcp_failure_text">Premium-sisältöä ei voi näyttää.</string>
+    <string name="miracast_connection_status_discovery">Etsii kohdetta \u0020</string>
+    <string name="miracast_connection_status_progress">Yhdistetään kohteeseen \u0020</string>
+    <string name="miracast_connection_status_connected">Toistaa nyt kohteeseen \u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Kohdetta \u0020 ei löytynyt </string>
+    <string name="miracast_connection_status_warning_conn_lost">Yhteys kohteeseen \u0020 katkennut.</string>
+    <string name="miracast_connection_status_warning_auth_failed">Todennusongelma kohteen \u0020 kanssa </string>
+    <string name="miracast_access_settings_title">Avaa Miracast-asetukset</string>
+</resources>

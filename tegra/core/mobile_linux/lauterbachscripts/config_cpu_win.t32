@@ -1,0 +1,19 @@
+;---------------------------------------------------------------
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;---------------------------------------------------------------
+
+; Printer settings
+PRINTER=WINDOWS
+
+; Environment variables
+OS=
+ID=T32
+TMP=C:\WINDOWS\Temp
+SYS=C:\T32
+
+PBI=
+USB
+CORE=1
+
+SCREEN=
+HEADER=TEGRA - CortexA9 SMP

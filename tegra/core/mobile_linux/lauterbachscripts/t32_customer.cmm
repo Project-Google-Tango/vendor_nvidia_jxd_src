@@ -1,0 +1,58 @@
+; Default startup program for TRACE32
+; This script must reside in the $T32SYS directory
+
+GLOBAL &T32_INSTANCE
+GLOBAL &T32SYS
+&T32_INSTANCE=os.env(T32_INSTANCE)
+&T32SYS=os.env(T32SYS)
+
+; Choose hex mode for input
+radix hex
+
+; Perform common user customization.
+do &T32SYS/user_config_customer.cmm
+
+; Set up common paths and global environment.
+do setup_customer_environment.cmm
+
+IF "&T32_INSTANCE"==""
+(
+  PRINT "Environment variable T32_INSTANCE not set -- assuming cpu"
+  WAIT 3.s
+  &T32_INSTANCE="cpu"
+)
+
+; Determine which instance of TRACE32 is being started
+IF "&T32_INSTANCE"=="cpu"
+(
+  ; Perform CPU-side custom initialization
+  do cpu_menu_setup.cmm
+)
+ELSE IF "&T32_INSTANCE"=="avp"
+(
+  ; Perform AVP-side custom initialization
+  do avp_menu_setup.cmm
+)
+ELSE IF "&T32_INSTANCE"=="coredump"
+(
+  ; Perform Coredump custom initialization
+  do coredump_menu_setup.cmm
+)
+ELSE
+(
+  PRINT "Environment variable T32_INSTANCE is invalid -- must be cpu or avp or coredump"
+  STOP
+)
+
+if language()!=""
+(
+  local &menuname
+  &menuname="~~/t32"+language()
+  menu.rp &menuname
+)
+
+; Recall and Define History File
+autostore , history bookmark
+
+enddo
+

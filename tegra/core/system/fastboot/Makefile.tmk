@@ -1,0 +1,276 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# bootloader
+#
+###############################################################################
+#
+# Sanity checks: board & SoC
+#
+$(call NV_BUILD_VARIABLES_SANITY_CHECK, NV_TARGET_SOC)
+
+ifdef NV_COMPONENT_FLAG_STATIC_EXECUTABLE_SECTION
+
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME     := bootloader
+NV_COMPONENT_MAP_FILE := $(NV_COMPONENT_NAME).map
+NV_COMPONENT_CFLAGS += -DENABLE_NVDUMPER=0
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),pluto)
+NV_COMPONENT_CFLAGS += -DHAS_DEFAULT_CHARGE_CAPABILITY=1
+NV_COMPONENT_CFLAGS += -DDISP_FONT_SCALE=2
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),dalmore)
+NV_COMPONENT_CFLAGS += -DDISP_FONT_SCALE=2
+endif
+
+NV_COMPONENT_SOURCES  := \
+	main.c \
+	prettyprint.c \
+	gui.c \
+	linux_cmdline.c \
+	usb.c \
+	jingle.c \
+	dump.c \
+	recovery_utils.c
+
+NV_COMPONENT_SOURCES  += \
+	libfdt/fdt.c \
+	libfdt/fdt_ro.c \
+	libfdt/fdt_rw.c \
+	libfdt/fdt_strerror.c \
+	libfdt/fdt_sw.c \
+	libfdt/fdt_wip.c
+
+ifeq ($(BUILD_NV_CRASHCOUNTER),true)
+NV_COMPONENT_SOURCES += crash_counter.c
+NV_COMPONENT_CFLAGS  += -DNV_USE_CRASH_COUNTER
+endif
+
+NV_COMPONENT_HAS_BROKEN_CODE := ignore-all
+
+NV_COMPONENT_INCLUDES  := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	../../drivers/nvrm/nvrmkernel/core/common \
+	../../drivers/nvddk/fuses/read \
+	../../utils/nvos/aos \
+	../nvaboot
+
+NV_COMPONENT_INCLUDES  += \
+	libfdt
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	../nv3p \
+	../nv3pserver \
+	../nvaboot \
+	../nvbct/$(NV_TARGET_SOC_FAMILY) \
+	../nvbootupdate \
+	../nvcrypto \
+	../nvfs \
+	../nvfsmgr \
+	../nvpartmgr \
+	../nvstormgr \
+	../utils \
+	../../drivers/nvpinmux \
+	../../drivers/nvddk/fuses/read/$(NV_TARGET_SOC_FAMILY) \
+	../../drivers/nvddk/fuses/write \
+	../../drivers/nvavpgpio \
+	../../drivers/nvavp/uart \
+	../../drivers/nvavp/sdmmc \
+	../../drivers/nvddk/aes \
+	../../drivers/nvddk/blockdev \
+	../../drivers/nvddk/disp \
+	../../drivers/nvddk/i2s \
+	../../drivers/nvddk/keyboard \
+	../../drivers/nvddk/sdio \
+	../../drivers/nvddk/snor \
+	../../drivers/nvddk/i2c \
+	../../drivers/nvddk/spi_flash \
+	../../drivers/nvodm/services \
+	../../drivers/nvrm \
+	../../drivers/nvrm/graphics \
+	../../utils/nvfxmath \
+	../../utils/nvappmain \
+	../../utils/nvintr \
+	../../utils/nvos/aos \
+	../../utils/chipid \
+	$(NV_SOURCE)/core-private/drivers/nvddk/fuse/fusebypass \
+	$(NV_SOURCE)/core-private/drivers/nvddk/issp \
+	../../utils/nvos/aos/nvap
+
+ifneq ($(filter t114, $(NV_TARGET_SOC)),)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core-private/drivers/tsec_otf_keygen \
+	$(NV_SOURCE)/core-private/drivers/xusb_fw_load \
+	../../drivers/nvddk/xusb
+endif
+
+ifneq ($(filter t124, $(NV_TARGET_SOC)),)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core-private/drivers/tsec_otf_keygen \
+	$(NV_SOURCE)/bootloader/microboot/nvboot/$(NV_TARGET_SOC)/warm_boot_0
+
+ifeq ($(NV_BUILD_CONFIGURATION_IS_DEBUG),1)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	$(NV_SOURCE)/bootloader/microboot/nvboot/$(NV_TARGET_SOC)/util
+endif
+endif
+
+ifneq ($(filter t124, $(NV_TARGET_SOC)),)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core-private/drivers/xusb_fw_load \
+	$(NV_SOURCE)/core/drivers/nvddk/sata \
+	$(NV_SOURCE)/core/drivers/nvddk/usb
+endif
+
+ifeq ($(BUILD_NV_NCT),true)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+    ../nvnct \
+
+NV_COMPONENT_CFLAGS += -DNV_USE_NCT
+endif
+
+#
+# Board specific components
+#
+NV_COMPONENT_ODM_STATIC       := \
+	audiocodec \
+	disp \
+	extfs \
+	extfsmgr \
+	fuelgaugefwupgrade \
+	gpio_ext \
+	keyboard \
+	misc \
+	pmu \
+	query \
+	system_update \
+	tmon
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	../../utils/nvos/aos/libgcc
+# C startup code provided by utils/nvos/aos/nvap/nvos_aos_gcc.c
+NV_COMPONENT_FLAG_C_INIT_PROVIDED_BY_NVOS := 1
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	../nvsku
+NV_COMPONENT_CFLAGS                       += \
+	-DNV_EMBEDDED_BUILD
+endif
+
+_boards_simulation := \
+	bonaire%
+
+# Enable LED for thor
+ifeq ($(NV_TARGET_REFERENCE_BOARD),thor)
+NV_COMPONENT_ODM_STATIC                   += \
+	led
+NV_COMPONENT_CFLAGS                       += \
+	-DHAVE_LED=1
+endif# Enable LED for thor
+
+
+# Enable USB charging
+# Embedded, FPGA and simulation platforms can never support USB charging
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+# no usb charging in embedded
+else ifneq ($(filter $(_boards_simulation),$(NV_TARGET_REFERENCE_BOARD)),)
+# no usb charging for development emulation/simulation boards
+else
+NV_COMPONENT_ODM_STATIC                   += \
+	charging
+NV_COMPONENT_CFLAGS                       += \
+	-DLPM_BATTERY_CHARGING=1
+endif # Enable USB charging
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),loki)
+NV_COMPONENT_CFLAGS                       += \
+	-DREAD_BATTERY_SOC=1
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),ardbeg)
+NV_COMPONENT_CFLAGS                       += \
+	-DREAD_BATTERY_SOC=1
+endif
+_boards_simulation :=
+
+# fastboot doesn't wholly link in any ODM components
+NV_COMPONENT_ODM_WHOLE_STATIC :=
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-partner/Makefile.odm.tmk
+
+NV_COMPONENT_CFLAGS       += \
+	-DNV_AOS_ENTRY_POINT=0x80108000 \
+	-DNV_AOS_LOAD_ADDRESS=0x80108000
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	../../drivers/nvddk/se
+NV_COMPONENT_SCATTER_FILE := \
+	../../utils/nvos/aos/nvap/t30_cpu.x
+
+ifneq ($(filter t114, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS       += \
+        -DBL_DISP_CONTROLLER=0 \
+        -DTSEC_EXISTS=1 \
+        -DVPR_EXISTS=1
+endif
+
+ifneq ($(filter t124, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS       += \
+        -DTSEC_EXISTS=1 \
+        -DVPR_EXISTS=1 \
+	-DSATA_EXISTS=1
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core-private/utils/nvsecureblob
+
+NV_COMPONENT_FLAG_USES_GENERATED_FILES := 1
+
+# generate the publickey.h file based on signkey.pk8
+publickey.h: $(NV_TOOLS_OUTDIR)/nvdumppublickey $(NV_ANDROID_TOP)/device/nvidia/common/security/signkey.pk8
+	$^ $@
+
+ifeq ($(NV_BUILD_CONFIGURATION_IS_SECURE_OS),1)
+    ifneq ($(filter cardhu, $(NV_TARGET_REFERENCE_BOARD)),)
+    NV_COMPONENT_CFLAGS       += \
+				 -DCONFIG_TRUSTED_LITTLE_KERNEL
+    else
+    NV_COMPONENT_CFLAGS       += \
+				 -DCONFIG_TRUSTED_FOUNDATIONS
+    endif
+    NV_COMPONENT_INCLUDES     += \
+				 $(NV_ANDROID_TOP)/3rdparty/trustedlogic/sdk/include/$(NV_TARGET_REFERENCE_BOARD)
+    endif
+else
+NV_COMPONENT_CFLAGS  += -DNV_LDK_BUILD
+endif
+
+build:: $(NV_COMPONENT_NAME).bin
+
+$(NV_COMPONENT_NAME).bin: $(NV_COMPONENT_NAME)$(STATIC_EXECUTABLE_SUFFIX)
+	$(call NV_BUILD_MACRO_ELF2BIN)
+
+NV_COMPONENT_FLAG_SYSTEMIMAGE_SKIP := 1
+
+include $(NV_BUILD_STATIC_EXECUTABLE)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

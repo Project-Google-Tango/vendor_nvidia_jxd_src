@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">NVCP</string>
+
+  <string name="display_0">Primary Display</string>
+  <string name="display_1">Secondary Display</string>
+  <string name="other_settings">Other Settings</string>
+
+  <string name="not_connected">This display is not connected</string>
+  <string name="mode_summary_one">This display only supports one resolution</string>
+  <string name="mode_summary_many">This display supports multiple resolutions</string>
+
+  <string name="match_resolution_to_">Match resolution to </string>
+  <string name="match_resolution_to_summary">Specify which display to optimize the desktop resolution for</string>
+  <string-array name="display_names">
+    <item>Primary Display</item>
+    <item>Secondary Display</item>
+  </string-array>
+  <string-array name="display_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+
+  <string name="play_audio_via_hdmi">Play audio via HDMI</string>
+  <string name="play_audio_via_hdmi_summary">Uncheck this feature if the display connected to HDMI does not support audio</string>
+</resources>

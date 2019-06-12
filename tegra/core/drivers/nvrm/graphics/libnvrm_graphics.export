@@ -1,0 +1,106 @@
+#
+# Copyright (c) 2012-2013 NVIDIA Corporation.  All Rights Reserved.
+#
+# NVIDIA Corporation and its licensors retain all intellectual property and
+# proprietary rights in and to this software and related documentation.  Any
+# use, reproduction, disclosure or distribution of this software and related
+# documentation without an express license agreement from NVIDIA Corporation
+# is strictly prohibited.
+#
+
+call_forward = on
+
+NvRmChannelOpen
+NvRmChannelClose
+NvRmChannelSubmit
+NvRmContextAlloc
+NvRmContextFree
+NvRmChannelSyncPointAlloc
+NvRmChannelSyncPointFree
+NvRmChannelSyncPointRead
+NvRmChannelSyncPointReadMax
+NvRmChannelSyncPointIncr
+NvRmChannelSyncPointSignalSemaphore
+NvRmChannelSyncPointWait
+NvRmChannelSyncPointWaitTimeout
+NvRmChannelSyncPointWaitexTimeout
+NvRmChannelSyncPointWaitmexTimeout
+NvRmChannelGetModuleWaitBase
+NvRmChannelGetModuleSyncPoint
+NvRmChannelGetModuleMutex
+NvRmChannelModuleMutexLock
+NvRmChannelModuleMutexUnlock
+NvRmHostModuleRegRd
+NvRmHostModuleRegWr
+NvRmHostModuleBlockRegRd
+NvRmHostModuleBlockRegWr
+NvRmChannelAlloc
+NvRmChannelGetModuleClockRate
+NvRmChannelSetModuleClockRate
+NvRmChannelSetModuleBandwidth
+NvRmChannelSetSubmitTimeout
+NvRmChannelGetModuleTimedout
+NvRmStreamSetPriority
+NvRmStreamSetPriorityEx
+NvRmFenceWait
+NvRmFenceTrigger
+NvRmFenceSignalSemaphore
+NvRmFencePutToFile
+NvRmFenceGetFromFile
+NvRmChannelRegRd
+NvRmChannelRegWr
+NvRmChannelBlockRegRd
+NvRmChannelBlockRegWr
+NvRmChannelSetSubmitTimeoutEx
+NvRmChannelNumSyncPoints
+NvRmChannelNumMutexes
+NvRmChannelNumWaitBases
+NvRmStreamSetContextSwitch
+
+# These functions below are exposed to shim
+NvRmGraphics_Dispatch
+
+call_forward = off
+
+NvRmStreamInit
+NvRmStreamFree
+NvRmStreamFlush
+NvRmStreamGetError
+NvRmStreamRead3DRegister
+NvRmStreamBegin
+NvRmStreamEnd
+NvRmStreamPushReloc
+NvRmStreamPushFdReloc
+NvRmStreamPushGather
+NvRmStreamPushFdGather
+NvRmStreamPushGatherNonIncr
+NvRmStreamPushGatherIncr
+NvRmStreamPushWaitCheck
+NvRmStreamPushSetClass
+NvRmStreamPushIncr
+NvRmStreamPushWait
+NvRmStreamPushWaitLast
+NvRmStreamPushWaits
+NvRmStreamSetWaitBase
+
+NvSchedClientInit
+NvSchedClientRegisterCallback
+NvSchedClientRegisterPreFlushCallback
+NvSchedSetPriority
+NvSchedClientClose
+NvSchedVirtualSyncPointInit
+NvSchedVirtualSyncPointReadLatest
+NvSchedVirtualSyncPointReadCached
+NvSchedVirtualSyncPointCpuWaitTimeout
+NvSchedVirtualSyncPointCpuWouldWait
+NvSchedVirtualSyncPointCpuWouldWaitCached
+
+NvSchedCpuWaitLast
+NvSchedHostWaitLast
+NvSchedFlushAndCpuWait
+NvSchedPushHostWaitLast
+NvSchedPushIncr
+
+NvSchedClientInitEx
+NvRmStreamInitEx
+NvRmStreamInitParamsSetDefaults

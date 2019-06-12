@@ -1,0 +1,28 @@
+; Lauterbach TRACE32 debugger script to attach to CPU with kernel symbols loaded.
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_jtag_setup.cmm
+
+; Setup for kernel virtual addressing mode.
+do virtual_setup.cmm
+
+sYmbol.RESet
+
+; Load the kernel symbols symbols.
+print "Loading &KERNEL_ELF symbols"
+data.load.elf &KERNEL_ELF /NOCODE
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+IF ("&LOAD_SAVED_WINDOWS"=="TRUE")
+(
+  ; Restore saved window configuration (this is always saved in the $T32SYS directory -- don't change the path)
+  do &T32SYS/windows.cmm
+)
+
+system.mode.attach
+
+enddo

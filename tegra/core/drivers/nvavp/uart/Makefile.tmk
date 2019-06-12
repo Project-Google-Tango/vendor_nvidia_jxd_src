@@ -1,0 +1,59 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvavpuart static library
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvavpuart
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+
+USE_UART_STUB := false
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED), 1)
+USE_UART_STUB := true
+endif
+
+ifeq ($(USE_UART_STUB),true)
+NV_COMPONENT_SOURCES           := avp_uart_stub.c
+else
+NV_COMPONENT_SOURCES           := \
+                                  avp_uart.c \
+                                  avp_vsnprintf.c
+endif
+
+NV_COMPONENT_INCLUDES          := \
+        $(NV_SOURCE)/hwinc \
+        $(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+        ../../../utils/nvos/aos \
+        ../../nvboot/$(NV_TARGET_SOC)/include \
+        $(NV_COMPONENT_DIR)/$(NV_TARGET_SOC) \
+        $(NV_COMPONENT_DIR)
+
+#
+# NOTE: The code from these modules is also executed on the AVP!
+#       Therefore they need to be compiled with code generation flags
+#       compatible with AVP, i.e. ARMv4T ARM code.
+#
+NV_COMPONENT_CODE_GENERATION   := avp
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

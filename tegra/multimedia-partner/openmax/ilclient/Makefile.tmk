@@ -1,0 +1,57 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvomxilclient shared library component makefile fragment
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := nvomxilclient
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	nvxrecordgraph.c \
+	nvxtunneledrecordgraph.c \
+	nvxframework.c \
+	nvxgraph.c \
+	nvxplayergraph.c
+
+NV_COMPONENT_CFLAGS            += \
+	-D__OMX_EXPORTS \
+	-DOMXVERSION=2
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/utils/nvos
+
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+	$(NV_SOURCE)/multimedia-partner/nvmm/nvmm/utils
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/utils/nvfxmath
+
+ifeq ($(NV_BUILD_CONFIGURATION_LOGGER_ENABLED),1)
+NV_COMPONENT_CFLAGS            += \
+	-DNV_LOGGER_ENABLED=1
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_HAS_BROKEN_CODE   := ignore-all
+endif
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

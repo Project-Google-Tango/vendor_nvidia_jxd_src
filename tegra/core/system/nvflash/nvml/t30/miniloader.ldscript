@@ -1,0 +1,57 @@
+#
+# AVP linker script
+#
+
+LR_RAM 0x4000A000 0x21C00
+{
+        StartRegion +0x0
+        {
+            *init_avp.o (+ENTRY, MainRegion, +RO, +RW, +ZI)
+        }
+        MainRegion +0x0
+        {
+            __main.o (+RO, +RW, +ZI)
+            __scatter.o (+RO, +RW, +ZI)
+            __scatter_copy.o (+RO, +RW, +ZI)
+            __scatter_zi.o (+RO, +RW, +ZI)
+            anon$$obj.o (+RO, +RW, +ZI)
+            *(+RO, +RW, +ZI)
+        }
+
+       ; SDRAM section which is empty as this
+	    ER_KERNEL_ROOT +0x0 EMPTY 0x10
+       {
+	}
+        .text +0 EMPTY 0x10
+        {
+        }
+
+        ; Carve off a region into which the loader can patch the test's
+        ; command-line arguments.
+        AosProcessArgs +0 NOCOMPRESS
+        {
+            *(AosProcessArgs)
+        }
+
+        # AOS places the stack and heap based on these three regions
+        EndRegion +0
+        {
+            *init_avp.o (EndRegion)
+        }
+        HEAP_START +0x0 EMPTY 0x2000
+        {
+        }
+        ProgramStackRegion +0 EMPTY 0x200
+        {
+        }
+        ProgramStackRegionEnd +0 EMPTY 0x8
+        {
+        }
+}
+GUARD_RAM 0x4002BC00 0x4
+{
+        GuardMain +0 EMPTY 0x4
+        {
+        }
+}
+

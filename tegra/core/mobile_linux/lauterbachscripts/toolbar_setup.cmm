@@ -1,0 +1,24 @@
+; Lauterbach TRACE32 debugger script to setup common toolbar items.
+
+winpage.create Main
+winpage.create Regs
+winpage.select Main
+
+menu.reprogram
+(
+  add
+  toolbar
+  (
+    separator
+    toolitem   "Reset CPU" "RS,r"  "system.mode.up"
+    separator
+    toolitem   "Main page" "Mn,b"  "winpage.select Main"
+    toolitem   "Regs page" "Rg,g"  "winpage.select Regs"
+    separator
+    toolitem   "Start Log" "LG"    "term.write c:\temp\term.log"
+    toolitem   "Close Log" "CL"    "term.close"
+    separator
+  )
+)
+ enddo
+

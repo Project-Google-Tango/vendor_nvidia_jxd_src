@@ -1,0 +1,5 @@
+; Lauterbach TRACE32 debugger start-up script to disable the CPU MMU and caches.
+
+per.set C15:0x1 %long 0x0052078
+
+ENDDO

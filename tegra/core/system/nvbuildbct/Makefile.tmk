@@ -1,0 +1,53 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvbuildbct target static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME := libnvbuildbct
+NV_COMPONENT_SOURCES  := \
+	nvbuildbct.c \
+	nvbuildbct_util.c \
+	t30/t30_parse.c \
+	t30/t30_set.c \
+	t30/t30_data_layout.c \
+	t30/t30_buildbctinterface.c \
+	t11x/t11x_parse.c \
+	t11x/t11x_set.c \
+	t11x/t11x_data_layout.c \
+	t11x/t11x_buildbctinterface.c \
+	t12x/t12x_parse.c \
+	t12x/t12x_set.c \
+	t12x/t12x_data_layout.c \
+	t12x/t12x_buildbctinterface.c
+
+NV_COMPONENT_INCLUDES := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/t11x \
+	../../drivers/nvboot/t114/include
+
+NV_COMPONENT_CFLAGS            += \
+	-DNVODM_BOARD_IS_FPGA=0 \
+	-DT114_BUILDBCT_NAND_SUPPORT=1
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

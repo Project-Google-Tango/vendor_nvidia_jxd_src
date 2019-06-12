@@ -1,0 +1,5 @@
+; Lauterbach script to set up CPU for QT
+
+do &(TARGET_SOC)/&(TARGET_SOC)_qt_init_cpu.cmm
+
+enddo

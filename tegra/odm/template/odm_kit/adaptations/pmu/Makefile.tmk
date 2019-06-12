@@ -1,0 +1,202 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+#
+# nvodm_pmu static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvodm_pmu
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+        pmu_hal.c \
+        pmu_i2c/nvodm_pmu_i2c.c
+
+NV_COMPONENT_INCLUDES          := \
+    . \
+    $(NV_SOURCE)/core/system/nvnct
+
+#
+# NOTE: The code from these modules is also executed on the AVP!
+#       Therefore they need to be compiled with code generation flags
+#       compatible with AVP, i.e. ARMv4T ARM code.
+#
+NV_COMPONENT_CODE_GENERATION   := avp
+
+NV_COMPONENT_HAS_BROKEN_CODE   := \
+        missing-field-initializers
+
+ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+# Nothing, aos build uses the 'default' stub implementation from
+# pmu_hal.c
+#
+###############################################################################
+#
+# Please keep the board list in alphabetical order
+#
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),ardbeg)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_ARDBEG
+NV_COMPONENT_CFLAGS            += -DLPM_BATTERY_CHARGING
+NV_COMPONENT_CFLAGS            += -DREAD_BATTERY_SOC
+
+NV_COMPONENT_SOURCES           += \
+        boards/ardbeg/nvodm_pmu_ardbeg_rail.c \
+        boards/ardbeg/nvodm_pmu_ardbeg_dummy.c \
+        boards/ardbeg/nvodm_pmu_ardbeg_battery.c \
+        boards/ardbeg/odm_pmu_ardbeg_apgpio_rail.c \
+        boards/ardbeg/odm_pmu_ardbeg_tps80036_rail.c \
+        boards/ardbeg/odm_pmu_ardbeg_tps51632_rail.c \
+        boards/ardbeg/odm_pmu_ardbeg_as3722_rail.c \
+        boards/ardbeg/odm_pmu_ardbeg_tps65914_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps80036/nvodm_pmu_tps80036_pmu_driver.c \
+        tps51632/nvodm_pmu_tps51632_pmu_driver.c \
+        as3722/nvodm_pmu_as3722_pmu_driver.c \
+        tps65914/nvodm_pmu_tps65914_pmu_driver.c \
+        max17048/nvodm_pmu_max17048_fuel_gauge_driver.c \
+        lc709203f/nvodm_pmu_lc709203f_fuel_gauge_driver.c \
+        bq2419x/nvodm_pmu_bq2419x_batterycharger_driver.c \
+        cw2015/nvodm_pmu_cw2015_fuel_gauge_driver.c \
+        bq24z45/nvodm_pmu_bq24z45_fuel_gauge_driver.c \
+        bq2477x/nvodm_pmu_bq2477x_batterycharger_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),dalmore)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_DALMORE
+NV_COMPONENT_CFLAGS            += -DLPM_BATTERY_CHARGING
+NV_COMPONENT_SOURCES           += \
+        boards/dalmore/nvodm_pmu_dalmore_dummy.c \
+        boards/dalmore/nvodm_pmu_dalmore_rail.c \
+        boards/dalmore/odm_pmu_dalmore_apgpio_rail.c \
+        boards/dalmore/odm_pmu_dalmore_max77663_rail.c \
+        boards/dalmore/odm_pmu_dalmore_tps51632_rail.c \
+        boards/dalmore/odm_pmu_dalmore_tps65090_rail.c \
+        boards/dalmore/odm_pmu_dalmore_tps65914_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps65090/nvodm_pmu_tps65090_pmu_driver.c \
+        max77663/nvodm_pmu_max77663_pmu_driver.c \
+        tps51632/nvodm_pmu_tps51632_pmu_driver.c \
+        tps65914/nvodm_pmu_tps65914_pmu_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),e1853)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_E1853
+NV_COMPONENT_SOURCES           += \
+        boards/e1853/nvodm_pmu_e1853_rail.c \
+        boards/e1853/odm_pmu_e1853_tps6591x_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps6591x/nvodm_pmu_tps6591x_pmu_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),laguna)
+
+# TODO: remove when e1859_t114 converted to vcm30t114
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),e1859_t114)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_E1859_T114
+NV_COMPONENT_CFLAGS            += -DLPM_BATTERY_CHARGING
+NV_COMPONENT_SOURCES           += \
+        boards/e1859_t114/nvodm_pmu_e1859_t114_dummy.c \
+        boards/e1859_t114/nvodm_pmu_e1859_t114_rail.c \
+        boards/e1859_t114/odm_pmu_e1859_t114_apgpio_rail.c \
+        boards/e1859_t114/odm_pmu_e1859_t114_max77663_rail.c \
+        boards/e1859_t114/odm_pmu_e1859_t114_tps51632_rail.c \
+        boards/e1859_t114/odm_pmu_e1859_t114_tps65090_rail.c \
+        boards/e1859_t114/odm_pmu_e1859_t114_tps65914_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps65090/nvodm_pmu_tps65090_pmu_driver.c \
+        max77663/nvodm_pmu_max77663_pmu_driver.c \
+        tps51632/nvodm_pmu_tps51632_pmu_driver.c \
+        tps65914/nvodm_pmu_tps65914_pmu_driver.c
+
+# TBD
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),m2601)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_M2601
+NV_COMPONENT_SOURCES           += \
+        boards/m2601/nvodm_pmu_m2601_rail.c \
+        boards/m2601/odm_pmu_m2601_tps6591x_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps6591x/nvodm_pmu_tps6591x_pmu_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),pismo)
+# nothing
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),p1852)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_P1852
+NV_COMPONENT_SOURCES           += \
+        boards/p1852/nvodm_pmu_p1852_rail.c \
+        boards/p1852/odm_pmu_p1852_tps6591x_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps6591x/nvodm_pmu_tps6591x_pmu_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),vcm30t30)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_VCM30T30
+NV_COMPONENT_SOURCES           += \
+        boards/vcm30t30/nvodm_pmu_vcm30t30_rail.c \
+        boards/vcm30t30/odm_pmu_vcm30t30_tps6591x_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps6591x/nvodm_pmu_tps6591x_pmu_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),vcm30t114)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_VCM30T114
+NV_COMPONENT_SOURCES           += \
+        boards/vcm30t114/nvodm_pmu_vcm30t114_dummy.c \
+        boards/vcm30t114/nvodm_pmu_vcm30t114_rail.c \
+        boards/vcm30t114/odm_pmu_vcm30t114_apgpio_rail.c \
+        boards/vcm30t114/odm_pmu_vcm30t114_max77663_rail.c \
+        boards/vcm30t114/odm_pmu_vcm30t114_tps51632_rail.c \
+        boards/vcm30t114/odm_pmu_vcm30t114_tps65090_rail.c \
+        boards/vcm30t114/odm_pmu_vcm30t114_tps65914_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps65090/nvodm_pmu_tps65090_pmu_driver.c \
+        max77663/nvodm_pmu_max77663_pmu_driver.c \
+        tps51632/nvodm_pmu_tps51632_pmu_driver.c \
+        tps65914/nvodm_pmu_tps65914_pmu_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),pluto)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_PLUTO
+NV_COMPONENT_SOURCES           += \
+        boards/pluto/nvodm_pmu_pluto_rail.c \
+        boards/pluto/nvodm_pmu_pluto_battery.c \
+        boards/pluto/nvodm_pmu_pluto_dummy.c \
+        boards/pluto/odm_pmu_pluto_apgpio_rail.c \
+        boards/pluto/odm_pmu_pluto_tps65914_rail.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps65914/nvodm_pmu_tps65914_pmu_driver.c \
+        max77665a/nvodm_pmu_max77665a_pmu_driver.c \
+        max77665a/nvodm_pmu_max17047_pmu_driver.c
+
+else ifeq ($(NV_TARGET_REFERENCE_BOARD),loki)
+NV_COMPONENT_CFLAGS            += -DNV_TARGET_LOKI
+NV_COMPONENT_CFLAGS            += -DREAD_BATTERY_SOC
+NV_COMPONENT_CFLAGS            += -DLPM_BATTERY_CHARGING
+NV_COMPONENT_SOURCES           += \
+        boards/loki/nvodm_pmu_loki_rail.c \
+        boards/loki/nvodm_pmu_loki_dummy.c \
+        boards/loki/nvodm_pmu_loki_battery.c \
+        boards/loki/odm_pmu_loki_apgpio_rail.c \
+        boards/loki/odm_pmu_loki_tps65914_rail.c \
+        bq27441/nvodm_pmu_bq27441_fuel_gauge_driver.c \
+        bq2419x/nvodm_pmu_bq2419x_batterycharger_driver.c \
+        apgpio/nvodm_pmu_apgpio.c \
+        tps65914/nvodm_pmu_tps65914_pmu_driver.c \
+        lc709203f/nvodm_pmu_lc709203f_fuel_gauge_driver.c
+else
+$(error unsupported board configuration '$(NV_TARGET_REFERENCE_BOARD)' for nvodm_pmu)
+endif
+#
+###############################################################################
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

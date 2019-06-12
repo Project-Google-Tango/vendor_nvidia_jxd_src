@@ -1,0 +1,25 @@
+; Configure PTM (CPU0 only -- dual core PTM not yet supported).
+
+; Configure Coresight
+SYStem.CONFIG ETMBASE 0x8003c000
+SYStem.CONFIG FUNNELBASE 0x80004000
+SYStem.CONFIG ETMFUNNELPORT 0
+SYStem.CONFIG ETBBASE 0x80001000
+SYStem.CONFIG TPIUBASE 0x80003000
+
+; Configure PTM
+ETM.PortSize 8
+ETM.PortMode Normal
+ETM.HalfRate On
+ETM.DataTrace Off
+ETM.ContextId 8
+
+; Configure Preprocessor
+Analyzer.THreshold VCC
+Analyzer.TERMination ON
+
+; Calibrate the trace data bus.
+Analyzer.AutoFocus
+
+enddo
+

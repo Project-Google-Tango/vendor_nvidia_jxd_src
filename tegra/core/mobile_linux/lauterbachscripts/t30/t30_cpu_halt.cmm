@@ -1,0 +1,8 @@
+; Lauterbach TRACE32 debugger script to halt the CPU.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+D.S SR:0x60007000 0x40000000
+ENDDO

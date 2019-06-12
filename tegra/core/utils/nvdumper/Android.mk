@@ -1,0 +1,16 @@
+ifndef PLATFORM_IS_JELLYBEAN
+LOCAL_PATH := $(call my-dir)
+
+include $(NVIDIA_DEFAULTS)
+LOCAL_SRC_FILES := nvdumper.c
+LOCAL_CFLAGS += -D_BSD_SOURCE -D_GNU_SOURCE
+LOCAL_MODULE := nvdumper
+LOCAL_MODULE_TAGS := optional
+include $(NVIDIA_HOST_EXECUTABLE)
+
+include $(NVIDIA_DEFAULTS)
+LOCAL_SRC_FILES := nvdumper.c
+LOCAL_MODULE := nvdumper
+LOCAL_MODULE_TAGS := optional
+include $(NVIDIA_EXECUTABLE)
+endif

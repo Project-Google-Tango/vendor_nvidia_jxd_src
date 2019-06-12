@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">Services IU d\'affichage sans fil NVIDIA</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Indisponible car Miracast est actif.</string>
+    <string name="miracast_hdcp_title">Échec de l\'authentification HDCP auprès de %1$s </string>
+    <string name="miracast_hdcp_failure_text">Impossible d\'afficher le contenu Premium.</string>
+    <string name="miracast_connection_status_discovery">Recherche de\u0020</string>
+    <string name="miracast_connection_status_progress">Connexion à\u0020</string>
+    <string name="miracast_connection_status_connected">Transfert courant vers\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Could not find\u0020 introuvable</string>
+    <string name="miracast_connection_status_warning_conn_lost">Perte de la connexion avec \u0020</string>
+    <string name="miracast_connection_status_warning_auth_failed">Problème d\'authentification auprès de \u0020</string>
+    <string name="miracast_access_settings_title">Accéder aux paramètres Miracast</string>
+</resources>

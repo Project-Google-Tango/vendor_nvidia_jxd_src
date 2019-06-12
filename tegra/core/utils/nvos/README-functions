@@ -1,0 +1,189 @@
+== List of NVOS functions ==
+
+The functions are categorized roughly by the corresponding POSIX headers.
+(The list is very wide. Expand the width of your browser.)
+
+The prefixed keys are as follows.
+ LAQ     used (L: in Linux, A: in AOS, Q: in QNX)
+ laq     used, but only in limited place
+ ---     not used
+ xxx     not even implemented
+
+      R  replace this function
+      x  do not change for now
+      n  do not change for now, maybe in the next phase
+
+<stdio.h and unistd.h>
+ LAQ  R  NvError        NvOsFprintf(NvOsFileHandle hFile, const char *format, ...);                                          int fprintf(FILE *stream, const char *format, ...)
+ LAQ  R  NvError        NvOsVfprintf(NvOsFileHandle hFile, const char *format, va_list ap);                                  int vfprintf(FILE *stream, const char *format, va_list ap);
+ LAQ  R  NvS32          NvOsSnprintf(char *str, size_t size, const char *format, ...);                                       int snprintf(char *str, size_t size, const char * format, ...)
+ LAQ  R  NvS32          NvOsVsnprintf(char *str, size_t size, const char *format, va_list ap);                               int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+
+ LAQ  x  void           NvOsDebugPrintf(const char *format, ...);                                                            int printf(const char *format, ...)
+ LAQ  x  void           NvOsDebugVprintf(const char *format, va_list ap);                                                    int vprintf(const char *format, va_list ap);
+ laq  x  NvS32          NvOsDebugNprintf(const char *format, ...);                                                           int printf(const char *format, ...)
+ lax  x  NvError        NvOsShowError(NvError err, const char *file, int line);                                              (use printf)
+                            NvOsDebugPrintf(), NvOsDebugVprintf(), and NvOsDebugNprintf() stays
+                            as convenience functions. The output of those functions go to LOG()
+                            or /dev/console.
+
+ LAQ  R  NvError        NvOsFopen(const char *path, NvU32 flags, NvOsFileHandle *hFile);                                     FILE *fopen(const char *path, const char *mode);
+ LAQ  R  void           NvOsFclose(NvOsFileHandle hFile);                                                                    int fclose(FILE *fp);
+ LAQ  R  NvError        NvOsFwrite(NvOsFileHandle hFile, const void *ptr, size_t size);                                      size_t fwrite (const void *array, size_t size, size_t count, FILE *stream);
+ LAQ  R  NvError        NvOsFread(NvOsFileHandle hFile, void *ptr, size_t size, size_t *bytes);                              size_t fread (void * ptr, size_t size, size_t nmemb, FILE * stream)
+ LAQ  R  NvError        NvOsFgetc(NvOsFileHandle hFile, NvU8 *c);                                                            int fgetc(FILE *fp);
+ LAQ  R  NvError        NvOsFseek(NvOsFileHandle hFile, NvS64 offset, NvOsSeekEnum whence);                                  int fseek(FILE *stream_pointer, long offset, int origin);
+ LAQ  R  NvError        NvOsFtell(NvOsFileHandle hFile, NvU64 *position);                                                    long ftell ( FILE * stream );
+ LAQ  R  NvError        NvOsStat(const char *filename, NvOsStatType *stat);                                                  int stat(const char *path, struct stat *buf);
+ LAQ  R  NvError        NvOsFstat(NvOsFileHandle hFile, NvOsStatType *stat);                                                 (use stat)
+ LAQ  R  NvError        NvOsFflush(NvOsFileHandle hFile);                                                                    int fflush(FILE *stream);
+ lxq  R  NvError        NvOsFremove(const char *filename);                                                                   int remove ( const char * filename );
+ lxq  R  NvError        NvOsFsync(NvOsFileHandle hFile);                                                                     int fflush(FILE *stream);
+
+<stropts.h>
+ Lxx  n  NvError        NvOsIoctl(NvOsFileHandle hFile, NvU32 IoctlCode, void *pBuf, NvU32 nIn, NvU32 nInOut, NvU32 nOut);   int ioctl(int d, int request, ...);
+                            Let us keep NvOsIoctl() as convenience function for now.
+                            Corresponding NfOsFopen()/close() should also stay.
+
+<string.h>
+ LAQ  R  size_t         NvOsStrlen(const char *s);                                                                           size_t strlen(const char *s);
+ LAQ  R  int            NvOsStrcmp(const char *s1, const char *s2);                                                          int strcmp(const char *s1, const char *s2);
+ LAQ  R  int            NvOsStrncmp(const char *s1, const char *s2, size_t size);                                            int strncmp(const char *s1, const char *s2, size_t n);
+ LAQ  R  void           NvOsMemcpy(void *dest, const void *src, size_t size);                                                void *memcpy(void *dest, const void *src, size_t n);
+ LAQ  R  void           NvOsStrncpy(char *dest, const char *src, size_t size);                                               char *strncpy(char *dest, const char *src, size_t n);
+ LAQ  R  int            NvOsMemcmp(const void *s1, const void *s2, size_t size);                                             int memcmp(const void *s1, const void *s2, size_t n);
+ LAQ  R  void           NvOsMemset(void *s, NvU8 c, size_t size);                                                            void *memset(void *s, int c, size_t n);
+ LAQ  R  void           NvOsMemmove(void *dest, const void *src, size_t size);                                               void *memmove(void *dest, const void *src, size_t n);
+ laq  R  NvError        NvOsCopyIn(void *pDst, const void *pSrc, size_t Bytes);                                              (use memcpy)
+ laq  R  NvError        NvOsCopyOut(void *pDst, const void *pSrc, size_t Bytes);                                             (use memcpy)
+
+<dirent.h>
+ lxq  n  NvError        NvOsOpendir(const char *path, NvOsDirHandle *dir);                                                   DIR* opendir(const char* dirname)
+ lxq  n  NvError        NvOsReaddir(NvOsDirHandle dir, char *name, size_t size);                                             struct dirent* readdir(DIR* dirp)
+ lxq  n  void           NvOsClosedir(NvOsDirHandle dir);                                                                     int closedir(DIR* dirp)
+
+<stdlib.h>
+ LAQ  R  void*          NvOsAlloc(size_t size);                                                                              void *malloc(size_t size);
+ LAQ  R  void*          NvOsRealloc(void *ptr, size_t size);                                                                 void *realloc(void *ptr, size_t size);
+ LAQ  R  void           NvOsFree(void *ptr);                                                                                 void free(void *ptr);
+
+<sched.h>
+ LAQ  R  void           NvOsThreadYield(void);                                                                               int sched_yield(void);
+
+<pthread.h>
+ LAQ  R  NvError        NvOsThreadCreate(NvOsThreadFunction function, void *args, NvOsThreadHandle *thread);                 int pthread_create(pthread_t *, &attr, func, void*);
+ LAQ  R  void           NvOsThreadJoin(NvOsThreadHandle thread);                                                             int pthread_join(pthread_t thread, void **value_ptr);
+ laq  x  NvError        NvOsThreadMode(int coop);                                                                            (no equivalent in POSIX)
+ xAQ  x  NvError        NvOsInterruptPriorityThreadCreate(NvOsThreadFunction func, void *args, NvOsThreadHandle *thread);    (no equivalent in POSIX)
+ xax  x  NvError        NvOsThreadSetLowPriority(void);                                                                      (no equivalent in POSIX)
+
+ LAQ  R  NvError        NvOsMutexCreate(NvOsMutexHandle *mutex);                                                             int pthread_mutex_init(pthread_mutex_t *, const pthread_mutexattr_t *attr);
+ LAQ  R  void           NvOsMutexLock(NvOsMutexHandle mutex);                                                                int pthread_mutex_lock(pthread_mutex_t *mutex);
+ LAQ  R  void           NvOsMutexUnlock(NvOsMutexHandle mutex);                                                              int pthread_mutex_unlock(pthread_mutex_t *mutex);
+ LAQ  R  void           NvOsMutexDestroy(NvOsMutexHandle mutex);                                                             int pthread_mutex_destroy(pthread_mutex_t *mutex);
+                            Replace them only where it is easy to use POSIX mutex.
+                            NVOS mutex is recursive, while POSIX one is not.
+
+ l-q  R  NvU32          NvOsTlsAlloc(void);                                                                                  int pthread_key_create(pthread_key_t *key, void (*dtor) (void *));
+ l-q  R  void           NvOsTlsFree(NvU32 TlsIndex);                                                                         int pthread_key_delete(pthread_key_t key);
+ l-q  R  void*          NvOsTlsGet(NvU32 TlsIndex);                                                                          void * pthread_getspecific(pthread_key_t key);
+ l-q  R  void           NvOsTlsSet(NvU32 TlsIndex, void *Value);                                                             int pthread_setspecific(pthread_key_t key, const void *pointer);
+
+<semaphore.h>
+ LAQ  R  NvError        NvOsSemaphoreCreate(NvOsSemaphoreHandle *semaphore, NvU32 value);                                    int sem_init(sem_t *sem, int pshared, unsigned int value);
+ LAQ  R  void           NvOsSemaphoreWait(NvOsSemaphoreHandle semaphore);                                                    int sem_wait(sem_t *sem);
+ LAQ  R  NvError        NvOsSemaphoreWaitTimeout(NvOsSemaphoreHandle semaphore, NvU32 msec);                                 int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
+ LAQ  R  void           NvOsSemaphoreSignal(NvOsSemaphoreHandle semaphore);                                                  int sem_post(sem_t *sem);
+ LAQ  R  void           NvOsSemaphoreDestroy(NvOsSemaphoreHandle semaphore);                                                 int sem_destroy(sem_t *sem);
+ LAQ  x  NvError        NvOsSemaphoreClone(NvOsSemaphoreHandle orig,  NvOsSemaphoreHandle *semaphore);                       (no equivalent in POSIX)
+ xaq  x  NvError        NvOsSemaphoreUnmarshal(NvOsSemaphoreHandle hClientSema, NvOsSemaphoreHandle *phDriverSema);          (no equivalent in POSIX)
+                            Replace them only where it is possible to use POSIX semaphore.
+                            Use NVOS semaphore to communicate with kernel or other processes.
+
+<time.h>
+ lxq  x  NvError        NvOsGetSystemTime(NvOsSystemTime *hNvOsSystemtime);                                                  int clock_gettime(CLOCK_MONOTONIC, struct timespec *tp);
+ xxx  x  NvError        NvOsSetSystemTime(NvOsSystemTime *hNvOsSystemtime);                                                  int clock_settime(CLOCK_MONOTONIC, const struct timespec *tp);
+ LAQ  x  NvU32          NvOsGetTimeMS(void);                                                                                 int clock_gettime(CLOCK_MONOTONIC, struct timespec *tp);
+ LAQ  x  NvU64          NvOsGetTimeUS(void);                                                                                 int clock_gettime(CLOCK_MONOTONIC, struct timespec *tp);
+                            Keep them as convenience functions.
+
+<unistd.h>
+ LAQ  x  void           NvOsSleepMS(NvU32 msec);                                                                             (no direct match; use nanosleep(struct timespec *, struct timespec *))
+ LAQ  x  void           NvOsWaitUS(NvU32 usec);                                                                              (no direct match; use nanosleep(struct timespec *, struct timespec *))
+                            Keep them as convenience functions.
+
+<sys/mman.h>
+ lxq  n  NvError        NvOsSharedMemAlloc(const char *key, size_t size, NvOsSharedMemHandle *desc);                         int shm_open(const char *name, int oflag, mode_t mode);
+ lxq  n  NvError        NvOsSharedMemMap(NvOsSharedMemHandle desc, size_t offset, size_t size, void **ptr);                  void *shmat(int shmid, const void *shmaddr, int shmflg);
+ lxq  n  void           NvOsSharedMemUnmap(void *ptr, size_t size);                                                          int shmdt(const void *shmaddr);
+ lxq  n  void           NvOsSharedMemFree(NvOsSharedMemHandle desc);                                                         int shm_unlink(const char *name);
+
+<dlfcn.h>
+ LAQ  x  NvError        NvOsLibraryLoad(const char *name, NvOsLibraryHandle *hLib);                                          void *dlopen(const char *filename, int flag);
+ LAQ  x  void*          NvOsLibraryGetSymbol(NvOsLibraryHandle hLib, const char *symbol);                                    void *dlsym(void *handle, const char *symbol);
+ LAQ  x  void           NvOsLibraryUnload(NvOsLibraryHandle hLib);                                                           int dlclose(void *handle);
+
+<not in POSIX, no rewrite>
+ l-q  x  NvError        NvOsTlsAddTerminator(void (*func)(void *), void *context);
+
+ lxx  x  void           NvOsThreadSetAffinity(NvU32 CpuHint);
+ -xx  x  NvU32          NvOsThreadGetAffinity(void);
+
+ LAQ  x  NvS32          NvOsAtomicCompareExchange32(NvS32 *pTarget, NvS32 OldValue, NvS32 NewValue);
+ LAQ  x  NvS32          NvOsAtomicExchange32(NvS32 *pTarget, NvS32 Value);
+ LAQ  x  NvS32          NvOsAtomicExchangeAdd32(NvS32 *pTarget, NvS32 Value);
+
+ LAx  x  NvError        NvOsSetConfigU32(const char *name, NvU32 value);
+ LAx  x  NvError        NvOsSetConfigString(const char *name, const char *value);
+ ---  x  NvError        NvOsSetSysConfigString(const char *name, const char *value);
+ LAQ  x  NvError        NvOsGetConfigU32(const char *name, NvU32 *value);
+ LAQ  x  NvError        NvOsGetConfigString(const char *name, char *value, NvU32 size);
+ --q  x  NvError        NvOsGetSysConfigString(const char *name, char *value, NvU32 size);
+ ---  x  NvError        NvOsConfigSetState(int stateId, const char *name, const char *value, int valueSize, int flags);
+ LAq  x  NvError        NvOsConfigGetState(int stateId, const char *name, char *value, int valueSize, int flags);
+ ---  x  NvError        NvOsConfigQueryState(int stateId, const char **ppKeys, int *pNumKeys, int maxKeySize);
+
+ LAQ  x  NvError        NvOsIntrMutexCreate(NvOsIntrMutexHandle *mutex);
+ LAQ  x  void           NvOsIntrMutexLock(NvOsIntrMutexHandle mutex);
+ LAQ  x  void           NvOsIntrMutexUnlock(NvOsIntrMutexHandle mutex);
+ LAQ  x  void           NvOsIntrMutexDestroy(NvOsIntrMutexHandle mutex);
+
+ xAq  x  NvError        NvOsInterruptRegister(NvU32, NvU32*, NvOsInterruptHandler*, void*, NvOsInterruptHandle*, NvBool);
+ xAq  x  void           NvOsInterruptUnregister(NvOsInterruptHandle hInt);
+ xAq  x  NvError        NvOsInterruptEnable(NvOsInterruptHandle hInt);
+ xAq  x  void           NvOsInterruptDone(NvOsInterruptHandle hInt);
+ xxq  x  void           NvOsInterruptMask(NvOsInterruptHandle hInt, NvBool mask);
+
+ LAQ  x  NvError        NvOsPhysicalMemMap(NvOsPhysAddr phys, size_t size, NvOsMemAttribute attr, NvU32 flags, void **ptr);
+ xxx  x  NvError        NvOsPhysicalMemMapIntoCaller(void *pCaller, NvOsPhysAddr, size_t, NvOsMemAttribute, NvU32 flags);
+ LAQ  x  void           NvOsPhysicalMemUnmap(void *ptr, size_t size);
+
+ xAx  x  void           NvOsDataCacheWriteback(void);
+ xAx  x  void           NvOsDataCacheWritebackInvalidate(void);
+ LAx  x  void           NvOsDataCacheWritebackRange(void *start, NvU32 length);
+ LAx  x  void           NvOsDataCacheWritebackInvalidateRange(void *start, NvU32 length);
+ xAx  x  void           NvOsInstrCacheInvalidate(void);
+ LAx  x  void           NvOsInstrCacheInvalidateRange(void *start, NvU32 length);
+ xaq  x  void           NvOsFlushWriteCombineBuffer(void);
+
+ -x-  x  NvError        NvOsFreadTimeout(NvOsFileHandle hFile, void *ptr, size_t size, size_t *bytes, NvU32 msec);
+ laq  x  NvOsFileHooks* NvOsSetFileHooks(NvOsFileHooks *newHooks);
+
+ lxq  x  void*          NvOsExecAlloc(size_t size);
+ lxq  x  void           NvOsExecFree(void *ptr, size_t size);
+
+ laq  x  NvError        NvOsGetOsInformation(NvOsOsInfo *pOsInfo);
+ laq  x  NvOsCodePage   NvOsStrGetSystemCodePage(void);
+
+ xxx  x  NvError        NvOsPageAlloc(size_t, NvOsMemAttribute, NvOsPageFlags, NvU32 protect, NvOsPageAllocHandle *desc);
+ xxx  x  NvError        NvOsPageLock(void *ptr, size_t size, NvU32 protect, NvOsPageAllocHandle *desc);
+ xxx  x  void           NvOsPageFree(NvOsPageAllocHandle desc);
+ xxx  x  NvError        NvOsPageMap(NvOsPageAllocHandle desc, size_t offset, size_t size, void **ptr);
+ xxx  x  NvError        NvOsPageMapIntoPtr(NvOsPageAllocHandle desc, void *pCaller, size_t offset, size_t size);
+ xxx  x  void           NvOsPageUnmap(NvOsPageAllocHandle desc, void *ptr, size_t size);
+ xxx  x  NvOsPhysAddr   NvOsPageAddress(NvOsPageAllocHandle desc, size_t offset);
+
+ xxx  x  NvError        NvOsBootArgSet(NvU32 key, void *arg, NvU32 size);
+ xxx  x  NvError        NvOsBootArgGet(NvU32 key, void *arg, NvU32 size);
+ xxx  x  NvError        NvOsListResources(NvOsResource, NvU32 *nResources, NvOsResourceHandle*);
+ xxx  x  NvError        NvOsResourceInfo(NvOsResourceHandle, NvU32 InfoSize, void *Info);

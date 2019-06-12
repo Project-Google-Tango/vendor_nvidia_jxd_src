@@ -1,0 +1,13 @@
+Index: cwiid-0.6.00+svn184.orig/wmgui/Makefile.in
+===================================================================
+--- cwiid-0.6.00+svn184.orig.orig/wmgui/Makefile.in	2009-03-27 13:08:33.000000000 +0100
++++ cwiid-0.6.00+svn184.orig/wmgui/Makefile.in	2009-03-27 13:08:36.000000000 +0100
+@@ -8,7 +8,7 @@
+ 
+ CFLAGS += @GTK_CFLAGS@ -I@top_builddir@/libcwiid
+ LDFLAGS += -L@top_builddir@/libcwiid
+-LDLIBS += @GTK_LIBS@ -lm -lcwiid
++LDLIBS += -Wl,--as-needed @GTK_LIBS@ -lm -lcwiid
+ INST_DIR = @bindir@
+ 
+ include $(COMMON)/include/app.mak

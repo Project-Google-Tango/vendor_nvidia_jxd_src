@@ -1,0 +1,247 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake makefile fragment for libnvtestio.
+#
+###############################################################################
+
+# These are the variables that should be set by the wrapper makefile:
+# _wrapper_name:
+#   Used as NV_COMPONENT_NAME (with “lib” prefixed for a static library).
+# _wrapper_gdbt_supported:
+#   Whether to use GDBT based protocol (1) or stdio based protocol (0).
+# _wrapper_relative_path
+#   Prefix for relative paths (sources, include paths, interfaces) mentioned
+#   in this file.  If it is not empty, it must end with "/".
+
+# The set of source files to include varies quite a bit amongst
+# build configurations.  Some files are used in all cases, some depend
+# on the build configuration and some on the combination of build config
+# and artifact type.  This is reflected in the partitioning of this file.
+
+###############################################################################
+# Common to all build variants.
+_nvtestio_common_sources           := \
+	tio_null_file_cache.c \
+	tio_nvos.c \
+	tio_reliable.c \
+	tio_remote.c \
+	tio_target.c \
+	tio_vfs.c
+_nvtestio_common_includes          := \
+	include \
+	$(NV_SOURCE)/core/drivers/nvboot
+_nvtestio_common_cflags            := \
+	-DNV_TIO_GDBT_SUPPORTED=$(_wrapper_gdbt_supported)
+_nvtestio_common_broken_code_flags := \
+	missing-field-initializers
+
+###############################################################################
+# Common for certain build configuration.
+
+# Local helper: AOS (CPU and AVP) and MODS AVP use the same sources.
+_is_aos_or_mods := 0
+ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+ifneq ($(NV_TARGET_ARCH),hostcc)
+_is_aos_or_mods := 1
+endif
+endif
+
+# Local helper: files used by variants that get built when !_is_aos_or_mods.
+_nvtestio_common_to_all_excluding_aos_and_mods_sources := \
+	tio_host.c \
+	tio_host_stdio.c \
+	tio_listen.c
+
+# Select between GDBT and stdio.
+# GDBT version.
+ifeq ($(_wrapper_gdbt_supported),1)
+_nvtestio_common_sources           += \
+	tio_gdbt.c \
+	tio_gdbt_target.c \
+	tio_shmoo.c
+ifeq ($(_is_aos_or_mods),1)
+ifeq ($(NV_TARGET_ARCH),rvds_armv4)
+_nvtestio_common_sources += tio_shmoo_norm.c
+else
+_nvtestio_common_sources += tio_shmoo_rm.c
+endif
+endif
+
+_nvtestio_common_to_all_excluding_aos_and_mods_sources += \
+	tio_gdbt_host.c \
+	tio_shmoo_norm.c
+
+# stdio version.
+else
+_nvtestio_common_sources += \
+	tio_stdio.c
+
+_nvtestio_common_to_all_excluding_aos_and_mods_sources += \
+	tio_stdio_host.c
+
+ifeq ($(NV_TARGET_ARCH),rvds_armv4)
+_nvtestio_common_sources += tio_stdio_target.c
+_nvtestio_common_cflags  += -DTIO_TARGET_SUPPORTED
+else
+_nvtestio_common_sources += tio_null_target.c
+endif
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+_nvtestio_common_sources += \
+	$(_nvtestio_common_to_all_excluding_aos_and_mods_sources) \
+	tio_null_poll.c \
+	tio_null_stdio.c \
+	tio_null_tcp.c \
+	tio_null_uart.c
+
+else ifeq ($(NV_HOST_OS)-$(NV_TARGET_ARCH),windows-hostcc)
+_nvtestio_common_sources += \
+	$(_nvtestio_common_to_all_excluding_aos_and_mods_sources) \
+	tio_tcp.c \
+	tio_winnt.c \
+	tio_winnt_poll.c \
+	tio_winnt_usb.c
+
+else ifeq ($(_is_aos_or_mods),1)
+_nvtestio_common_sources  += \
+	tio_null_host.c \
+	tio_null_listen.c \
+	tio_null_poll.c \
+	tio_null_stdio.c \
+	tio_null_tcp.c \
+	tio_uart_t1xx.c
+
+_nvtestio_common_includes += \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	$(NV_SOURCE)/core/drivers/nvboot/$(NV_TARGET_SOC)/include \
+	$(NV_SOURCE)/bootloader/microboot/nvboot/$(NV_TARGET_SOC)/include \
+	$(NV_SOURCE)/bootloader/microboot/nvboot/$(NV_TARGET_SOC)/include/$(NV_TARGET_SOC) \
+	$(NV_SOURCE)/bootloader/microboot/nvboot/$(NV_TARGET_SOC)/usbf
+
+else
+_nvtestio_common_sources                += \
+	$(_nvtestio_common_to_all_excluding_aos_and_mods_sources) \
+	tio_linux.c \
+	tio_linux_poll.c \
+	tio_tcp.c
+
+endif
+
+_nvtestio_common_to_all_excluding_aos_and_mods_sources :=
+
+# Add prefix to relative paths in $(1), leaving absolute paths unchanged.
+_nvtestio_path_prefix = $(filter /%,$(1)) \
+	$(addprefix $(_wrapper_relative_path),$(filter-out /%,$(1)))
+
+
+###############################################################################
+# Static library.
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := lib$(_wrapper_name)
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_nvtestio_common_sources)
+NV_COMPONENT_INCLUDES          := $(_nvtestio_common_includes)
+NV_COMPONENT_CFLAGS            := $(_nvtestio_common_cflags)
+
+ #################################
+ # Build config specific sources #
+ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+NV_COMPONENT_SOURCES         += tio_null_usb.c
+
+else ifeq ($(_is_aos_or_mods),1)
+ifeq ($(NV_TARGET_ARCH),rvds_armv4)
+NV_COMPONENT_SOURCES         += tio_usb_target.c
+else
+NV_COMPONENT_SOURCES         += tio_usb_nvddk.c
+endif
+
+else ifneq ($(NV_HOST_OS)-$(NV_TARGET_ARCH),windows-hostcc)
+NV_COMPONENT_SOURCES         += tio_linux_usb.c
+endif
+
+ #########################
+ # Other build specifics #
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_HAS_BROKEN_CODE := $(_nvtestio_common_broken_code_flags)
+endif
+
+NV_COMPONENT_SOURCES  := $(call _nvtestio_path_prefix,$(NV_COMPONENT_SOURCES))
+NV_COMPONENT_INCLUDES := $(call _nvtestio_path_prefix,$(NV_COMPONENT_INCLUDES))
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif # NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+
+###############################################################################
+# Shared library
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := $(_wrapper_name)
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_nvtestio_common_sources)
+NV_COMPONENT_INCLUDES          := $(_nvtestio_common_includes)
+NV_COMPONENT_CFLAGS            := $(_nvtestio_common_cflags)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/utils/nvos
+ifneq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core/utils/nvapputil
+endif
+
+ #################################
+ # Build config specific sources #
+ifneq ($(NV_HOST_OS)-$(NV_TARGET_ARCH),windows-hostcc)
+NV_COMPONENT_SOURCES           += tio_null_usb.c
+endif
+
+ ####################################
+ # Build config specific interfaces #
+ifeq ($(NV_HOST_OS)-$(NV_TARGET_ARCH),windows-hostcc)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS   += ../../utils/nvusbhost/libnvusbhost
+NV_COMPONENT_SYSTEM_STATIC_LIBRARIES := WS2_32
+endif
+
+ #########################
+ # Other build specifics #
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_HAS_BROKEN_CODE   := $(_nvtestio_common_broken_code_flags)
+endif
+
+NV_COMPONENT_SOURCES  := $(call _nvtestio_path_prefix,$(NV_COMPONENT_SOURCES))
+NV_COMPONENT_INCLUDES := $(call _nvtestio_path_prefix,$(NV_COMPONENT_INCLUDES))
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(call _nvtestio_path_prefix,$(NV_COMPONENT_NEEDED_INTERFACE_DIRS))
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif # NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+
+# Reset local variables.
+_nvtestio_common_sources  :=
+_nvtestio_common_includes :=
+_nvtestio_common_broken_code_flags :=
+_is_aos_or_mods           :=
+_wrapper_name             :=
+_wrapper_gdbt_supported   :=
+_wrapper_relative_path    :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

@@ -1,0 +1,50 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile
+#
+# Repository umbrella makefile fragment for "tests-partner"
+#
+###############################################################################
+
+#
+# Components in this repository
+#
+NV_REPOSITORY_COMPONENTS :=
+
+#
+# Platform specific components in this repository
+#
+ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_LINUX),1)
+# All Linux variants: Android, L4T and embedded.
+NV_REPOSITORY_COMPONENTS += \
+	openmax/omxplayer \
+	openmax/omxplayer2
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+# All embedded variants: QNX and Embedded Linux.
+NV_REPOSITORY_COMPONENTS += \
+	libjpeg_test/libjpeg_6b_test/cjpeg \
+	libjpeg_test/libjpeg_6b_test/djpeg \
+	libjpeg_test/libjpeg_6b_test/jpegtran
+endif
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_L4T),1)
+NV_REPOSITORY_COMPONENTS += \
+	libjpeg_test/libjpeg_8b_test/cjpeg \
+	libjpeg_test/libjpeg_8b_test/djpeg \
+	libjpeg_test/libjpeg_8b_test/jpegtran
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

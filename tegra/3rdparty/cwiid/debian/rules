@@ -1,0 +1,51 @@
+#!/usr/bin/make -f
+
+DEB_AUTO_UPDATE_LIBTOOL = pre
+DEB_AUTO_UPDATE_ACLOCAL = 1.10
+DEB_AUTO_UPDATE_AUTOMAKE = 1.10
+DEB_AUTO_UPDATE_AUTOCONF = 2.60
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/rules/patchsys-quilt.mk
+
+# In order to regenerate 'debian/control' :
+#    DEB_AUTO_UPDATE_DEBIAN_CONTROL=yes fakeroot debian/rules clean
+# Then check manually if everything's ok
+
+DEB_CONFIGURE_EXTRA_FLAGS := --with-cwiid-config-dir="\$${debroot}/etc/cwiid" --disable-ldconfig
+
+DEB_MAKE_INSTALL_TARGET := install debroot=$(CURDIR)/debian/tmp prefix=$(CURDIR)/debian/tmp/usr
+
+DEB_INSTALL_CHANGELOGS_ALL := ChangeLog
+
+STAGING_DIR               := $(CURDIR)/debian/python-cwiid
+DEB_COMPRESS_EXCLUDE      := .py
+
+#LDFLAGS := -Wl,--as-needed -lbluetooth -lrt
+
+binary-install/python-cwiid::
+	dh_pysupport -ppython-cwiid
+
+configure/lswm::
+	mkdir -p $(CURDIR)/debian/tmp/usr/bin
+
+configure/libcwiid1-dev::
+	mkdir -p $(CURDIR)/debian/tmp/usr/include
+
+configure/libcwiid1::
+	mkdir -p $(CURDIR)/debian/tmp/usr/lib
+
+configure/wmgui::
+	mkdir -p $(CURDIR)/debian/tmp/usr/bin
+
+configure/wminput::
+	mkdir -p $(CURDIR)/debian/tmp/usr/bin
+
+binary-install/wminput::
+	chmod -x $(CURDIR)/debian/wminput/etc/cwiid/wminput/*
+	rm -f $(CURDIR)/debian/wminput/etc/cwiid/wminput/default
+	dh_link -pwminput etc/cwiid/wminput/acc_ptr etc/cwiid/wminput/default
+
+clean::
+	rm -rf config.log config.status

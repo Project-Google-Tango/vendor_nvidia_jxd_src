@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# TODO: this should look at PDK_FUSION_PLATFORM_ZIP env var
+zip -d $(gettop)/out/platform.zip system/lib/libnvmm_camera.so \
+				  system/lib/libnvcamerahdr.so \
+		    		  system/lib/libnvomxadaptor.so \
+		    		  system/lib/libnvstereoutils_jni.so 

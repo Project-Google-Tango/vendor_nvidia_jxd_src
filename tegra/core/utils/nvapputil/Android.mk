@@ -1,0 +1,29 @@
+LOCAL_PATH := $(call my-dir)
+
+COMMON_SRC_FILES := nvaurand.c
+COMMON_SRC_FILES += nvaugetopt.c
+COMMON_SRC_FILES += nvaureadline.c
+COMMON_SRC_FILES += nvauerr.c
+COMMON_SRC_FILES += nvauprintf.c
+COMMON_SRC_FILES += nvau_hashtable.c
+COMMON_SRC_FILES += nvau_token.c
+COMMON_SRC_FILES += nvauproc_linux.c
+
+include $(NVIDIA_DEFAULTS)
+
+LOCAL_MODULE := libnvapputil
+LOCAL_CFLAGS += -DNV_DEF_USE_FLOAT=1
+LOCAL_SRC_FILES += $(COMMON_SRC_FILES)
+LOCAL_SHARED_LIBRARIES += libnvos
+
+LOCAL_NVIDIA_NO_EXTRA_WARNINGS := 1
+include $(NVIDIA_SHARED_LIBRARY)
+
+include $(NVIDIA_DEFAULTS)
+
+LOCAL_MODULE := libnvapputil
+LOCAL_MODULE_TAGS := eng
+LOCAL_CFLAGS += -DNV_DEF_USE_FLOAT=1
+LOCAL_SRC_FILES += $(COMMON_SRC_FILES)
+
+include $(NVIDIA_HOST_STATIC_LIBRARY)

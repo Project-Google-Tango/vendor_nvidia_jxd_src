@@ -1,0 +1,56 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake component makefile for libnvappmain.
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvappmain
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           :=
+NV_COMPONENT_INCLUDES          := \
+	$(NV_SOURCE)/hwinc
+
+# Windows host build
+ifeq ($(NV_HOST_OS)-$(NV_TARGET_ARCH),windows-hostcc)
+NV_COMPONENT_SOURCES		+= \
+	nvappmain_standard.c
+
+# AOS build, non-hostcc.
+else ifneq ($(filter 1-rvds_%,$(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST)-$(NV_TARGET_ARCH)),)
+NV_COMPONENT_SOURCES		+= \
+	nvappmain_jtag.c
+
+ifeq ($(NV_TARGET_ARCH),rvds_armv4)
+NV_COMPONENT_SOURCES		+= \
+	nvappmain_avp.c
+else ifeq ($(NV_TARGET_ARCH),rvds_armv6)
+NV_COMPONENT_SOURCES		+= \
+	nvappmain_aos.c
+endif
+
+else # Host is not Windows and target is not AOS.
+NV_COMPONENT_SOURCES		+= \
+	nvappmain_aos.c \
+	nvappmain_jtag.c \
+	nvappmain_standard.c
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif # NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

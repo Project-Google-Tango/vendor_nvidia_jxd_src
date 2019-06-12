@@ -1,0 +1,111 @@
+; Lauterbach TRACE32 debugger script to reconfigure the CPU-side JTAG with a variable number of active cores.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+if (VERSION.BUILD()<17663.)
+(
+  PRINT "Trace32 versions prior to build 17663 are not supported"
+  STOP
+)
+
+LOCAL &OPERATION
+LOCAL &CORE_NUMBER
+LOCAL &SB_PFCFG
+LOCAL &OPERATION_PRINT
+LOCAL &CORE_PRINT
+
+PRINT "(S)et or (C)lear CPU DBG Request?"
+INKEY &KEY
+
+IF &KEY==0x53		; 'S'
+(
+  &OPERATION="S"
+  &OPERATION_PRINT="Set"
+)
+ELSE IF &KEY==0x73	; 's'
+(
+  &OPERATION="S"
+  &OPERATION_PRINT="Set"
+)
+ELSE IF &KEY==0x43	; 'C'
+(
+  &OPERATION="C"
+  &OPERATION_PRINT="Cleared"
+)
+ELSE IF &KEY==0x63	; 'c'
+(
+  &OPERATION="C"
+  &OPERATION_PRINT="Cleared"
+)
+ELSE
+(
+  PRINT "Invalid operation: &KEY"
+  STOP
+)
+
+&SB_PFCFG=data.long(a:0x6000C208)	; SB_PFCFG_0
+
+PRINT "Which core (0, 1, 2, or 3)?"
+INKEY &KEY
+
+IF &KEY==0x30
+(
+  &CORE_PRINT="0"
+  IF "&OPERATION"=="S"
+  (
+    &SB_PFCFG=&SB_PFCFG|0x00000100	; EDBGRQ_CPU0
+  )
+  ELSE
+  (
+    &SB_PFCFG=&SB_PFCFG&0xFFFFFEFF	; EDBGRQ_CPU0
+  )
+)
+ELSE IF &KEY==0x31
+(
+  &CORE_PRINT="1"
+  IF "&OPERATION"=="S"
+  (
+    &SB_PFCFG=&SB_PFCFG|0x00000200	; EDBGRQ_CPU0
+  )
+  ELSE
+  (
+    &SB_PFCFG=&SB_PFCFG&0xFFFFFDFF	; EDBGRQ_CPU0
+  )
+)
+ELSE IF &KEY==0x32
+(
+  &CORE_PRINT="2"
+  IF "&OPERATION"=="S"
+  (
+    &SB_PFCFG=&SB_PFCFG|0x00000400	; EDBGRQ_CPU0
+  )
+  ELSE
+  (
+    &SB_PFCFG=&SB_PFCFG&0xFFFFFBFF	; EDBGRQ_CPU0
+  )
+)
+ELSE IF &KEY==0x33
+(
+  &CORE_PRINT="3"
+  IF "&OPERATION"=="S"
+  (
+    &SB_PFCFG=&SB_PFCFG|0x00000800	; EDBGRQ_CPU0
+  )
+  ELSE
+  (
+    &SB_PFCFG=&SB_PFCFG&0xFFFFF7FF	; EDBGRQ_CPU0
+  )
+)
+ELSE
+(
+  PRINT "Invalid core number: &KEY"
+  STOP
+)
+
+D.S a:0x6000C208 %LE %LONG &SB_PFCFG	; SB_PFCFG_0
+PRINT "Extern Debug Request &OPERATION_PRINT for CPU &CORE_PRINT"
+
+enddo
+

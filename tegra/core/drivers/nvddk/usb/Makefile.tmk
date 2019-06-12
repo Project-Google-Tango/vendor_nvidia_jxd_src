@@ -1,0 +1,59 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_usbphy library component makefile
+#
+###############################################################################
+
+#------------------------------------------------------------------------------
+# Common definitions
+#------------------------------------------------------------------------------
+_nvddk_usbphy_common_sources                := \
+	host/nvddk_usbh.c \
+	host/nvddk_usbh_priv.c \
+	host/nvddk_usbh_priv_t124.c \
+	nvddk_usbphy.c \
+	nvddk_usbphy_t124.c \
+	host/usbhblockdriver/nvddk_usbh_block_driver.c \
+	host/usbhblockdriver/nvddk_usbh_scsi_driver.c \
+	device/nvddk_usbf.c \
+	device/nvddk_usbf_priv.c
+_nvddk_usbphy_common_includes               := $(NV_SOURCE)/hwinc
+_nvddk_usbphy_common_cflags                 :=
+
+#------------------------------------------------------------------------------
+# Static library
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvddk_usbphy
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_nvddk_usbphy_common_sources)
+NV_COMPONENT_INCLUDES          := $(_nvddk_usbphy_common_includes)
+NV_COMPONENT_CFLAGS            += $(_nvddk_usbphy_common_cflags)
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+#------------------------------------------------------------------------------
+# Cleanup
+#------------------------------------------------------------------------------
+_nvddk_usbphy_common_sources  :=
+_nvddk_usbphy_common_includes :=
+_nvddk_usbphy_common_cflags   :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

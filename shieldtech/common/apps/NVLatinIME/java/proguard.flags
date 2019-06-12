@@ -1,0 +1,64 @@
+-keep class com.nvidia.inputmethod.latin.BinaryDictionary {
+  int mDictLength;
+  <init>(...);
+}
+
+-keep class com.nvidia.inputmethod.keyboard.ProximityInfo {
+  <init>(com.nvidia.inputmethod.keyboard.ProximityInfo);
+}
+
+-keep class com.nvidia.inputmethod.latin.Suggest {
+  <init>(...);
+  com.nvidia.inputmethod.latin.SuggestedWords getSuggestions(...);
+}
+
+-keep class com.nvidia.inputmethod.latin.AutoCorrection {
+  java.lang.CharSequence getAutoCorrectionWord();
+}
+
+-keep class com.nvidia.inputmethod.latin.Utils {
+  boolean equalsIgnoreCase(...);
+}
+
+-keep class com.nvidia.inputmethod.latin.InputPointers {
+  *;
+}
+
+-keep class com.nvidia.inputmethod.latin.ResizableIntArray {
+  *;
+}
+
+-keep class com.nvidia.inputmethod.latin.spellcheck.SpellCheckerSettingsFragment {
+  *;
+}
+
+-keep class com.nvidia.inputmethod.keyboard.MainKeyboardView {
+  # Keep getter/setter methods for ObjectAnimator
+  int getLanguageOnSpacebarAnimAlpha();
+  void setLanguageOnSpacebarAnimAlpha(int);
+  int getAltCodeKeyWhileTypingAnimAlpha();
+  void setAltCodeKeyWhileTypingAnimAlpha(int);
+}
+
+-keep class com.nvidia.inputmethod.keyboard.MoreKeysKeyboard$Builder$MoreKeysKeyboardParams {
+  <init>(...);
+}
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-keep class com.nvidia.inputmethod.research.ResearchLogger {
+  void flush();
+  void publishCurrentLogUnit(...);
+}
+
+-keep class com.nvidia.inputmethod.keyboard.KeyboardLayoutSet$Builder {
+  void setTouchPositionCorrectionEnabled(...);
+}
+
+# The support library contains references to newer platform versions.
+# Don't warn about those in case this app is linking against an older
+# platform version.  We know about them, and they are safe.
+-dontwarn android.support.v4.**
+-dontwarn android.support.v13.**

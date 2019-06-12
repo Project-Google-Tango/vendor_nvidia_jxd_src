@@ -1,0 +1,99 @@
+/* The peripheral discovery database will contain NvOdmIoAddress entries
+   which will be used by the nvodm_imager to properly reserve and allocate
+   the resources needed to connect to the device. For instance, GPIO, power,
+   i2c, and clocks.
+   Provided here are some examples.  Alter using the nvodm_imager_guids.h
+   as a reference for the #defines used here, and place in the
+   odm_kit/query/include directory and alter
+   odm_kit/query/nvodm_query_discovery.c to include into the database.
+
+   Be very careful to understand the power, i2c and gpios used by the
+   device you are writing an adaptation for.  Correct information put into
+   the addresses structure is critical for a successful bringup of a device.
+   If the sensor device is unresponsive to any i2c transactions, it is very
+   likely the source of the problem lies here.
+   Imagers tend to use a lot of GPIOs. Labelling the purpose of each GPIO 
+   helps make the code more robust. Relying on the order they are given can
+   break things if the order is not remembered.
+*/
+
+/* nvodm_query_discovery examples for imager  "imager_addresses.h" */
+#include "nvodm_query_gpio.h"
+#include "nvodm_imager_guids.h"
+
+#define BAYERSENSOR_PINS (NVODM_CAMERA_PARALLEL_VD0_TO_VD9 | \
+                     NVODM_CAMERA_DEVICE_IS_DEFAULT)
+static const NvOdmIoAddress s_ImagerBayerSensorAddresses[] =
+{
+    { NvOdmIoModule_I2c,  0x01, 0x20, 0 }, 
+    { NvOdmIoModule_Gpio, NVODM_GPIO_CAMERA_PORT, 5 | NVODM_IMAGER_RESET, 0 },
+    { NvOdmIoModule_Vdd,  0x00, PCF50626PmuSupply_D7REG, 0  },
+    { NvOdmIoModule_Vdd,  0x00, PCF50626PmuSupply_RF1REG, 0 },
+    { NvOdmIoModule_Vdd,  0x00, PCF50626PmuSupply_RF3REG, 0 },
+    { NvOdmIoModule_VideoInput, 0x00, BAYERSENSOR_PINS, 0 },
+    { NvOdmIoModule_ExternalClock, 2, 0, 0 } // CSUS
+};
+static const NvOdmIoAddress s_ImagerFocuserAddresses[] =
+{
+    { NvOdmIoModule_I2c,  0x01, 0x18, 0 },  // focuser i2c
+};
+static const NvOdmIoAddress s_ImagerFlashAddresses[] =
+{
+    { NvOdmIoModule_Gpio, NVODM_GPIO_CAMERA_PORT, 3 | NVODM_IMAGER_FLASH0, 0 },  // Flash 200mA
+    { NvOdmIoModule_Gpio, NVODM_GPIO_CAMERA_PORT, 6 | NVODM_IMAGER_FLASH1, 0 }   // Flash 600mA
+};
+
+#define YUVSENSOR_PINS (NVODM_CAMERA_PARALLEL_VD0_TO_VD7)
+static const NvOdmIoAddress s_ImagerYUVSensorAddresses[] =
+{
+    { NvOdmIoModule_I2c,  0x01, 0x78 },
+    { NvOdmIoModule_Gpio, NVODM_GPIO_CAMERA_PORT, 4 | NVODM_IMAGER_POWERDOWN_AL, 0 },  // Powerdown
+    { NvOdmIoModule_Gpio, NVODM_GPIO_CAMERA_PORT, 0 | NVODM_IMAGER_RESET_AL, 0 },  // Reset
+    { NvOdmIoModule_Vdd,  0x00, PCF50626PmuSupply_D7REG, 0  },
+    { NvOdmIoModule_Vdd,  0x00, PCF50626PmuSupply_RF1REG, 0 },
+    { NvOdmIoModule_Vdd,  0x00, PCF50626PmuSupply_RF3REG, 0 },
+    { NvOdmIoModule_VideoInput, 0x00, YUVSENSOR_PINS, 0 },
+    { NvOdmIoModule_ExternalClock, 2, 0, 0 } // CSUS
+};
+
+
+/*************** cut here ***************************/
+
+/* nvodm_query_discovery examples for imager  "imager_peripherals.h" */
+#include "nvodm_imager_guids.h"
+
+// Imager - Primary
+// Module name: Example Bayer Sensor
+// sensor
+{
+    // ManufacturerName, PartName, PartDetails
+    BAYERSENSOR_GUID,
+    s_ImagerBayerSensorAddresses,
+    NV_ARRAY_SIZE(s_ImagerBayerSensorAddresses),
+    NvOdmPeripheralClass_Imager
+},
+// focuser
+{
+    // FocuserType, FocuserManufacturer, PartName, PartDetails
+    FOCUSER_GUID,
+    s_ImagerFocuserAddresses,
+    NV_ARRAY_SIZE(s_ImagerFocuserAddresses),
+    NvOdmPeripheralClass_Other
+},
+// flash
+{
+    FLASH_GUID,
+    s_ImagerFlashAddresses,
+    NV_ARRAY_SIZE(s_ImagerFlashAddresses),
+    NvOdmPeripheralClass_Other
+},
+
+// Imager - Secondary
+// Module Name - Example YUV Sensor
+{
+    // ManufacturerName, PartName, PartDetails
+    YUVSENSOR_GUID,
+    s_ImagerYUVSensorAddresses,
+    NV_ARRAY_SIZE(s_ImagerYUVSensorAddresses),
+    NvOdmPeripheralClass_Imager
+},

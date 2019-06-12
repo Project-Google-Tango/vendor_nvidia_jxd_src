@@ -1,0 +1,11 @@
+When new SOC is introduced (either as phone, tablet or some other product) a new xml file needs to be generated.
+
+If NVSI_PRODUCT_CLASS is not defined in the device.mk it will default to "tablet". So for example, for T210 we
+need to add "./xml/com.nvidia.nvsi.t210.tablet.xml" and make sure that content of the file is correct 
+(please consult the wiki https://wiki.nvidia.com/wmpwiki/index.php/Devtech/NVSI_v2_Configuration_and_Requirements)
+
+Please note that feature "com.nvidia.nvsi.product.X" can be modified to clearly identify product (TegraNote8, Shield etc).
+This is useful for filtering apps on Google play or product detection at run-time.
+
+Once xml files are added/modified you need to run ./generate_includes.sh in order to generate matching .h files.
+At this point you should be able to compile the OS image.

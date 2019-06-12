@@ -1,0 +1,45 @@
+;---------------------------------------------------------------
+; Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+;---------------------------------------------------------------
+; Lauterbach TRACE32 debugger start-up script to install AVP-side menu buttons.
+
+menu.rp
+(
+  add
+  toolbar
+  (
+      toolitem "Source/List" "list" "Data.List"
+      toolitem "Memory Dump" "dump" "Data.dump"
+      toolitem "Register" "reg" "Register"
+    separator
+      toolitem "Watch" ":varwatch" "Var.Watch"
+      toolitem "Stack" ":varframe" "Var.Frame /l /c"
+      toolitem "Automatic Watch" ":varref" "Var.Ref"
+    separator
+      toolitem "List Breakpoints" "break" "Break.List"
+      toolitem "List Symbols" "symbols" "sYmbol.Browse"
+   separator
+      toolitem "Run Tegra-Boot script (avp_boot_tb.cmm)"                        "TB,y"  "do avp_boot_tb.cmm"
+      toolitem "Run Fastboot SDRAM script (avp_boot_sdram.cmm)"                 "FS,y"  "do avp_boot_sdram.cmm"
+      toolitem "Run Fastboot SDRAM noreset script (avp_boot_sdram_noreset.cmm)" "FL,y"  "do avp_boot_sdram_noreset.cmm"
+      toolitem "Run U-Boot SDRAM noreset script (avp_boot_sdram_noreset_u-boot.cmm)" "UU,y"  "do avp_boot_sdram_noreset_u-boot.cmm"
+      toolitem "Run Fastboot Boot ROM script (avp_boot_rom.cmm)"                "FR,y"  "do avp_boot_rom.cmm"
+;      toolitem "Run Fastboot NOR Flash script (avp_boot_nor.cmm)"               "FN,y"  "do avp_boot_nor.cmm"
+      toolitem "Run Fastboot Attach script (avp_boot_attach.cmm)"               "FA,y"  "do avp_boot_attach.cmm"
+      toolitem "Run AVP Attach-only script (avp_attach.cmm)" 		        "AT,y"  "do avp_attach.cmm"
+      toolitem "Run Mini-Loader script (avp_boot_ml.cmm)"                       "ML,y"  "do avp_boot_ml.cmm"
+      toolitem "Run Mini-Loader script (avp_boot_ml_nobr.cmm)"                  "MS,y"  "do avp_boot_ml_nobr.cmm"
+   separator
+      toolitem "Run CPU init script (avp_init_cpu.cmm)"                         "CI,y"  "do avp_init_cpu.cmm"
+      toolitem "Run CPU count fuse programming script (avp_mp_setup.cmm)"       "CM,y"  "do avp_mp_setup.cmm"
+      toolitem "Run CPU Power Enable script (avp_power_cpu.cmm)"                "CP,y"  "do avp_power_cpu.cmm"
+      toolitem "Run CPU Clock Enable script (avp_start_cpu.cmm)"                "CC,y"  "do avp_start_cpu.cmm"
+   separator
+      toolitem "Run SNOR Flash programmer (avp_nor_prog.cmm)"                   "FP,y"  "do avp_nor_prog.cmm"
+      toolitem "Run Register Display script (soc_reg.cmm)"                      "DR,y"  "do soc_reg.cmm"
+   separator
+  )
+)
+
+enddo
+

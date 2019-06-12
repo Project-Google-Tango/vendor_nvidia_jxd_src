@@ -1,0 +1,11 @@
+; Lauterbach TRACE32 debugger script to configure DCC (SWI method).
+
+term.reset
+term.size 80 10000
+term.scroll on
+break.set p:8 /onchip
+tronchip.set swi on
+term.method armswi
+term.gate
+
+enddo

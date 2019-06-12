@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DidimCalibration</string>
+    <color name="black_color">#000000</color>
+    <string name="backlight">Backlight: 128  </string>
+    <string name="red">Red: 0</string>
+    <string name="green">Green: 0</string>
+    <string name="blue">Blue : 0</string>
+    <string name="empty_string"></string>
+    <string name="calculate">Run</string>
+    <color name="gray">#909090</color>
+    <string name="fullscreen">Fullscreen Mode</string>
+    <string name="X_marks_the_spot_cardhu">x\n\n\n\n\n\n\n\n\n\n\n\n\n\nx\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tx\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tx\n\n\n\n\n\n\n\n\n\n\n\n\n\nx</string>
+    <string name="Grey_scale">Grey: n/a</string>
+    <string name="x_center_enterprise">x</string>
+</resources>

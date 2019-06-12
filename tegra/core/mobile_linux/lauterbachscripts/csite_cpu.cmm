@@ -1,0 +1,25 @@
+; Lauterbach TRACE32 debugger script to dump CoreSight CPU apertures
+
+; Enable CoreSight CYA bits so we can see error codes:
+LOCAL &SB_PFCFG
+&SB_PFCFG=data.long(a:0x6000C208)       ; SB_PFCFG_0
+&SB_PFCFG=&SB_PFCFG|0x01400000          ; CS_DEADSTATUS_EN | CS_CODES_EN
+D.S a:0x6000C208 %LE %LONG &SB_PFCFG    ; SB_PFCFG_0
+
+WINPOS 0.0 31.692 87. 5. 15. 1. W000
+data.dump a:0x70050080 /track /spotlight /noascii ; CPU0
+
+WINPOS 90.857 31.692 87. 5. 15. 1. W001
+data.dump a:0x70052080 /track /spotlight /noascii ; CPU1
+
+WINPOS 0.0 40.846 87. 5. 15. 1. W002
+data.dump a:0x70054080 /track /spotlight /noascii ; CPU2
+
+WINPOS 91.0 40.769 87. 5. 15. 1. W003
+data.dump a:0x70056080 /track /spotlight /noascii ; CPU3
+
+WINPOS 0.0 49.846 87. 5. 15. 1. W004
+data.dump a:0x7004F000 /track /spotlight /noascii ; CPU0
+
+ENDDO
+

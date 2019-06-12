@@ -1,0 +1,11 @@
+; Lauterbach TRACE32 debugger script to configure DCC for the CPU.
+
+term.reset
+term.method dcc4A
+term.mode string
+Term.size 80,300
+term.scroll on
+term.view
+
+enddo
+

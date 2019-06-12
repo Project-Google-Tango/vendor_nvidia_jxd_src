@@ -1,0 +1,11 @@
+nvtestmain
+----------
+The libnvtestmain.a library implements the NvAppMain() entry point and calls
+NvTestMain().
+
+nvtestrun
+---------
+The libnvtestrun.a library implements the NvAppMain() entry point and calls
+    NvTestCreate()
+    NvTestRun()
+    NvTestDestroy()

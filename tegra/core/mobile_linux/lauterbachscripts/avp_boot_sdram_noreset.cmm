@@ -1,0 +1,39 @@
+; Lauterbach TRACE32 debugger script to boot AVP with FASTBOOT loaded into SDRAM by this script without resetting the chip.
+
+; NOTE: THIS SCRIPT WILL WORK ONLY ON UN-FUSED PARTS.
+
+winclear
+
+; This should be set to "auto" if the symbol information
+; is built with the correct labeling of "arm" vs. "thumb"
+; mode code areas.
+;system.option.dismode.auto
+system.option.dismode.access
+
+; Tell the debugger not to access non-existent memory locations.
+do physical_setup.cmm
+
+;Break.Delete
+sYmbol.RESet
+
+print "Loading &FASTBOOT symbols"
+data.load.elf &FASTBOOT /NOCODE
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+; Setup common toolbar items
+do toolbar_setup.cmm
+
+IF ("&LOAD_SAVED_AVP_WINDOWS"=="TRUE")
+(
+  ; Restore saved window configuration (this is always saved in the $T32SYS directory -- don't change the path)
+  do &T32SYS/windows.cmm
+)
+
+;mode.hll
+
+enddo
+

@@ -1,0 +1,53 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012 - 2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile
+#
+# Shared library libnvodm_query component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := nvodm_query
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           :=
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED)-$(NV_TARGET_SOC),1-t124)
+ifeq ($(NV_BUILD_CONFIGURATION_IS_DEBUG),1)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../../utils/nvos
+endif
+else
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../nvrm \
+	../../../utils/nvos
+endif
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	../services \
+	../../nvpinmux \
+	$(NV_SOURCE)/core/drivers/nvddk/fuses/read \
+	../../../system/nvbct/$(NV_TARGET_SOC_FAMILY)
+
+NV_COMPONENT_ODM_WHOLE_STATIC       := \
+	query
+
+include $(NV_SOURCE)/bootloader/nvbootloader/odm-partner/Makefile.odm.tmk
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

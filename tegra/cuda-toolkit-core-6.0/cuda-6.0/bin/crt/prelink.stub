@@ -1,0 +1,8 @@
+#include FATBINFILE
+
+#if defined(_WIN32)
+__declspec(selectany) void *__nv__fatDeviceText_dummy = (void *)&__FATIDNAME(__NV_MODULE_ID);
+#else
+void *__nv__fatDeviceText_dummy __attribute__((weak)) = (void *)&__FATIDNAME(__NV_MODULE_ID);
+;
+#endif

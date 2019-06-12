@@ -1,0 +1,77 @@
+;****************************************************************************
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;
+; RAM dump variables - CortexA9MPCore
+; using TRACE32
+;
+; Jan-01-12   joshuac@nvidia.com
+;****************************************************************************
+
+B::
+
+global &RAM_DUMP_START_ADDR
+global &RAM_DUMP_SIZE
+global &MAX_CORENUM
+global &CPUTYPE
+global &SAVE_DUMPFILE
+
+print "----------Current Settings---------"
+print "TOP=&TOP"
+print "TEGRA_TOP=&TEGRA_TOP"
+print "BTARGET_OS=&TARGET_OS"
+print "BTARGET_SOC=&TARGET_SOC"
+print "BTARGET_BOARD=&TARGET_BOARD"
+print "BTARGET_CONFIG=&TARGET_CONFIG"
+print "BUILD_FLAVOR=&BUILD_FLAVOR"
+print "-----------------------------------"
+
+&SAVE_DUMPFILE="&(TARGET_SOC)_&(TARGET_BOARD)_DUMP.bin"
+
+; note) RAM_DUMP_SIZE
+; 0x0FFFFFFF = 256MB
+; 0x1FFFFFFF = 512MB
+; 0x3FFFFFFF = 1GB
+
+if "&TARGET_SOC"=="t11x"
+(
+  ;*************************************
+  ;T11x
+  ;*************************************
+  &RAM_DUMP_START_ADDR=0x80000000
+  &RAM_DUMP_SIZE=0x3FFFFFFF
+  &MAX_CORENUM=4
+  &CPUTYPE="CortexA15MPCore"
+)
+else if "&TARGET_SOC"=="t30"
+(
+  ;*************************************
+  ;Tegra3
+  ;*************************************
+  &RAM_DUMP_START_ADDR=0x80000000
+  &RAM_DUMP_SIZE=0x3FFFFFFF
+  &MAX_CORENUM=4
+  &CPUTYPE="CortexA9MPCoreSMP4"
+)
+else if "&TARGET_SOC"=="ap20"
+(
+  ;*************************************
+  ;Tegra2
+  ;*************************************
+  &RAM_DUMP_START_ADDR=0x00000000
+  &RAM_DUMP_SIZE=0x1FFFFFFF
+  &MAX_CORENUM=2
+  &CPUTYPE="CortexA9MPCoreSMP2"
+)
+else
+(
+  print "TARGET_SOC=&TARGET_SOC is not valid"
+  stop
+)
+print "-----------------------------------"
+print "RAM_DUMP_START_ADDR=&RAM_DUMP_START_ADDR"
+print "RAM_DUMP_SIZE=&RAM_DUMP_SIZE"
+print "MAX_CORENUM=&MAX_CORENUM"
+print "CPUTYPE=&CPUTYPE"
+print "-----------------------------------"
+
+enddo

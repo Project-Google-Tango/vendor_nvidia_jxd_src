@@ -1,0 +1,54 @@
+;---------------------------------------------------------------
+; Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+;---------------------------------------------------------------
+; Lauterbach TRACE32 debugger start-up script to install CPU-side menu buttons.
+
+global &TARGET_SOC
+
+menu.rp
+(
+  add
+  toolbar
+  (
+    separator
+      toolitem "Source List" "list" "Data.List"
+      toolitem "Memory Dump" "dump" "Data.dump"
+      toolitem "Register" "reg" "Register"
+    separator
+      toolitem "Watch" ":varwatch" "Var.Watch"
+      toolitem "Stack" ":varframe" "Var.Frame /l /c"
+      toolitem "Automatic Watch" ":varref" "Var.Ref"
+    separator
+      toolitem "List Breakpoints" "break" "Break.List"
+      toolitem "List Symbols" "symbols" "sYmbol.Browse"
+    separator
+      toolitem "Run Fastboot SDRAM script (cpu_boot_sdram.cmm)"                "FS,y"  "do cpu_boot_sdram.cmm"
+      toolitem "Run Fastboot SDRAM Noload script (cpu_boot_sdram_noload.cmm)"  "FB,y"  "do cpu_boot_sdram_noload.cmm"
+      toolitem "Run U-Boot SDRAM Noload script (cpu_boot_sdram_noload_u-boot.cmm)"   "UU,y"  "do cpu_boot_sdram_noload_u-boot.cmm"
+      toolitem "Run LK SDRAM Noload script (cpu_boot_sdram_noload_lk.cmm)"   "LK,y"  "do cpu_boot_sdram_noload_lk.cmm"
+;      toolitem "Run Fastboot NOR Flash script (cpu_boot_nor.cmm)"              "FN,y"  "do cpu_boot_nor.cmm"
+    separator
+      toolitem "Run Attach script (cpu_attach.cmm)"                        "AT,y"  "do cpu_attach.cmm"
+      toolitem "Run Attach Boot script (cpu_boot_attach.cmm)"              "AB,y"  "do cpu_boot_attach.cmm"
+      toolitem "Run Attach Kernel script (cpu_kernel_attach.cmm)"          "AK,y"  "do cpu_kernel_attach.cmm"
+    separator
+      toolitem "Run Kernel Backdoor Loader script (cpu_kernel_load.cmm)"   "KB,y"  "do cpu_kernel_load.cmm"
+   separator
+      toolitem "Run CPU Uniprocessor Attach script (cpu_up_attach.cmm)"    "CU,y"  "do cpu_up_attach.cmm"
+      toolitem "Run CPU Multiprocessor Attach script (cpu_mp_attach.cmm)"  "CM,y"  "do cpu_mp_attach.cmm"
+   separator
+      toolitem "Run CPU0 Selection script (cpu_select.cmm)"                "C0,y"  "do cpu_select.cmm 0"
+      toolitem "Run CPU1 Selection script (cpu_select.cmm)"                "C1,y"  "do cpu_select.cmm 1"
+      toolitem "Run CPU2 Selection script (cpu_select.cmm)"                "C2,y"  "do cpu_select.cmm 2"
+      toolitem "Run CPU3 Selection script (cpu_select.cmm)"                "C3,y"  "do cpu_select.cmm 3"
+   separator
+      toolitem "Run save RAMdump script (save_ramdump.cmm)"                "RD,r"  "do save_ramdump.cmm"
+;   separator
+;      toolitem "Run Register Display script (soc_reg.cmm)"                 "DR,y"  "do soc_reg.cmm"
+   separator
+      toolitem "Run QT setup script (qt_init_cpu.cmm)"                 "QT,y"  "do qt_init_cpu.cmm"
+  )
+)
+
+enddo
+

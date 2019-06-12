@@ -1,0 +1,13 @@
+Index: cwiid-0.6.00+svn184.orig/man/man1/wminput.1
+===================================================================
+--- cwiid-0.6.00+svn184.orig.orig/man/man1/wminput.1	2009-03-27 13:08:33.000000000 +0100
++++ cwiid-0.6.00+svn184.orig/man/man1/wminput.1	2009-03-27 13:16:04.000000000 +0100
+@@ -42,8 +42,6 @@
+ .PP
+ A uinput group can be created specifically for this purpose, or another existing group such as wheel can be used.
+ .PP
+-See usr/share/doc/wminput/wminput.conf.sample for an example wminput configuration file.  Copy this file to ~/.CWiid/wminput.conf and change as desired.
+-.PP
+ Getting X to recognize non-standard key symbols, and mapping actions to those symbols, is not automatic.  An excellent tutorial at http://gentoo-wiki.com/HOWTO_Use_Multimedia_Keys can help you set this up.  An overview of the process (see the HOWTO for more information):
+ .br
+ 1.Edit ~/.CWiid/wminput.conf

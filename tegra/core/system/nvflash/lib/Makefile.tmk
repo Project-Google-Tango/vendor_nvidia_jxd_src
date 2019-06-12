@@ -1,0 +1,73 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvflash static and shared library component makefile
+#
+###############################################################################
+
+_common_sources := \
+	nvflash_commands.c \
+	nvflash_configfile.c \
+	nvflash_configfile.tab.c \
+	nvflash_verifylist.c \
+	lex.yy.c \
+	nvflash_parser.c
+
+_common_cflags := \
+	-DNVODM_BOARD_IS_FPGA=0
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+_common_cflags += \
+	-DNV_EMBEDDED_BUILD
+endif
+
+# Static lib
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvflash
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_sources)
+NV_COMPONENT_NEEDED_HEADER_INTERFACE_DIRS := \
+	../../../utils/nvapputil
+NV_COMPONENT_CFLAGS            := $(_common_cflags)
+
+NV_COMPONENT_HAS_BROKEN_CODE   := ignore-all
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Shared lib
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := nvflash
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_sources)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../../utils/nvos \
+	../../../utils/nvapputil
+
+NV_COMPONENT_CFLAGS            := $(_common_cflags)
+
+NV_COMPONENT_HAS_BROKEN_CODE   := ignore-all
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Variable cleanup
+_common_sources :=
+_common_cflags :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

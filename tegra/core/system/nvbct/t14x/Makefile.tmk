@@ -1,0 +1,31 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvbct_t14x static library component makefile
+#
+###############################################################################
+
+_bct_lib_name         := libnvbct_t14x
+_bct_lib_soc_families := t14x
+_bct_lib_socs         := T148
+
+include $(NV_COMPONENT_DIR)/../Makefile.common.tmk
+
+_bct_lib_name         :=
+_bct_lib_soc_families :=
+_bct_lib_socs         :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

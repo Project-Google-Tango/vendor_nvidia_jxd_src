@@ -1,0 +1,5 @@
+To run the test, type the following from the adb shell prompt:
+
+nvcap_test
+
+The test runs for 20 seconds, and dumps the output to /data/VideoTest.ts on the device

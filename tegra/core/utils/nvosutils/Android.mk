@@ -1,0 +1,19 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(NVIDIA_DEFAULTS)
+
+LOCAL_MODULE := libnvosutils
+LOCAL_SRC_FILES += nvustring.c
+LOCAL_SRC_FILES += nvuhash.c
+
+LOCAL_NVIDIA_NO_EXTRA_WARNINGS := 1
+include $(NVIDIA_STATIC_LIBRARY)
+
+include $(NVIDIA_DEFAULTS)
+
+LOCAL_MODULE := libnvosutils
+LOCAL_SRC_FILES += nvustring.c
+LOCAL_SRC_FILES += nvuhash.c
+
+LOCAL_NVIDIA_NO_EXTRA_WARNINGS := 1
+include $(NVIDIA_HOST_STATIC_LIBRARY)

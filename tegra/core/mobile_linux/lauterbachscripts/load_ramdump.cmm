@@ -1,0 +1,112 @@
+;****************************************************************************
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;
+; Load RAM dump log
+; using TRACE32
+;
+; Jan-01-12   joshuac@nvidia.com
+;****************************************************************************
+B::
+area.res
+area
+
+;*******************************************************************
+; Declare variables
+;*******************************************************************
+local &cwd
+local &LNXKERN_ELF
+local &DUMPFILE
+
+;*******************************************************************
+; Define variables
+;*******************************************************************
+do ./ramdump_var.cmm
+
+; Save directory of this script
+&cwd=os.pwd()
+
+area
+print "&cwd"
+
+print "Simulator is configured as &CPUTYPE"
+system.cpu &CPUTYPE
+if "&TARGET_SOC"=="t11x"
+(
+	system.config corenumber 4.
+	core.number 4.
+	print "Simulator is configured as SMP4"
+)
+SYStem.Option MMUSPACES ON     ; enable space ids to virtual addresses
+sys.up
+
+sYmbol.RESet
+
+;*******************************************************************
+; Load Kernel image
+;*******************************************************************
+IF "&LNXKERN_ELF"==""
+(
+	print "Select Kernel ELF (vmlinux)...try $TOP/out/target/product/..board../obj/KERNEL/vmlinux"
+	dialog.file &(TOP)/out/target/product/&(TARGET_BOARD)/obj/KERNEL/*
+	entry &LNXKERN_ELF
+	if "&LNXKERN_ELF"==""
+	(
+		print "Aborted"
+		enddo
+	)
+	print " "
+)
+print "Loading Vmlinux..."
+data.load.elf &LNXKERN_ELF /nocode
+print " "
+
+
+;*******************************************************************
+; Load RAM dump binary
+;*******************************************************************
+print "Loading RAM dump binary ..."
+
+IF "&DUMPFILE"==""
+(
+	print  "Select RAMdump file"
+	dialog.file *
+	entry &DUMPFILE
+	if "&DUMPFILE"==""
+	(
+		print "Aborted"
+		enddo
+	)
+)
+
+data.load.binary &DUMPFILE AD:&RAM_DUMP_START_ADDR /noclear
+print " "
+
+
+;*******************************************************************
+; Restore CPU/MMU registers (default Core0)
+;*******************************************************************
+do ./ramdump_coresel.cmm 0
+
+
+;*******************************************************************
+; Config MMU
+;*******************************************************************
+print "Configuring MMU ..."
+MMU.FORMAT LINUX swapper_pg_dir 0xc0000000--0xffffffff &RAM_DUMP_START_ADDR
+MMU.Create 0xc0000000--0xffffffff &RAM_DUMP_START_ADDR
+MMU.Common 0xc0000000--0xffffffff  ; common area for kernel and processes
+MMU.TableWalk ON                   ; debugger uses a table walk to decode virtual addresses
+;*******************************************************************
+; Enable MMU
+;*******************************************************************
+MMU.ON                             ; switch on debugger address translation
+
+
+;*******************************************************************
+; Configue TRACE32 for Linux debugging
+;*******************************************************************
+print "Loading linux support ..."
+task.config &T32SYS/demo/arm/kernel/linux/linux
+menu.reprogram &T32SYS/demo/arm/kernel/linux/linux
+help.filter.add rtoslinux
+

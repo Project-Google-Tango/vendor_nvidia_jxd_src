@@ -1,0 +1,40 @@
+; Lauterbach TRACE32 debugger script to set user-specific parameters:
+;
+; Change the following parameters to match your particular development system:
+;
+;   TARGET_SOC          ap15, ap20
+;   SCRIPT_ROOT         location of the android/lauterbachscripts directory in the NVIDIA installation package
+;   KERNEL_ZIMAGE       path to the kernel zImage file
+;   KERNEL_ELF          path to the kernel vmlinux file
+;   FASTBOOT            path to the fastboot image file
+
+GLOBAL &TARGET_OS
+ &TARGET_OS="android"
+
+GLOBAL &BUILD_FLAVOR
+;&BUILD_FLAVOR="debug"
+&BUILD_FLAVOR="release"
+
+GLOBAL &TARGET_SOC
+;&TARGET_SOC="ap15"
+&TARGET_SOC="ap20"
+
+; Set paths to NVIDIA scripts
+GLOBAL &SCRIPT_ROOT
+&SCRIPT_ROOT="<path to where the NVIDIA installer placed the android/lauterbachscripts directory>"
+
+; Append script path to search path
+path + &(SCRIPT_ROOT)
+path + &(SCRIPT_ROOT)/&(TARGET_SOC)
+
+; Set paths to images
+GLOBAL &FASTBOOT
+&FASTBOOT="<path to fastboot image file>/fastboot"
+
+GLOBAL &KERNEL_ZIMAGE
+&KERNEL_ZIMAGE="<path to your zImage file>/zImage"
+
+GLOBAL &KERNEL_ELF
+&KERNEL_ELF="<path to your vmlinux file>/vmlinux"
+
+enddo

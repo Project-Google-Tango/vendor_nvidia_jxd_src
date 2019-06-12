@@ -1,0 +1,16 @@
+NvOdmDispListDevices
+NvOdmDispListModes
+NvOdmDispReleaseDevices
+NvOdmDispGetDeviceByGuid
+NvOdmDispSetMode
+NvOdmDispSetBacklight
+NvOdmDispSetPowerLevel
+NvOdmDispGetParameter
+NvOdmDispGetConfiguration
+NvOdmDispGetPinPolarities
+NvOdmDispSetSpecialFunction
+NvOdmDispGetDefaultGuid
+NvOdmBacklightInit
+NvOdmBacklightDeinit
+NvOdmBacklightIntensity
+InitDsi2LvdsBridge

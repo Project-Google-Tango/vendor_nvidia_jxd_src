@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <string name="AutoSaveCFUN0Msg">UNSOL_RESPONSE_RADIO_STATE_CHANGED RADIO_OFF</string>
+   <string name="AutoSaveCFUN1Msg1">UNSOL_RESPONSE_RADIO_STATE_CHANGED RADIO_ON</string> 
+   <string name="AutoSaveCFUN1Msg2">UNSOL_RESPONSE_RADIO_STATE_CHANGED SIM_NOT_READY</string>
+   
+   <string name="AutoSaveNetworkLost">Network lost</string>
+   <integer name="NetworkLostDelay">600</integer>
+   <string name="NetworkLostDirName">_NetworkLost</string>
+   <string name="NetworkLostCancelKeyword">.*CREG: [15].*</string>
+
+   
+   <string name="AutoSaveLocUpdateRej">Location update reject</string>
+   <integer name="LocUpdateRejDelay">600</integer>
+   <string name="LocUpdateRejDirName">_LocUpdateRej</string>
+   
+   <string name="AutoSaveDetach">Detach</string>
+   <integer name="DetachDelay">600</integer>
+   <string name="DetachDirName">_Detach</string>
+   
+   <string name="AutoSaveDataStall">doRecovery() cleanup all connections</string>
+   <integer name="DataStallDelay">600</integer>
+   <string name="DataStallDirName">_DataStall</string>
+   
+   <string name="AutoSaveAttachRej">PS attach reject</string>
+   <integer name="AttachRejDelay">600</integer>
+   <string name="AttachRejDirName">_AttachRej</string>
+   
+   <string name="AutoSavePDPActRej">PS activation reject</string>
+   <integer name="PDPActRejDelay">600</integer>
+   <string name="PDPActRejDirName">_PDPActRej</string>
+   
+   <string name="AutoSaveSIMLost1">ERROR 13 (SIM faulty)</string>
+   <string name="AutoSaveSIMLost2">ERROR 10 (SIM not inserted)</string>
+   <integer name="SIMLostDelay">60</integer>
+   <string name="SIMLostDirName">_SIMLost</string>
+   
+   <string name="AutoSaveCallDrop1">+CEER: There was an error</string>
+   <string name="AutoSaveCallDrop2">There was no radio path available</string>
+   <integer name="CallDropDelay">10</integer>
+   <string name="CallDropDirName">_CallDrop</string>
+</resources>

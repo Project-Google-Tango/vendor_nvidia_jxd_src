@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+     <!-- Controller settings screen heading -->
+    <add-resource type="string" name="controller_settings" />
+    <string name="controller_settings">컨트롤러</string>
+    <!-- Controller settings title -->
+    <add-resource type="string" name="controller_settings_title" />
+    <string name="controller_settings_title">컨트롤러</string>
+
+    <!-- Controller Use RS as Mouse setting text -->
+    <add-resource type="string" name="controller_rsmouse_text" />
+    <string name="controller_rsmouse_text">오른쪽 스틱을 가상 마우스로 사용합니다.</string>
+    <!-- Controller Use RS as Mouse Summary text -->
+    <add-resource type="string" name="controller_rsmouse_summary" />
+    <string name="controller_rsmouse_summary">오른쪽 트리거 또는 A 버튼으로 클릭하거나 오른쪽 스틱을 아래로 밀어 클릭합니다.</string>
+
+    <!-- Category title for Virtual mouse [CHAR LIMIT=40] -->
+    <add-resource type="string" name="nv_category_vmouse" />
+    <string name="nv_category_vmouse">가상 마우스 .</string>
+
+</resources>

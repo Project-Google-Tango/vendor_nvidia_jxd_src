@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:descendantFocusability="blocksDescendants">
+
+    <ToggleButton
+        android:id="@+id/testItemButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="35dip"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:textColor="#FFFFFF"
+         />
+
+    <TextView
+        android:id="@+id/testItem1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_alignBaseline="@+id/testItemButton1"
+		android:layout_alignParentLeft="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>

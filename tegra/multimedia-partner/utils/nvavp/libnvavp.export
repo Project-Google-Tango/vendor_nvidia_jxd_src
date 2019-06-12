@@ -1,0 +1,15 @@
+NvAvpOpen
+NvAvpClose
+NvAvpSubmitBuffer
+NvAvpSubmitBufferNew
+NvAvpGetSyncPointID
+NvAvpGetClockRate
+NvAvpSetClockRate
+NvAvpWakeAvp
+NvAvpForceClockStayOn
+NvAvpAudioOpen
+NvAvpAudioEnableClocks
+NvAvpAudioDisableClocks
+NvAvpSetMinOnlineCpus
+NvAvpMapIova
+NvAvpUnMapIova

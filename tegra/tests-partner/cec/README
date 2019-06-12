@@ -1,0 +1,18 @@
+This is a sample HDMI-CEC daemon
+
+Usage:
+
+[start application] #adb shell cectest
+
+[connect TV via HDMI] plug into port HDMI1 of TV.
+
+[check connection] in TV side, open up [menu] -> [External Inputs] -> [HDMI Device Selection]
+
+	*daemon works if there is a "TEGRA DEVICE"
+	*in the meanwhile, console will show communication information
+
+[stand by test]
+
+	*turn-off TV power, tegra device should go into standby mode
+
+

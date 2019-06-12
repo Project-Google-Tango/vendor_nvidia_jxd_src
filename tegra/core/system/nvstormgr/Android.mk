@@ -1,0 +1,9 @@
+LOCAL_PATH := $(call my-dir)
+include $(NVIDIA_DEFAULTS)
+
+LOCAL_MODULE := libnvstormgr
+LOCAL_NVIDIA_NO_COVERAGE := true
+LOCAL_SRC_FILES += nvstormgr.c
+
+LOCAL_NVIDIA_NO_EXTRA_WARNINGS := 1
+include $(NVIDIA_STATIC_LIBRARY)

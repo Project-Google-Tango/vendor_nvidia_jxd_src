@@ -1,0 +1,25 @@
+; Lauterbach TRACE32 debugger script to reconfigure for bootloader physical addressing mode.
+
+; Turn on trapping of undefined, prefetch abort, and data abort exceptions because the bootloaders can't handle these.
+tronchip.set PABORT ON
+tronchip.set DABORT ON
+tronchip.set UNDEF  ON
+
+map.NODENYACCESS 0--0xFFFFFFFF
+
+IF "&(TARGET_SOC)"=="ap20"
+(
+  map.DENYACCESS 0x40040000--0x4FFFFFFF
+)
+ELSE
+(
+  IF "&(TARGET_SOC)"=="t30"
+  (
+    map.DENYACCESS 0x00000000--0x3FFFFFFF ; PCIE aperture
+    map.DENYACCESS 0x40040000--0x47FFFFFF
+    map.DENYACCESS 0x48010000--0x4FFFFFFF
+  )
+)
+
+enddo
+

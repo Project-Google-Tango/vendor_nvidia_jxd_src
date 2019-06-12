@@ -1,0 +1,32 @@
+#
+# AVP linker script
+#
+
+ExternalRAM 0x80000000 0x4000000
+{
+        MainRegion +0x0
+        {
+            init_avp.o (+ENTRY, MainRegion, +RO, +RW, +ZI)
+        }
+
+        .text +0
+        {
+            *(+RO, +RW, +ZI)
+        }
+
+        ; Carve off a region into which the loader can patch the test's
+        ; command-line arguments.
+        AosProcessArgs +0 NOCOMPRESS
+        {
+            *(AosProcessArgs)
+        }
+
+        EndRegion +0
+        {
+            init_avp.o (EndRegion)
+        }
+
+        ProgramStackRegion 0x83fffc00 EMPTY 0x400
+        {
+        }
+}

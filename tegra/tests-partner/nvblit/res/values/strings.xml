@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="header">NvBlit Test Runner</string>
+  <string name="button_runselected">Run selected</string>
+  <string name="button_selectall">Select all</string>
+  <string name="button_selectnone">Select none</string>
+  <string name="button_runall">Run all</string>
+  <string name="timeout_text">Time/test (in milliseconds):</string>
+  <string name="timeout_default_value">1000</string>
+</resources>

@@ -1,0 +1,47 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvcrypto static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvcrypto
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	nvcrypto_cipher.c \
+	nvcrypto_cipher_aes.c \
+	nvcrypto_hash.c \
+	nvcrypto_hash_cmac.c \
+	nvcrypto_padding.c \
+	nvcrypto_random.c \
+	nvcrypto_random_ansix931.c
+
+ifeq ($(filter t30, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS += \
+	-DNV_IS_SE_USED=1
+NV_COMPONENT_SOURCES += \
+	nvcrypto_cipher_se_aes.c
+else
+NV_COMPONENT_CFLAGS += \
+	-DNV_IS_SE_USED=0
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

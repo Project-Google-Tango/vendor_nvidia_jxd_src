@@ -1,0 +1,24 @@
+; Lauterbach TRACE32 debugger script to attach to CPU on FASTBOOT symbols loaded.
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_jtag_setup.cmm
+
+; Tell the debugger not to access non-existent memory locations.
+do physical_setup.cmm
+
+sYmbol.RESet
+
+print "Loading &FASTBOOT symbols"
+data.load.elf &FASTBOOT /NOCODE /GNU
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+; Restore saved window configuration (this is always saved in the home directory -- don't change the path)
+;do ~/windows.cmm
+
+system.mode.attach
+
+ENDDO

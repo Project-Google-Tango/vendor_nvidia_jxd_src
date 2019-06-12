@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory android:title="@string/display_0">
+    <ListPreference
+      android:key="mode_0"
+            android:title="@string/display_0"
+      android:enabled="false"
+    />
+  </PreferenceCategory>
+  <PreferenceCategory android:title="@string/display_1">
+    <ListPreference
+      android:key="mode_1"
+            android:title="@string/display_1"
+      android:enabled="false"
+    />
+  </PreferenceCategory>
+  <PreferenceCategory android:title="@string/other_settings">
+    <ListPreference
+            android:title="@string/match_resolution_to_"
+            android:summary="@string/match_resolution_to_summary"
+            android:key="match_resolution_to_display"
+            android:entries="@array/display_names"
+            android:entryValues="@array/display_values"
+        />
+    <CheckBoxPreference
+            android:title="@string/play_audio_via_hdmi"
+            android:summary="@string/play_audio_via_hdmi_summary"
+            android:key="play_audio_via_hdmi"
+        />
+  </PreferenceCategory>
+</PreferenceScreen>

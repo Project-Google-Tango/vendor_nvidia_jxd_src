@@ -1,0 +1,67 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_aes static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvddk_aes
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	nvddk_aes_blockdev.c \
+	nvddk_aes_core.c \
+	nvddk_aes_hw_utils.c \
+	nvddk_aes_hw.c
+NV_COMPONENT_INCLUDES          := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY)
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../nvrm
+
+ifeq ($(NV_BUILD_CONFIGURATION_ENABLE_SECURITY),1)
+NV_COMPONENT_CFLAGS            += \
+	-DENABLE_SECURITY=1
+else
+NV_COMPONENT_CFLAGS            += \
+	-DENABLE_SECURITY=0
+endif
+
+ifneq ($(filter t30, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS            += \
+	-DSTORE_SSK_IN_PMC=1
+else
+NV_COMPONENT_CFLAGS            += \
+	-DSTORE_SSK_IN_PMC=0
+endif
+
+#Wait for AHB arbitration controller to be done with the job to make sure
+#that AES writes to memory are complete when AHB interface is used instead of MCIF
+ifneq ($(filter t30 t114, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS            += \
+	-DWAIT_ON_AHB_ARBC=1
+else
+NV_COMPONENT_CFLAGS            += \
+	-DWAIT_ON_AHB_ARBC=0
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

@@ -1,0 +1,3 @@
+WARNING: the generated lex.yy.c is modified after generation:
+  - unistd.h is removed
+  - stub isatty and fileno added

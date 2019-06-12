@@ -1,0 +1,59 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvavp: shared library
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := nvavp
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_SOURCES               :=
+NV_COMPONENT_NEEDED_INTERFACE_DIRS :=
+
+ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+NV_COMPONENT_SOURCES               += \
+	nvavp_qnx.c
+
+else ifneq ($(filter %_sim,$(NV_TARGET_BOARD)),)
+NV_COMPONENT_SOURCES               += \
+	nvavp_sim.c
+
+NV_COMPONENT_CFLAGS                += \
+	-DENABLE_VDE_CLOCK=0
+
+NV_COMPONENT_INCLUDES              += \
+	$(NV_SOURCE)/multimedia/tvmr/include \
+	$(NV_SOURCE)/multimedia/tvmr/tvmr/class
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core/drivers/nvrm \
+	$(NV_SOURCE)/multimedia/tvmr/tvmr/ucode
+
+else
+NV_COMPONENT_SOURCES               += \
+	nvavp.c
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS += \
+	$(NV_SOURCE)/core/drivers/nvrm
+endif
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

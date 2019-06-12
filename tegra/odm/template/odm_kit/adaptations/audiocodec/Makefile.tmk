@@ -1,0 +1,38 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvodm_audiocodec static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvodm_audiocodec
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+
+NV_COMPONENT_SOURCES           := \
+	audiocodec_hal.c \
+	nvodm_codec_wolfson8753.c \
+	nvodm_codec_wolfson8903.c \
+	nvodm_codec_wolfson8961.c \
+	nvodm_codec_wolfson8994.c \
+	nvodm_codec_maxim9888.c \
+	nvodm_codec_null.c
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

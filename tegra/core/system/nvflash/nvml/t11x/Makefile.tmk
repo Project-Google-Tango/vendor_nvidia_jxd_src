@@ -1,0 +1,61 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvflash_miniloader_t11x: static target executable
+#
+###############################################################################
+ifdef NV_COMPONENT_FLAG_STATIC_EXECUTABLE_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+# include common parts
+_MINILOADER_SOC := t114
+_MINILOADER_SOC_FAMILY := t11x
+include $(NV_COMPONENT_DIR)/../Makefile.common.tmk
+
+# SOC specific parts
+NV_COMPONENT_SOURCES  += \
+	nvml_aes.c \
+	nvml_hash.c \
+	../nvml_device_t1xx.c
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	../../../nvbct/t11x \
+	../../../nv3p/t11x \
+	../../../../drivers/nvddk/fuses/read/t11x \
+	$(NVBOOT_DRIVER_ROOT)/arc \
+	$(NVBOOT_DRIVER_ROOT)/fuse \
+	$(NVBOOT_DRIVER_ROOT)/nand \
+	$(NVBOOT_DRIVER_ROOT)/se \
+	$(NVBOOT_DRIVER_ROOT)/spi_flash \
+	$(NVBOOT_DRIVER_ROOT)/usb3 \
+	$(NVBOOT_DRIVER_ROOT)/usbf \
+	$(NVBOOT_DRIVER_ROOT)/wdt
+
+NV_COMPONENT_CFLAGS += \
+	-DNAND_SUPPORT=0 \
+	-DNO_BOOTROM=1 \
+	-DPKC_ENABLE=1 \
+	-DNVML_NAND_SUPPORT
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),roth)
+NV_COMPONENT_CFLAGS += \
+	-DUSE_ROTH_BOARD_ID=1
+
+endif
+include $(NV_BUILD_STATIC_EXECUTABLE)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

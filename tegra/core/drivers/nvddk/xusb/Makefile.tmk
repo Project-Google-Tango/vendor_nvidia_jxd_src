@@ -1,0 +1,46 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_xusb static library component makefile fragment
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvddk_xusb
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	nvddk_xusb_block_driver.c \
+	nvddk_xusbh.c \
+	nvddk_xusb_arc.c \
+	nvddk_xusb_msc.c
+
+NV_COMPONENT_INCLUDES          += \
+	../../nvboot/$(NV_TARGET_SOC)/include \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY)/xusb \
+	$(NV_SOURCE)/core/drivers/nvrm/nvrmkernel/core/common
+
+NV_COMPONENT_CFLAGS       += \
+    -DNVBOOT_TARGET_RTL=0 \
+    -DNVBOOT_TARGET_FPGA=0
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

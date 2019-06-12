@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	      android:id="@+id/mainmenu"
+	      android:layout_width="wrap_content"
+	      android:layout_height="wrap_content"
+	      android:descendantFocusability="beforeDescendants"
+	      android:focusableInTouchMode="true"
+	      android:orientation="vertical">
+
+  <TextView
+     android:id="@+id/header"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_gravity="center_horizontal"
+     android:text="@string/header" />
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/mainbuttons"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+    <Button
+       android:id="@+id/btn_runselected"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_runselected" />
+    <Button
+       android:id="@+id/btn_selectall"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_selectall" />
+    <Button
+       android:id="@+id/btn_selectnone"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_selectnone" />
+    <Button
+       android:id="@+id/btn_runall"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_runall" />
+  </LinearLayout>
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/mainbuttons"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+  <TextView
+     android:id="@+id/timeout_header"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/timeout_text" />
+  <EditText
+     android:id="@+id/timeout"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:inputType="number"
+     android:text="@string/timeout_default_value" />
+  </LinearLayout>
+
+</LinearLayout>

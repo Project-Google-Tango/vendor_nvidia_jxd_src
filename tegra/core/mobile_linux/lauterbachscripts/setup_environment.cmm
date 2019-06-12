@@ -1,0 +1,234 @@
+;-------------------------------------------------------------------------------
+; Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+;-------------------------------------------------------------------------------
+; Lauterbach TRACE32 debugger script to set up paths and global environment variables used by other scripts.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+; Change case of the user configuration variables to what we expect.
+&TARGET_OS=STRING.LWR("&TARGET_OS")
+&TARGET_OS_SKU=STRING.UPR("&TARGET_OS_SKU")
+&TARGET_SOC=STRING.LWR("&TARGET_SOC")
+&TARGET_BOARD=STRING.LWR("&TARGET_BOARD")
+
+; Global variables used by other scripts:
+;
+;   BACKDOOR_HANDOFF    bootloader backdoor to OS hand-off function
+;   BOOT_HANDOFF        bootloader to OS hand-off function
+;   FASTBOOT            path to fastboot (bootloader) executable image
+;   KERNEL_IMAGE        path to OS (kernel) uncompressed executable image
+;   KERNEL_ZIMAGE       path to OS (kernel) compressed executable image
+;   KERNEL_ELF          path to OS (kernel) symbols
+;   KERNEL_LOAD_PHYS    OS (kernel) physical load address (compressed image)
+;   KERNEL_RUN_PHYS     OS (kernel) physical load address (decompressed image)
+;   MACHINE_ID          kernel machine id
+;   MINILOADER          path to miniloader executable image
+;   TEGRABOOT           path to tegraboot executable image
+;   NOR_LOAD_ADDR       NOR load address for bootloader
+;   OS_HANDOFF          actual OS hand-off function
+;   RAMDISK             Path to RAMDISK image
+;   RAMDISK_ADDR        Address of RAMDISK image
+;   TAGS_ADDR           Address of TAGS
+;   USE_ONCHIP_BRKPT    Use onchip breakpoints for CPU run-control
+
+GLOBAL &BACKDOOR_HANDOFF
+GLOBAL &BOOT_HANDOFF
+GLOBAL &FASTBOOT
+GLOBAL &KERNEL_IMAGE
+GLOBAL &KERNEL_ZIMAGE
+GLOBAL &KERNEL_ELF
+GLOBAL &KERNEL_LOAD_PHYS
+GLOBAL &KERNEL_RUN_PHYS
+GLOBAL &LOAD_DECOMPRESSED_IMAGE
+GLOBAL &MACHINE_ID
+GLOBAL &MINILOADER
+GLOBAL &TEGRABOOT
+GLOBAL &OS_HANDOFF
+GLOBAL &NOR_LOAD_ADDR
+GLOBAL &RAMDISK
+GLOBAL &RAMDISK_ADDR
+GLOBAL &TAGS_ADDR
+GLOBAL &USE_ONCHIP_BRKPT
+GLOBAL &ENABLE_DCC_WINDOW
+GLOBAL &DTB_ADDR
+
+local &QT_EMU
+
+&QT_EMU=os.env(QT_EMU)
+&ENABLE_DCC_WINDOW="FALSE"
+&LOAD_DECOMPRESSED_IMAGE="FALSE"
+&DTB_ADDR=0x84f00000
+
+&MACHINE_ID=0xD05   ; Generic Tegra machine id (MUST BE HEXADECIMAL FORMAT!)
+
+IF "&TARGET_BOARD"=="cardhu"
+(
+  &MACHINE_ID=0xD6C
+)
+IF "&TARGET_BOARD"=="bonaire"
+(
+  &MACHINE_ID=0xD6E
+  &ENABLE_DCC_WINDOW="TRUE"
+)
+IF "&TARGET_BOARD"=="dalmore"
+(
+  &MACHINE_ID=0x10D0
+  &ENABLE_DCC_WINDOW="TRUE"
+)
+IF "&TARGET_BOARD"=="pluto"
+(
+  &MACHINE_ID=0x10D2
+  &ENABLE_DCC_WINDOW="TRUE"
+)
+IF "&TARGET_BOARD"=="ceres"
+(
+  &MACHINE_ID=0x1120
+  &ENABLE_DCC_WINDOW="TRUE"
+)
+IF "&TARGET_BOARD"=="ardbeg"
+(
+  &MACHINE_ID=0x11FA
+  &ENABLE_DCC_WINDOW="TRUE"
+)
+; Enable on-chip breakpoints if the debugger has trouble setting soft breakpoints
+&USE_ONCHIP_BRKPT="FALSE"
+
+IF "&TARGET_OS"=="gnu_linux"
+(
+  ; do nothing
+)
+ELSE IF "&TARGET_OS"=="rvds"
+(
+  ; do nothing
+)
+ELSE IF "&TARGET_OS"!="android"
+(
+  PRINT "TARGET_OS=&TARGET_OS not supported by this script"
+  STOP
+)
+
+IF "&BUILD_FLAVOR"=="debug"
+(
+  ; do nothing
+)
+ELSE IF "&BUILD_FLAVOR"=="release"
+(
+  ; do nothing
+)
+ELSE IF "&BUILD_FLAVOR"==""
+(
+  &BUILD_FLAVOR="debug"
+)
+ELSE
+(
+  PRINT "BUILD_FLAVOR=&BUILD_FLAVOR is invalid"
+  STOP
+)
+
+; Set addresses that are specific to this OS.
+IF "&TARGET_SOC"=="ap20"
+(
+  &KERNEL_LOAD_PHYS="0x00A00800"
+  &KERNEL_RUN_PHYS="0x00008000"
+  &NOR_LOAD_ADDR="0xD0000800"
+  &RAMDISK_ADDR=0x05000000
+  &TAGS_ADDR=0x00000100
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&TARGET_SOC"=="t30"
+(
+  &KERNEL_LOAD_PHYS="0x80A00800"
+  &KERNEL_RUN_PHYS="0x80008000"
+  &NOR_LOAD_ADDR="0x48000800"
+  &RAMDISK_ADDR=0x85000000
+  &TAGS_ADDR=0x80000100
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&TARGET_SOC"=="t11x"
+(
+  &KERNEL_LOAD_PHYS="0x80A00800"
+  &KERNEL_RUN_PHYS="0x80008000"
+  &NOR_LOAD_ADDR="0x48000800"
+  &RAMDISK_ADDR=0x85000000
+  &TAGS_ADDR=0x80000100
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&TARGET_SOC"=="t14x"
+(
+  &KERNEL_LOAD_PHYS="0x80A00800"
+  &KERNEL_RUN_PHYS="0x80008000"
+  &NOR_LOAD_ADDR="0x48000800"
+  &RAMDISK_ADDR=0x85000000
+  &TAGS_ADDR=0x80000100
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+)
+IF "&TARGET_SOC"=="t12x"
+(
+  &KERNEL_LOAD_PHYS="0x80A00800"
+  &KERNEL_RUN_PHYS="0x80008000"
+  &NOR_LOAD_ADDR="0x48000800"
+  &RAMDISK_ADDR=0x85000000
+  &TAGS_ADDR=0x80000100
+  &BOOT_HANDOFF="NvAbootToKernelHandoff"
+  &BACKDOOR_HANDOFF="DoBackdoorLoad"
+)
+IF "&KERNEL_LOAD_PHYS"==""
+(
+  PRINT "TARGET_SOC=&TARGET_SOC is not valid"
+  STOP
+)
+
+IF "&TARGET_OS"=="gnu_linux"
+(
+  ; Paths for LDK, assumes initramfs.cpio.gz is in TOP/core/_out/ (needs to be copied there)
+  &KERNEL_IMAGE="&TOP/core/_out/&(BUILD_FLAVOR)_tegra3_defconfig/arch/arm/boot/Image"
+  &KERNEL_ZIMAGE="&TOP/core/_out/&(BUILD_FLAVOR)_tegra3_defconfig/arch/arm/boot/zImage"
+  &KERNEL_ELF="&TOP/core/_out/&(BUILD_FLAVOR)_tegra3_defconfig/vmlinux"
+  &RAMDISK="&TOP/core/_out/initramfs.cpio.gz"
+  &FASTBOOT="&TOP/core/_out/&(BUILD_FLAVOR)_nv&(TARGET_SOC)_aos_armv6/fastboot"
+  &MINILOADER="&TOP/core/_out/&(BUILD_FLAVOR)_nv&(TARGET_SOC)_rvds_armv4/nvml_server.axf"
+)
+ELSE IF "&TARGET_OS"=="android"
+(
+  IF "&BUILD_FLAVOR"=="debug"
+  (
+    &KERNEL_IMAGE="&TOP/out/debug/target/product/&TARGET_BOARD/obj/KERNEL/arch/arm/boot/Image"
+    &KERNEL_ZIMAGE="&TOP/out/debug/target/product/&TARGET_BOARD/obj/KERNEL/arch/arm/boot/zImage"
+    &KERNEL_ELF="&TOP/out/debug/target/product/&TARGET_BOARD/obj/KERNEL/vmlinux"
+    IF "&QT_EMU"==""
+    (
+      ; FPGA case
+      &RAMDISK="&TOP/out/debug/target/product/&TARGET_BOARD/nvtest_ramdisk.img"
+    )
+    ELSE
+    (
+      ; QT case
+      &RAMDISK="&TOP/out/debug/target/product/&TARGET_BOARD/qt_ramdisk.img"
+    )
+    &FASTBOOT="&TOP/out/debug/target/product/&TARGET_BOARD/obj/EXECUTABLES/bootloader_intermediates/bootloader.elf"
+    &MINILOADER="&TOP/out/debug/target/product/&TARGET_BOARD/obj/EXECUTABLES/nvflash_miniloader_&(TARGET_SOC)_intermediates/nvflash_miniloader_&(TARGET_SOC).elf"
+    &TEGRABOOT="&TOP/out/debug/target/product/&TARGET_BOARD/obj/EXECUTABLES/nvtboot_&(TARGET_SOC_VERSION)_intermediates/nvtboot_&(TARGET_SOC_VERSION).elf"
+  )
+  ELSE
+  (
+    &KERNEL_IMAGE="&TOP/out/target/product/&TARGET_BOARD/obj/KERNEL/arch/arm/boot/Image"
+    &KERNEL_ZIMAGE="&TOP/out/target/product/&TARGET_BOARD/obj/KERNEL/arch/arm/boot/zImage"
+    &KERNEL_ELF="&TOP/out/target/product/&TARGET_BOARD/obj/KERNEL/vmlinux"
+    IF "&QT_EMU"==""
+    (
+      ; FPGA case
+      &RAMDISK="&TOP/out/target/product/&TARGET_BOARD/nvtest_ramdisk.img"
+    )
+    ELSE
+    (
+      ; QT case
+      &RAMDISK="&TOP/out/target/product/&TARGET_BOARD/qt_ramdisk.img"
+    )
+    &FASTBOOT="&TOP/out/target/product/&TARGET_BOARD/obj/EXECUTABLES/bootloader_intermediates/bootloader.elf"
+    &MINILOADER="&TOP/out/target/product/&TARGET_BOARD/obj/EXECUTABLES/nvflash_miniloader_&(TARGET_SOC)_intermediates/nvflash_miniloader_&(TARGET_SOC).elf"
+    &TEGRABOOT="&TOP/out/target/product/&TARGET_BOARD/obj/EXECUTABLES/nvtboot_&(TARGET_SOC_VERSION)_intermediates/nvtboot_&(TARGET_SOC_VERSION).elf"
+  )
+)
+enddo

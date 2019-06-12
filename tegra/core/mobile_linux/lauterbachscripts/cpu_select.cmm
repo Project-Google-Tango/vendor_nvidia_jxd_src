@@ -1,0 +1,13 @@
+; Lauterbach TRACE32 CPU Complex Core Selection script
+
+ENTRY &CORE_NUMBER
+
+IF "&(TARGET_SOC)"=="ap15"
+(
+   PRINT "This script is not supported for &(TARGET_SOC)==ap15"
+)
+ELSE
+(
+  core.select &CORE_NUMBER
+)
+ENDDO

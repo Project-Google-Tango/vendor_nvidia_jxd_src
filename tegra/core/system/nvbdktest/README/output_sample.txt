@@ -1,0 +1,100 @@
+==============================================
+Running test entry: se: nvsersaverifytest
+==============================================
+
+1) Running se with 1 tests
+# NvSeRsaVerifyTest : PASS, time : 781Ms
+
+------------------------
+Total Tests Run: 1
+Failed Tests: 0
+AssertsTested: 12
+AssertsFailed: 0
+TimeTaken: 781Ms
+------------------------
+
+
+==============================================
+Running test entry: all: all
+==============================================
+
+1) Running se with 5 tests
+# NvSeAesVerifyTest : PASS, time : 0Ms
+# NvSeShaVerifyTest : PASS, time : 89Ms
+# NvSeRsaVerifyTest : PASS, time : 44Ms
+# NvSeAesClearSBKTest : PASS, time : 18Ms
+# NvSeAesLocksskTest : PASS, time : 1Ms
+
+------------------------
+Total Tests Run: 5
+Failed Tests: 0
+AssertsTested: 5
+AssertsFailed: 0
+TimeTaken: 152Ms
+------------------------
+
+
+2) Running dsi with 1 tests
+# NvDsiBasicTest : PASS, time : 1656Ms
+
+------------------------
+Total Tests Run: 1
+Failed Tests: 0
+AssertsTested: 17
+AssertsFailed: 0
+TimeTaken: 1656Ms
+------------------------
+
+
+3) Running uart with 2 tests
+# NvUartWriteVerifyTest : PASS, time : 22Ms
+# NvUartWritePerfTest : PASS, time : 64046Ms
+
+------------------------
+Total Tests Run: 2
+Failed Tests: 0
+AssertsTested: 0
+AssertsFailed: 0
+TimeTaken: 64068Ms
+------------------------
+
+
+4) Running i2c with 2 tests
+# NvI2cEepromWRTest : FAIL, time : 13Ms
+NvI2cEepromWRTest : 106: ASSERT_EQUAL(err,NvSuccess)=>"NvRmI2cTransaction FAILED"
+# NvReadBoardID : PASS, time : 20Ms
+
+------------------------
+Total Tests Run: 2
+Failed Tests: 1
+AssertsTested: 1
+AssertsFailed: 1
+TimeTaken: 33Ms
+------------------------
+
+
+5) Running sd with 5 tests
+# NvSdWriteReadVerifyTest : FAIL, time : 26Ms
+SdInit : 38: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"NvDdkSDBlockDevOpen FAILED"
+NvSdWriteReadVerifyTest : 76: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"SdInit FAILED"
+# NvSdVerifyWriteReadFull : FAIL, time : 37Ms
+SdInit : 38: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"NvDdkSDBlockDevOpen FAILED"
+NvSdVerifyWriteReadFull : 201: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"SdInit FAILED"
+# NvSdVerifyWriteReadSpeed : FAIL, time : 36Ms
+SdInit : 38: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"NvDdkSDBlockDevOpen FAILED"
+NvSdVerifyWriteReadSpeed : 294: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"SdInit FAILED"
+# NvSdVerifyWriteReadSpeed_BootA: FAIL, time : 26Ms
+SdInit : 38: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"NvDdkSDBlockDevOpen FAILED"
+NvSdVerifyWriteReadSpeed_BootArea : 418: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"SdInit FAILED"
+# NvSdVerifyErase : FAIL, time : 26Ms
+SdInit : 38: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"NvDdkSDBlockDevOpen FAILED"
+NvSdVerifyErase : 542: ASSERT_EQUAL(ErrStatus,NvSuccess)=>"SdInit FAILED"
+
+------------------------
+Total Tests Run: 5
+Failed Tests: 5
+AssertsTested: 15
+AssertsFailed: 10
+TimeTaken: 151Ms
+------------------------
+

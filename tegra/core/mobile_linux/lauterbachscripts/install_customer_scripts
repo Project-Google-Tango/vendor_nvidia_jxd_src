@@ -1,0 +1,55 @@
+#!/bin/bash
+# ---------------------------------------------------------------
+#  Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+# ---------------------------------------------------------------
+
+if [[ -z $T32SYS ]]; then
+    echo "ERROR: Environment variable T32SYS not set"
+    echo "ERROR: T32SYS should point to the directory where the Lauterbach software is installed"
+    exit 1
+fi
+
+if [[ -f $T32SYS/user_config_customer.cmm ]]; then
+    rm -f $T32SYS/user_config_customer.cmm.backup
+    cp $T32SYS/user_config_customer.cmm $T32SYS/user_config_customer.cmm.backup
+    echo ""
+    echo "Saving old $T32SYS/user_config_customer.cmm as $T32SYS/user_config_customer.cmm.backup"
+fi
+
+echo ""
+echo "Installing Lauterbach scripts to $T32SYS"
+rm -f $T32SYS/config_avp.t32
+rm -f $T32SYS/config_cpu.t32
+rm -f $T32SYS/config_coredump.t32
+rm -f $T32SYS/config_ramdump.t32
+rm -f $T32SYS/t32avp 
+rm -f $T32SYS/t32cpu
+rm -f $T32SYS/t32coredump
+rm -f $T32SYS/t32ramdump
+rm -f $T32SYS/t32.cmm
+rm -f $T32SYS/user_config.cmm
+cp ./config_avp.t32 $T32SYS/.
+cp ./config_cpu.t32 $T32SYS/.
+cp ./config_coredump.t32 $T32SYS/.
+cp ./config_ramdump.t32 $T32SYS/.
+cp ./t32avp $T32SYS/.
+cp ./t32cpu $T32SYS/.
+cp ./t32coredump $T32SYS/.
+cp ./t32ramdump $T32SYS/.
+cp ./t32_customer.cmm $T32SYS/t32.cmm
+cp ./user_config_customer.cmm $T32SYS/user_config_customer.cmm
+
+# Make sure shell scripts are executable
+chmod +x $T32SYS/t32avp
+chmod +x $T32SYS/t32cpu
+chmod +x $T32SYS/t32coredump
+chmod +x $T32SYS/t32ramdump
+
+# Make sure user configuration file is writable
+chmod +w $T32SYS/user_config_customer.cmm
+
+# Let the user know they need to customize user_config.cmm
+echo ""
+echo "Customize $T32SYS/user_config.cmm to match your debug environment"
+echo ""
+

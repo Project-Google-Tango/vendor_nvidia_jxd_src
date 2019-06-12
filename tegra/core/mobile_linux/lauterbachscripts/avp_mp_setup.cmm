@@ -1,0 +1,20 @@
+; Lauterbach TRACE32 debugger script for number of CPUs to allow
+
+; The primitive Lauterbach scripting language does not allow compound
+; IF statements. So do two of them.
+if ("&(TARGET_SOC)"=="ap15")
+(
+    PRINT "Operation not supported for TARGET_SOC==&(TARGET_SOC)"
+    STOP
+)
+if ("&(TARGET_SOC)"=="ap20")
+(
+    PRINT "Operation not supported for TARGET_SOC==&(TARGET_SOC)"
+    STOP
+)
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_mp_setup.cmm
+
+ENDDO
+

@@ -1,0 +1,97 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2014, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvsecuretool static host executable
+#
+###############################################################################
+ifdef NV_COMPONENT_FLAG_STATIC_EXECUTABLE_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME := nvsecuretool
+
+NV_COMPONENT_SOURCES  := \
+	nvsecuretool_t30.c \
+	nvsecuretool_t1xx.c \
+	nvsecuretool_t12x.c \
+	nvsecuretool_version.c
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/drivers/nvboot/lib/host \
+	$(NV_SOURCE)/core/system/nvbct/host \
+	$(NV_SOURCE)/core/utils/aes_ref \
+	$(NV_SOURCE)/core/utils/nvapputil \
+	$(NV_SOURCE)/core/utils/nvos \
+	$(NV_SOURCE)/core/system/nvflash/lib \
+	$(NV_SOURCE)/core/system/nvbuildbct \
+	$(NV_SOURCE)/core-private/utils/nvelfutil
+
+NV_COMPONENT_INCLUDES := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/core/drivers/nvboot/include \
+	$(NV_SOURCE)/core/system/nvflash/lib \
+	$(NV_SOURCE)/core/system/nvflash/app \
+	$(NV_SOURCE)/core/system/nvbuildbct \
+	$(NV_SOURCE)/core-private/include/ \
+	$(NV_SOURCE)/core-private/utils/nvelfutil/include
+
+NV_COMPONENT_CFLAGS += \
+	-DNVODM_BOARD_IS_FPGA=0
+
+# Use nvtboot for all builds except embedded ones
+ifneq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS += -DNVTBOOT_EXISTS
+endif
+
+NV_COMPONENT_SYSTEM_SHARED_LIBRARIES := pthread dl
+
+# ARCHITECTURE PROBLEM ########################################################
+#
+# Generated from RVCT binaries introduce inter-component dependency
+#
+# Finalizing configuration
+ifndef NV_COMPONENTS_FINALIZING_INPUT
+
+# Don't link the final binary in first round
+NV_COMPONENT_FLAG_NEEDS_FINALIZING := 1
+
+else
+# Depends on generated nvflash_miniloader_XXX.h files
+NV_COMPONENT_SOURCES += \
+	nvsecuretool.c \
+	nvsecure_bctupdate.c \
+	nv_rsa_core.c \
+	nv_bigintmod.c \
+	nv_sha256.c \
+	nvsecuretool_pkc.c \
+	nvtest.c \
+	nv_asn_parser.c
+
+NV_COMPONENT_FLAG_USES_GENERATED_FILES := 1
+
+define _link_miniloader
+$(notdir $(1)): $(1)
+	$(LN_S) $$< $$@
+endef
+$(foreach m, $(NV_COMPONENTS_FINALIZING_INPUT), \
+	$(eval $(call _link_miniloader, $(m))))
+m :=
+endif
+###############################################################################
+
+include $(NV_BUILD_STATIC_EXECUTABLE)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

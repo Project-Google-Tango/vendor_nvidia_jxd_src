@@ -1,0 +1,148 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# adaptor makefile for libnvomxal.so build system
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := nvomxal
+
+NV_COMPONENT_SOURCES               := \
+	OpenSLES_IID.c \
+	assert.c \
+	classes.c \
+	MPH_to.c \
+	data.c \
+	devices.c \
+	entry.c \
+	handler_bodies.c \
+	trace.c \
+	locks.c \
+	sles.c \
+	sl_iid.c \
+	sllog.c \
+	ThreadPool.c \
+	sync.c \
+	xa_iid.c \
+	xa_entry.c \
+	autogen/IID_to_MPH.c \
+	objects/C3DGroup.c \
+	objects/CAudioPlayer.c \
+	objects/CAudioRecorder.c \
+	objects/CEngine.c \
+	objects/COutputMix.c \
+	objects/CMediaPlayer.c \
+	objects/CCameraDevice.c \
+	objects/CMediaRecorder.c \
+	objects/CNvDataTap.c \
+	itf/IEngine.c \
+	itf/IEngineCapabilities.c \
+	itf/IObject.c \
+	itf/IDynamicInterfaceManagement.c \
+	itf/IThreadSync.c \
+	itf/ICamera.c \
+	itf/IImageDecoderCapabilities.c \
+	itf/IMetadataInsertion.c \
+	itf/IVideoDecoderCapabilities.c \
+	itf/IAudioDecoderCapabilities.c \
+	itf/ICameraCapabilities.c \
+	itf/IImageEffect.c \
+	itf/IPlay.c \
+	itf/ISeek.c \
+	itf/IVideoEncoder.c \
+	itf/IAudioEncoderCapabilities.c \
+	itf/IImageEncoder.c \
+	itf/IRecord.c \
+	itf/IVideoEncoderCapabilities.c \
+	itf/IAudioIODeviceCapabilities.c \
+	itf/IImageControls.c \
+	itf/IImageEncoderCapabilities.c \
+	itf/ISnapshot.c \
+	itf/IVideoPostProcessing.c \
+	itf/linux_common.c \
+	itf/linux_mediaplayer.c \
+	itf/linux_postprocessing.c \
+	itf/linux_streaminfo.c \
+	itf/linux_outputmix.c \
+	itf/IEqualizer.c \
+	itf/IVolume.c \
+	itf/IMetadataExtraction.c \
+	itf/IPlaybackRate.c \
+	itf/IPrefetchStatus.c \
+	itf/IStreamInformation.c \
+	itf/IMetadataTraversal.c \
+	itf/IDeviceVolume.c \
+	itf/IDynamicSource.c \
+	itf/IAudioEncoder.c \
+	itf/linux_cameradevice.c \
+	itf/linux_mediarecorder.c \
+	itf/linux_audioiodeviceinfo.c \
+	itf/IOutputMix.c \
+	ut/slesutResult.c
+
+NV_COMPONENT_INCLUDES                := \
+	$(_private_source_dir) \
+	$(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/glib-2.0 \
+	$(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/gstreamer-0.10 \
+	$(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/lib/glib-2.0/include \
+	$(NV_SOURCE)/multimedia-partner/openmax/al/src \
+	$(NV_SOURCE)/multimedia-partner/openmax/al/src/autogen \
+	$(NV_SOURCE)/multimedia-partner/openmax/al/include \
+	$(NV_SOURCE)/multimedia-partner/openmax/include/openmax/al \
+	$(NV_SOURCE)/multimedia-partner/openmax/al/src/itf
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS   += \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstreamer-0.10 \
+	$(NV_SOURCE)/l4t/3rdpartystub/glib-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gthread-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gobject-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstinterfaces-0.10 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstpbutils-0.10 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstphotography-0.10
+
+NV_COMPONENT_SYSTEM_SHARED_LIBRARIES += \
+	pthread
+
+NV_COMPONENT_OWN_INTERFACE_DIR       := ..
+
+# FIXME: There are couple of extra CFLAGS mentioned in the legacy make.
+# CFLAGS of interest are:
+# 1. to turn on tracing: -DUSE_TRACE -DXA_TRACE_DEFAULT=XA_TRACE_ALL
+# 2. to turn on debugging: -DUSE_DEBUG
+# 3. to turn on log level Default: -DUSE_LOG=SLAndroidLogLevel_Default
+# 4. to turn on log level Verbose: -DUSE_LOG=SLAndroidLogLevel_Verbose
+# 5. to turn on log level Debug: -DUSE_LOG=SLAndroidLogLevel_Debug
+# 6. to turn on log level Info: -DUSE_LOG=SLAndroidLogLevel_Info
+# 7. to turn on log level Warn: -DUSE_LOG=SLAndroidLogLevel_Warn
+# 8. to turn on log level Error: -DUSE_LOG=SLAndroidLogLevel_Error
+# 9. to turn on log level Fatal: -DUSE_LOG=SLAndroidLogLevel_Fatal
+# Add a wanted flags at the end of NV_COMPONENT_CFLAGS.
+
+NV_COMPONENT_CFLAGS                  := \
+	-DLI_API='' -DUSE_PROFILES=0x18 -DLINUX_OMXAL -DGST_USE_UNSTABLE_API \
+	-UUSE_TRACE \
+	-UUSE_DEBUG \
+	-DUSE_LOG=SLAndroidLogLevel_Silent
+
+NV_COMPONENT_HAS_BROKEN_CODE         := c++-code-in-c-modules ignore-all
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

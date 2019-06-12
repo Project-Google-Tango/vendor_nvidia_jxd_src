@@ -1,0 +1,110 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake makefile for libnvaboot static library
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvaboot
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	nvaboot.c \
+	nvaboot_blockdev_nice.c \
+	nvaboot_bootfs.c \
+	nvaboot_rawfs.c \
+	nvaboot_usbf.c \
+	nvaboot_warmboot_sign.c \
+	nvaboot_$(NV_TARGET_SOC_FAMILY).c
+
+NV_COMPONENT_SOURCES_PREPROCESSED := \
+	nvaboot_sanitize.S \
+	nvaboot_cluster_switch.S \
+	nvaboot_warmboot_avp_$(NV_TARGET_SOC).S
+NV_COMPONENT_INCLUDES          := \
+	../nv3p \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	../../drivers/nvrm/nvrmkernel/core/common \
+	../../utils/nvos/aos
+
+NV_COMPONENT_HAS_BROKEN_CODE := ignore-all
+
+NV_COMPONENT_CFLAGS            :=
+
+ifneq ($(filter t30 t114, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS            += -DBSEAV_USED=1
+else
+NV_COMPONENT_CFLAGS            += -DBSEAV_USED=0
+endif
+
+ifneq ($(filter t30, $(NV_TARGET_SOC)),)
+NV_COMPONENT_CFLAGS            += -DHAS_PKC_BOOT_SUPPORT=0
+else
+NV_COMPONENT_CFLAGS            += -DHAS_PKC_BOOT_SUPPORT=1
+endif
+
+ifeq ($(NV_TARGET_SOC),t114)
+NV_COMPONENT_CFLAGS            += -DXUSB_EXISTS=1
+NV_COMPONENT_ASMFLAGS          += -D__ARM_ERRATA_784420__=1
+endif
+
+ifeq ($(NV_TARGET_SOC),t124)
+NV_COMPONENT_CFLAGS            += -DXUSB_EXISTS=1
+NV_COMPONENT_CFLAGS            += -DVPR_EXISTS=1
+NV_COMPONENT_CFLAGS            += -DTSEC_EXISTS=1
+endif
+
+# Following flag is applicable for all Cortex-A9 based SoCs
+ifneq ($(filter t30, $(NV_TARGET_SOC)),)
+NV_COMPONENT_ASMFLAGS          += -D__ARM_ERRATA_794073__=1
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_SOURCES           += nvaboot_sanitize_keys.c
+ifeq ($(NV_BUILD_CONFIGURATION_IS_SECURE_OS),1)
+NV_COMPONENT_SOURCES           += nvaboot_tf.c
+ifneq ($(filter cardhu, $(NV_TARGET_REFERENCE_BOARD)),)
+NV_COMPONENT_CFLAGS            += -DCONFIG_TRUSTED_LITTLE_KERNEL
+else
+NV_COMPONENT_CFLAGS            += -DCONFIG_TRUSTED_FOUNDATIONS
+endif
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_INCLUDES          += $(NV_ANDROID_TOP)/3rdparty/trustedlogic/sdk/include/tegra3
+else ifeq ($(NV_TARGET_SOC),t114)
+NV_COMPONENT_INCLUDES          += $(NV_ANDROID_TOP)/3rdparty/trustedlogic/sdk/include/tegra4
+endif
+endif
+endif
+
+ifneq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+# AOS and simulation platforms can never support USB charging
+NV_COMPONENT_CFLAGS            += -DLPM_BATTERY_CHARGING=1
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS            += -DNV_EMBEDDED_BUILD
+endif
+
+# NOTE: global variables aren't supported in tmake, so this is a NOOP.
+ifeq ($(BUILD_NV_NCT),true)
+NV_COMPONENT_CFLAGS            += -DNV_USE_NCT
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

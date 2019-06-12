@@ -1,0 +1,13 @@
+; Lauterbach TRACE32 debugger script to reconfigure for kernel virtual addressing mode.
+
+; Turn off trapping of undefined, prefetch abort, and data abort exceptions so that the kernel can handle page faults.
+tronchip.set PABORT OFF
+tronchip.set DABORT OFF
+tronchip.set UNDEF  OFF
+tronchip.set SWI    OFF
+
+; Allow all accesses
+map.NODENYACCESS 0x00000000--0xFFFFFFFF
+
+enddo
+

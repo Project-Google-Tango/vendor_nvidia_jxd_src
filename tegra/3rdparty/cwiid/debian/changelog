@@ -1,0 +1,159 @@
+cwiid (0.6.00+svn201-2) unstable; urgency=low
+
+  * Fixe cwiid.pc 
+  Closes: #548866
+  * Updated debian/copyright
+
+ -- Romain Beauxis <toots@rastageeks.org>  Tue, 29 Sep 2009 14:30:48 -0500
+
+cwiid (0.6.00+svn201-1) unstable; urgency=low
+
+  * New svn snapshot.
+  * Dropped patch applied upstream.
+  * Bumped standards version to 3.8.3 
+  * Added debug package.
+  * Added Homepage: tag in debian/control
+  * Renamed libcwiid1-dev to libcwiid-dev
+  * Install cwiid.pc file in libcwiid-dev 
+    to enable pkg-config support.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Mon, 28 Sep 2009 00:04:05 -0500
+
+cwiid (0.6.00+svn184-2) unstable; urgency=low
+
+  * Added patch from upstream's revision 186.
+  Closes: #458303 
+  * Bumped standards version to 3.8.2
+
+ -- Romain Beauxis <toots@rastageeks.org>  Sun, 09 Aug 2009 21:09:14 -0500
+
+cwiid (0.6.00+svn184-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fixed build-dep on bluez.
+  Closes: #501510
+  * Fixed python's threading conventions (upstream)
+  Closes: #490607
+  * Removed mention on missing wminput.conf.sample in wminput manpage
+  Closes: #458245
+  * Added extra plugins.
+  Closes: #487498
+  * Updated compat to level 7.
+  * Bumped standards version to 3.8.1
+
+ -- Romain Beauxis <toots@rastageeks.org>  Fri, 27 Mar 2009 11:36:50 +0100
+
+cwiid (0.6.00-4) unstable; urgency=low
+
+  * Removed buggy LDFLAGS from debian/rules
+  Closes: #476004
+  * Rebuild against new python
+
+ -- Romain Beauxis <toots@rastageeks.org>  Mon, 14 Apr 2008 15:32:08 +0100
+
+cwiid (0.6.00-3) unstable; urgency=high
+
+  * Added dependency on libbluetooth-dev for libcwiid1-dev
+  Closes: #458827
+  * Fixed watch file
+  Closes: #449977
+  * Updated standards to 3.7.3 (no changes)
+  * Added --as-needed flag for wmgui until libraries are fixed.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Mon, 07 Jan 2008 11:40:08 +0100
+
+cwiid (0.6.00-2) unstable; urgency=low
+
+  * Added linker flags to remove non-necessary link dependencies.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Wed, 21 Nov 2007 09:58:28 +0100
+
+cwiid (0.6.00-1) unstable; urgency=low
+
+  * New upstream release 
+
+ -- Romain Beauxis <toots@rastageeks.org>  Mon, 27 Aug 2007 18:44:46 +0200
+
+cwiid (0.6.00~rc2-4) unstable; urgency=low
+
+  * Corrected depends for wminput (Closes: #434295) 
+
+ -- Romain Beauxis <toots@rastageeks.org>  Mon, 23 Jul 2007 01:26:49 +0200
+
+cwiid (0.6.00~rc2-3) unstable; urgency=low
+
+  * Initial upload to unstable for new soversion.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Sun, 22 Jul 2007 16:38:13 +0200
+
+cwiid (0.6.00~rc2-2) experimental; urgency=low
+
+  * Added conflict with old -dev package 
+
+ -- Romain Beauxis <toots@rastageeks.org>  Wed, 18 Jul 2007 02:14:56 +0200
+
+cwiid (0.6.00~rc2-1) experimental; urgency=low
+
+  * New upstream release
+  * Added python packages
+  * New library soversion
+
+ -- Romain Beauxis <toots@rastageeks.org>  Tue, 17 Jul 2007 04:04:29 +0200
+
+cwiid (0.5.03+svn20070508-2) unstable; urgency=low
+
+  * Stupid typo in .install files.. 
+  * Removed autotools-dev from build dependencies
+  * Added conflicts and replaces for new library packages
+
+ -- Romain Beauxis <toots@rastageeks.org>  Sat, 12 May 2007 03:31:29 +0200
+
+cwiid (0.5.03+svn20070508-1) unstable; urgency=low
+
+  * New upstream release
+  * New library soname, changed package names accordingly
+  * New binary lswm
+
+ -- Romain Beauxis <toots@rastageeks.org>  Tue, 08 May 2007 05:31:12 +0200
+
+cwiid (0.5.03-1) unstable; urgency=low
+
+  * New upstream release. 
+  * default configuration link corrected for wminput
+  Closes: #419341
+
+ -- Romain Beauxis <toots@rastageeks.org>  Tue, 24 Apr 2007 14:20:48 +0200
+
+cwiid (0.5.02-1) unstable; urgency=low
+
+  * New upstream release 
+  * Dropped no more needed patches, thanks to upstream author for considering
+    them !
+
+ -- Romain Beauxis <toots@rastageeks.org>  Tue, 20 Mar 2007 13:13:34 +0100
+
+cwiid (0.5.00-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Romain Beauxis <toots@rastageeks.org>  Wed, 21 Feb 2007 14:28:53 +0100
+
+cwiid (0.4.01-1) unstable; urgency=low
+
+  * New upstream release
+  * First upload to unstable (Closes: #407468)
+
+ -- Romain Beauxis <toots@rastageeks.org>  Fri, 26 Jan 2007 12:34:51 +0100
+
+cwiid (0.4.00-1) unstable; urgency=low
+
+  * News upstream release. 
+
+ -- Romain Beauxis <toots@rastageeks.org>  Thu, 25 Jan 2007 12:36:58 +0100
+
+cwiid (0.3.51-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Romain Beauxis <toots@rastageeks.org>  Thu, 18 Jan 2007 19:40:34 +0100
+

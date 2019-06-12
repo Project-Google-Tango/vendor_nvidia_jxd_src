@@ -1,0 +1,27 @@
+;*******************************************************************
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;
+; Setup default Windows for RAMdump debugging
+;*******************************************************************
+TOOLBAR ON
+STATUSBAR ON
+WINPAGE.RESET
+
+WINCLEAR
+
+;[HELP]
+;WINPOS left up hsize vsize hscale vscale name [Normal|Iconic|Maximized] string
+;WINTABS tabs
+
+WINPOS 0. 0. 80. 50. 0. 0. W000
+Data.List
+
+WINPOS 84. 0. 48. 10. 0. 0. W001
+Register
+
+WINPOS 84. 15. 48. 36. 0. 0. W002
+Var.Frame /Locals /Caller
+
+WINPOS 136. 0. 45. 51. 0. 0. W003
+Task.Process
+

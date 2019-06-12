@@ -1,0 +1,3 @@
+cpu_only NvMMLiteOpenBlock
+cpu_only NvMMLiteCloseBlock
+

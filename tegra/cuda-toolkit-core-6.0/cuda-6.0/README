@@ -1,0 +1,21 @@
+By using this software you agree to fully comply with the terms and conditions of the EULA (End User License Agreement).
+The EULA can also be found at http://docs.nvidia.com/cuda/eula/index.html.
+If you do not agree to the terms and conditions of the EULA, do not use the software.
+
+The Open64 source files are controlled under terms of the GPL license.
+Current and previously released versions are located here:
+    ftp://download.nvidia.com/CUDAOpen64/.
+
+The CUDA-GDB source files are controlled under terms of the GPL license.
+The source code for CUDA-GDB shipped with CUDA 5.5 and subsequent versions are
+located here:
+    https://github.com/NVIDIA/cuda-gdb.
+Source code for CUDA-GDB shipped with CUDA 5.0 and previous versions are located here:
+    ftp://download.nvidia.com/CUDAOpen64/.
+
+To obtain source code for software provided under licenses 
+that require redistribution of source code, including the 
+GNU General Public License (GPL) and GNU Lesser General 
+Public License (LGPL), contact oss-requests@nvidia.com.  
+This offer is valid for a period of three (3) years from the 
+date of the distribution of this product by NVIDIA CORPORATION.

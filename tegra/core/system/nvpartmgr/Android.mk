@@ -1,0 +1,15 @@
+LOCAL_PATH := $(call my-dir)
+include $(NVIDIA_DEFAULTS)
+
+LOCAL_MODULE := libnvpartmgr
+LOCAL_NVIDIA_NO_COVERAGE := true
+LOCAL_SRC_FILES += nvpartmgr.c
+
+LOCAL_NVIDIA_NO_EXTRA_WARNINGS := 1
+include $(NVIDIA_STATIC_LIBRARY)
+include $(NVIDIA_DEFAULTS)
+LOCAL_MODULE := libnvpartmgrhost
+LOCAL_C_INCLUDES += $(TARGET_OUT_HEADERS)
+LOCAL_SRC_FILES += nvpartmgr.c
+
+include $(NVIDIA_HOST_STATIC_LIBRARY)

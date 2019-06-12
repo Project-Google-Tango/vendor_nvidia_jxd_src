@@ -1,0 +1,43 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvbdktestbl
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+    include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvaboot
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+    nvrm_secure.c
+
+NV_COMPONENT_INCLUDES += $(LOCAL_PATH)/../nvrmkernel/core
+NV_COMPONENT_INCLUDES += $(LOCAL_PATH)/../nvrmkernel/core/common
+
+ifeq ($(NV_BUILD_CONFIGURATION_IS_SECURE_OS),1)
+
+ifneq ($(filter cardhu, $(NV_TARGET_REFERENCE_BOARD)),)
+NV_COMPONENT_CFLAGS     += \
+                           -DCONFIG_TRUSTED_LITTLE_KERNEL
+else
+NV_COMPONENT_CFLAGS     += \
+                           -DCONFIG_TRUSTED_FOUNDATIONS
+endif
+NV_COMPONENT_INCLUDES   += \
+                           $(NV_ANDROID_TOP)/3rdparty/trustedlogic/sdk/include/$(NV_TARGET_REFERENCE_BOARD)
+
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif

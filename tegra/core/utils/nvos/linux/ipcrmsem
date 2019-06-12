@@ -1,0 +1,2 @@
+ipcs -s | awk '{if ($2 ~ /^[0-9]/) system("ipcrm -s " $2)}'
+ipcs -m | awk '{if ($2 ~ /^[0-9]/) system("ipcrm -m " $2)}'

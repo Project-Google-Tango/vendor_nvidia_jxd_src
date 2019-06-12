@@ -1,0 +1,40 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# omxplayer2 dynamic binary component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_DYNAMIC_EXECUTABLE_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME			:= omxplayer2
+NV_COMPONENT_FLAG_IS_TEST		:= 1
+NV_COMPONENT_SOURCES			:= omxplayer2.c
+NV_COMPONENT_NEEDED_INTERFACE_DIRS	:= \
+	$(NV_SOURCE)/core/utils/nvos \
+	$(NV_INTERFACE_GPU_GRAPHICS_EGL) \
+	$(NV_INTERFACE_GPU_GRAPHICS_OPENGLES2) \
+	$(NV_INTERFACE_GPU_GRAPHICS_NVWINSYS_PRIVATE) \
+	$(NV_SOURCE)/multimedia-partner/openmax/ilclient
+
+NV_COMPONENT_CFLAGS			+= \
+	-D__OMX_EXPORTS -DOMXVERSION=2
+
+include $(NV_BUILD_DYNAMIC_EXECUTABLE)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

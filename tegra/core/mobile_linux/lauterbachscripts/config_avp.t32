@@ -1,0 +1,55 @@
+;
+;please refer the installation guide for more information
+;about your configuration
+;
+;
+;uncomment the following 3 lines if you don't use already environment variables
+;changes to the actual directory names are necessary
+;OS=
+;SYS=/opt/t32
+;TMP=/tmp
+;ID=AVP
+
+;uncomment the following 4 lines if you use PowerTrace, PowerNexus or PowerDebugEthernet
+;with onhost driver executable (t32m*)
+;the nodename is only the default name, please replace it with the actual node name
+;PBI=
+;NET
+;NODE=t32
+;PACKLEN=1024
+
+;uncomment the following 2 lines if you use PowerTrace, PowerNexus, PowerDebugEthernet or
+;PowerDebugInterface USB with onhost driver executable (t32m*)
+;please refer the installation manual (file icd_quick_installation.pdf) about more details
+;concerning USB driver installation
+PBI=
+USB
+CORE=2
+PORT=20001
+
+;uncomment the following 3 lines if you use Ethernet (ICE or PodbusEthernetController)
+;with standard hostdriver executable (t32cde)
+;the nodename is only the default name, please replace it with the actual node name
+;LINK=NET
+;NODE=t32
+;PACKLEN=1024
+
+;uncomment the following 1 lines if you use SCSI interface (ICE)
+;LINK=SCSI
+
+;uncomment the following 3 lines if you want to use TRACE32 fonts
+SCREEN=
+HEADER=Trace32 AVP Debugger
+FONT=DEC
+FONT=SMALL
+PALETTE 41 = 84 0 0
+
+;uncomment the following 2 lines if you use OPENWINDOWS
+;SCREEN=
+;WMGR=OW16
+
+;uncomment the following 2 lines if you use MOTIF
+;SCREEN=
+;WMGR=MOTIF16
+
+

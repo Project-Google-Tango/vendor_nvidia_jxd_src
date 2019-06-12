@@ -1,0 +1,19 @@
+; Lauterbach TRACE32 debugger start-up script to install Coredump menu buttons.
+
+menu.rp
+(
+  add
+  toolbar
+  (
+    separator
+      toolitem "Source List" "list" "Data.List"
+      toolitem "Memory Dump" "dump" "Data.dump"
+    separator
+      toolitem "List Symbols" "symbols" "sYmbol.Browse"
+    separator
+       toolitem "Run Kernel Coredump script (coredump_kernel.cmm)"          "CD,y"  "do coredump_kernel.cmm"
+  )
+)
+
+enddo
+

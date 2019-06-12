@@ -1,0 +1,30 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile makefile
+#
+# nv_hciattach executable tmake makefile
+#
+###############################################################################
+ifdef NV_COMPONENT_FLAG_DYNAMIC_EXECUTABLE_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME         := nv_hciattach
+NV_COMPONENT_SOURCES      := nv_hciattach.c
+NV_COMPONENT_FLAG_IS_TEST := 1
+
+include $(NV_BUILD_DYNAMIC_EXECUTABLE)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

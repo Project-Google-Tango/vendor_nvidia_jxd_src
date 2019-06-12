@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/main"
+   android:layout_width="wrap_content"
+   android:layout_height="wrap_content"
+   android:descendantFocusability="beforeDescendants"
+   android:focusableInTouchMode="true"
+   android:orientation="vertical">
+  <LinearLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     android:id="@+id/mainbuttons"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:orientation="horizontal">
+    <Button
+       android:id="@+id/btn_selectvideo"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_selectvideo" />
+    <Button
+       android:id="@+id/btn_startvideo"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_startvideo" />
+    <Button
+       android:id="@+id/btn_pausevideo"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_pausevideo" />
+    <Button
+       android:id="@+id/btn_hideui"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_hideui" />
+    <Button
+       android:id="@+id/btn_mode"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/button_mode" />
+  </LinearLayout>
+  <SurfaceView
+     android:id="@+id/myVideo"
+     android:layout_width="fill_parent"
+     android:layout_height="fill_parent" />
+</LinearLayout>

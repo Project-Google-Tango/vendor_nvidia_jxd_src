@@ -1,0 +1,221 @@
+;****************************************************************************
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;
+; Save RAM dump log
+; using TRACE32
+;
+; Jan-01-12   joshuac@nvidia.com
+;****************************************************************************
+B::
+area.res
+area
+
+;*******************************************************************
+; Declare variables
+;*******************************************************************
+local &cwd
+local &filename
+local &reg
+local &time_total
+local &time_each
+local &t
+local &cnt &corenum &online_cpu &temp &status
+
+; do dump_var.cmm
+; define start_address, dump_size
+do ./ramdump_var.cmm
+
+; Save directory of this script
+&cwd=os.pwd()
+
+&time_total=clock.unix()
+area
+print "Begin debug save"
+print "&cwd"
+
+;*******************************************************************
+; Get online CPU info
+;*******************************************************************
+if y.exist(cpu_online_bits)
+(
+	&online_cpu=data.long(cpu_online_bits)
+)
+else
+(
+	print "There is no cpu_online_bits symbol. Did you load symbol info?"
+	stop
+)
+
+;*******************************************************************
+; Store CPU registers
+;*******************************************************************
+; save all arm registers
+print "============================================================"
+print "Save the register state data"
+&cnt=0
+&corenum=&MAX_CORENUM
+&temp=&online_cpu
+repeat &corenum
+(
+	&status=(&temp>>&cnt)&(0x1)
+	if &status==0x1
+	(
+		print "CPU&cnt is online"
+		core &cnt
+		&num=string.mid("&cnt",2,1)
+		&filename="REG_CORE"+"&num"+".cmm"
+		print "Writing &filename"
+		store &filename hex register
+	)
+	else
+	(
+		print "CPU&cnt is offline"
+	)
+	&cnt=&cnt+1
+)
+
+
+;*******************************************************************
+; Store MMU registers
+;*******************************************************************
+; save CP15 registers
+print "============================================================"
+print "Save the MMU state data"
+&cnt=0
+&corenum=&MAX_CORENUM
+&temp=&online_cpu
+repeat &corenum
+(
+	&status=(&temp>>&cnt)&(0x1)
+	if &status==0x1
+	(
+		print "CPU&cnt is online"
+		core &cnt
+		&num=string.mid("&cnt",2,1)
+		&filename="MMU_CORE"+"&num"+".cmm"
+		print "Writing &filename"
+		store &filename hex register
+		open #1 &filename /create
+
+		; Cortex-A9
+		; http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0388f/BABGCBAC.html
+		; Cortex-A15
+		; http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0438c/BABHBIDJ.html
+		;**************************************************
+		; reg : 0xABCD (A: op1, B: op2, C: CRm, D: CRn)
+		; instrunction : "mrc p15, op1, %0, CRn, CRm, op2"
+		;**************************************************
+		&cp15_sctlr=data.long(C15:0x1)
+		&cp15_ttbr0=data.long(C15:0x2)
+		&cp15_ttbr1=data.long(C15:0x102)
+		&cp15_ttbcr=data.long(C15:0x202)
+		&cp15_dacr=data.long(C15:0x3)
+		&cp15_dfsr=data.long(C15:0x5)
+		&cp15_ifsr=data.long(C15:0x105)
+		&cp15_adfsr=data.long(C15:0x15)
+		&cp15_aifsr=data.long(C15:0x115)
+		&cp15_dfar=data.long(C15:0x6)
+		&cp15_ifar=data.long(C15:0x206)
+		&cp15_par=data.long(C15:0x47)
+		if "&TARGET_SOC"!="t11x"
+		(
+			&cp15_tlblr=data.long(C15:0x0A)
+		)
+		&cp15_prrr=data.long(C15:0x2A)
+		&cp15_nmrr=data.long(C15:0x12A)
+		&cp15_contextidr=data.long(C15:0x10D)
+		&cp15_tpidrurw=data.long(C15:0x20D)
+		&cp15_tpidruro=data.long(C15:0x30D)
+		&cp15_tpidrprw=data.long(C15:0x40D)
+		&cp15_cbar=data.long(C15:0x400F)
+		if "&TARGET_SOC"!="t11x"
+		(
+			; access to TLB lockdown reg is not permitted on secureos
+			;&cp15_mtlbvar=data.long(C15:0x525F)
+			;&cp15_mtlbpar=data.long(C15:0x526F)
+			;&cp15_mtlbar=data.long(C15:0x527F)
+		)
+
+		write #1 " R.S NS 0x0 ;secure"
+		write #1 " R.S M 0x13"
+		write #1 " PER.S C15:0x1 %LONG &cp15_sctlr"
+		write #1 " PER.S C15:0x2 %LONG &cp15_ttbr0"
+		write #1 " PER.S C15:0x102 %LONG &cp15_ttbr1"
+		write #1 " PER.S C15:0x202 %LONG &cp15_ttbcr"
+		write #1 " PER.S C15:0x3 %LONG &cp15_dacr"
+		write #1 " PER.S C15:0x5 %LONG &cp15_dfsr"
+		write #1 " PER.S C15:0x105 %LONG &cp15_ifsr"
+		write #1 " PER.S C15:0x15 %LONG &cp15_adfsr"
+		write #1 " PER.S C15:0x115 %LONG &cp15_aifsr"
+		write #1 " PER.S C15:0x6 %LONG &cp15_dfar"
+		write #1 " PER.S C15:0x206 %LONG &cp15_ifar"
+		write #1 " PER.S C15:0x47 %LONG &cp15_par"
+		if "&TARGET_SOC"!="t11x"
+		(
+			write #1 " PER.S C15:0x0A %LONG &cp15_tlblr"
+		)
+		write #1 " PER.S C15:0x2A %LONG &cp15_prrr"
+		write #1 " PER.S C15:0x12A %LONG &cp15_nmrr"
+		write #1 " PER.S C15:0x10D %LONG &cp15_contextidr"
+		write #1 " PER.S C15:0x20D %LONG &cp15_tpidrurw"
+		write #1 " PER.S C15:0x30D %LONG &cp15_tpidruro"
+		write #1 " PER.S C15:0x40D %LONG &cp15_tpidrprw"
+		write #1 " PER.S C15:0x42F %LONG &cp15_cbar"
+		if "&TARGET_SOC"!="t11x"
+		(
+			; access to TLB lockdown reg is not permitted on secureos
+			;write #1 " PER.S C15:0x525F %LONG &cp15_mtlbvar"
+			;write #1 " PER.S C15:0x526F %LONG &cp15_mtlbpar"
+			;write #1 " PER.S C15:0x527F %LONG &cp15_mtlbar"
+		)
+
+		write #1 ""
+		write #1 "ENDDO"
+		write #1 ""
+
+		close #1
+	)
+	else
+	(
+		print "CPU&cnt is offline"
+	)
+	&cnt=&cnt+1
+)
+
+
+;*******************************************************************
+; Disable MMU so physical memory can be read
+;*******************************************************************
+print "============================================================"
+&reg=data.long(C15:0x1)
+print "CP15 SCTLR is &reg"
+&reg=&reg&0xfffffffe
+;&reg=0x0052078
+per.set C15:0x1 %long &reg
+print "MMU disabled (CP15 SCTLR set to &reg)"
+
+
+;*******************************************************************
+; Save RAM data (3 hours for 512MB)
+;*******************************************************************
+;data.save.binary xxx_EBI.bin 0x0++RAM_SIZE
+print "============================================================"
+print "Saving RAM contents to &SAVE_DUMPFILE ..."
+&time_each=clock.unix()
+data.save.binary &SAVE_DUMPFILE AD:&RAM_DUMP_START_ADDR++&RAM_DUMP_SIZE /long
+&t=clock.unix()
+&time_each=&t-&time_each
+&time_each=(&time_each+59)/60
+print "RAMDUMP saved (&time_each min)"
+
+&t=clock.unix()
+&time_total=&t-&time_total
+&time_total=(&time_total+59)/60
+print "Debug save complete (total &time_total min)"
+
+
+;*******************************************************************
+; Enable MMU
+;*******************************************************************
+per.s C15:0x1 %long &reg|0x1
+

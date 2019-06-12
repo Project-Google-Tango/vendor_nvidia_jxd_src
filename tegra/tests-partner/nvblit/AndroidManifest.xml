@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.nvidia.tests.graphics.nvblit">
+    <uses-feature android:glEsVersion="0x00020000" />
+    <uses-sdk android:targetSdkVersion="11"/>
+    <uses-permission android:name="android.permission.REORDER_TASKS"/>
+    <application
+            android:label="NvBlit Test Suite"
+            android:hardwareAccelerated="true">
+        <uses-library android:name="com.nvidia.graphics" android:required="false" />
+	<!-- The Main application -->
+	<activity android:name=".NvBlitTestSuite"
+                android:theme="@android:style/Theme.Holo.Dialog"
+                android:configChanges="orientation|keyboardHidden">
+          <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+          </intent-filter>
+	</activity>
+
+	<!-- Individual tests -->
+        <activity android:name=".NvBlitBasicActivity"
+		  android:label="BasicClear"
+                  android:theme="@android:style/Theme.Holo.Dialog"
+                  android:configChanges="orientation|keyboardHidden">
+          <intent-filter>
+            <action android:name="android.intent.action.RUN" />
+	  </intent-filter>
+        </activity>
+        <activity android:name=".NvBlitMultiClearActivity"
+		  android:label="MultiClear"
+                  android:theme="@android:style/Theme.Holo.Dialog"
+                  android:configChanges="orientation|keyboardHidden">
+          <intent-filter>
+            <action android:name="android.intent.action.RUN" />
+	  </intent-filter>
+        </activity>
+<!--                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen" -->
+        <activity android:name=".NvBlitTransformActivity"
+		  android:label="Transform"
+                  android:theme="@android:style/Theme.Holo.Dialog"
+                  android:configChanges="orientation|keyboardHidden">
+          <intent-filter>
+            <action android:name="android.intent.action.RUN" />
+	  </intent-filter>
+        </activity>
+    </application>
+</manifest>

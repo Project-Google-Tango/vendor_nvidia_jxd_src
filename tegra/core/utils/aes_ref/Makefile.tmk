@@ -1,0 +1,60 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2012 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvaes_ref library component makefile
+#
+###############################################################################
+
+#------------------------------------------------------------------------------
+# Common definitions
+#------------------------------------------------------------------------------
+_common_sources                := \
+	aes_ref.c
+
+#------------------------------------------------------------------------------
+# Static library libnvaes_ref
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvaes_ref
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_sources)
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+#------------------------------------------------------------------------------
+# Shared library libnvaes_ref
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := nvaes_ref
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_sources)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../nvos
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+#------------------------------------------------------------------------------
+# Cleanup
+#------------------------------------------------------------------------------
+_common_sources                :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

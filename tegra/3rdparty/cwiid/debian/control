@@ -1,0 +1,116 @@
+Source: cwiid
+Section: utils
+Priority: extra
+Maintainer: Romain Beauxis <toots@rastageeks.org>
+XS-Python-Version: all
+Build-Depends: cdbs (>= 0.4.53), debhelper (>= 7.0.1), libtool, automake1.10, autoconf, quilt, patchutils (>= 0.2.25),
+               python-all-dev, python, python-support, 
+               libbluetooth-dev, libgtk2.0-dev, flex, bison
+Standards-Version: 3.8.3
+Homepage: http://abstrakraft.org/cwiid/
+
+Package: python-cwiid
+Architecture: any
+Depends: ${python:Depends}, ${shlibs:Depends}, libcwiid1 (>= ${binary:Version}), ${misc:Depends}
+XB-Python-Version: ${python:Versions}
+Provides: ${python:Provides}
+Section: python
+Description: library to interface with the wiimote
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This package provides the Python cwiid module.
+
+Package: libcwiid1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Section: libs
+Description: library to interface with the wiimote -- runtime files
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This package provides the wiimote library that abstracts the interface
+ to the wiimote by hiding the details of the underlying Bluetooth
+ connection.
+
+Package: cwiid-dbg
+Architecture: any
+Depends: lswm (= ${binary:Version}), libcwiid1 (= ${binary:Version}), 
+         wmgui (= ${binary:Version}), wminput (= ${binary:Version}),
+         ${shlibs:Depends}, ${misc:Depends}
+Section: debug
+Description: library to interface with the wiimote -- debug files
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This package provides the debug symbols needed to debug programs 
+ using cwiid.
+
+Package: libcwiid1-dev
+Architecture: all
+Depends: libcwiid-dev
+Section: libdevel
+Description: library to interface with the wiimote -- dummy package
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This package is a dummy transitional package to install libcwiid-dev
+ you may safetly remove it.
+
+Package: libcwiid-dev
+Architecture: any
+Depends: libcwiid1 (= ${binary:Version}), libbluetooth-dev, pkg-config, ${misc:Depends}
+Conflicts: libcwiid0-dev
+Replaces: libcwiid0-dev, libcwiid1-dev
+Section: libdevel
+Description: library to interface with the wiimote -- development
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This package provides the developpement files needed for building against
+ Cwiid.
+
+Package: lswm
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: wiimote discover utility
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This packages provides an utility to discover new wiimotes.
+
+Package: wmgui
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: GUI interface to the wiimote
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote 
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This packages provides the GUI to test and display the wiimote data.
+
+Package: wminput
+Architecture: any
+Depends: python-cwiid, ${shlibs:Depends}, ${misc:Depends}
+Description: Userspace driver for the wiimote
+ CWiid is a working userspace driver along with various
+ applications implementing event drivers, multiple wiimote 
+ connectivity, gesture recognition, and other Wiimote-based
+ functionality.
+ .
+ This packages provides an event driver for the wiimote, supporting all
+ buttons (except Power) and pointer tracking, and featuring a tracking 
+ algorithm plugin architecture.

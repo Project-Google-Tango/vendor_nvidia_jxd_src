@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">NVIDIA bezvadu displeju lietotāju saskarnes pakalpojumi</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Nav pieejams, jo Miracast ir aktīvs.</string>
+    <string name="miracast_hdcp_title">HDCP autentifikācija ar %1$s neizdevās </string>
+    <string name="miracast_hdcp_failure_text">Maksas saturu nevar parādīt.</string>
+    <string name="miracast_connection_status_discovery">Meklē\u0020</string>
+    <string name="miracast_connection_status_progress">Notiek savienojuma izveide ar \u0020</string>
+    <string name="miracast_connection_status_connected">Straumē uz\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Nevar atrast\u0020</string>
+    <string name="miracast_connection_status_warning_conn_lost">Savienojums ar \u0020 ir pārtraukts.</string>
+    <string name="miracast_connection_status_warning_auth_failed">Autentificēšanas problēmas ar\u0020</string>
+    <string name="miracast_access_settings_title">Piekļuve Miracast iestatījumiem</string>
+</resources>

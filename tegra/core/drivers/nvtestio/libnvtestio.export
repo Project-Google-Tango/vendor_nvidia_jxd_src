@@ -1,0 +1,50 @@
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA Corporation and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA Corporation is strictly prohibited.
+#
+NvTioInitialize
+NvTioDeinitialize
+NvTioFopen
+NvTioClose
+NvTioFwrite
+NvTioFread
+NvTioFreadTimeout
+NvTioFseek
+NvTioFtell
+NvTioFstat
+NvTioFflush
+NvTioIoctl
+NvTioOpendir
+NvTioReaddir
+NvTioFprintf
+NvTioVfprintf
+NvTioDebugf
+NvTioGetConfigU32
+NvTioGetConfigString
+NvTioConnectToHost
+NvTioDisconnectFromHost
+NvTioBreakpoint
+NvTioExit
+NvTioPoll
+NvTioTargetFopen
+NvTioListen
+NvTioAccept
+NvTioAcceptTimeout
+NvTioConnectToTarget
+NvTioDisconnectFromTarget
+NvTioEnableNvosTransport
+NvTioDebugDumpEnable
+NvTioDebugDumpFile
+NvTioSetUartBaud
+NvTioSetUartPort
+NvTioMakeReliable
+NvTioMakeUnreliable
+NvTioGetSdramParams
+NvTioStreamType
+g_NvTioFileCache
+NvTioSetParamU32

@@ -1,0 +1,17 @@
+; Lauterbach TRACE32 debugger script for Uniprocessor CPU Attach
+
+if "&(TARGET_SOC)"=="ap15"
+(
+    PRINT "Operation not supported for TARGET_SOC==&(TARGET_SOC)"
+    STOP
+)
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_up_jtag_setup.cmm
+
+system.mode.attach
+
+PRINT "CPU attached via uni-processor JTAG scan chain"
+
+ENDDO
+

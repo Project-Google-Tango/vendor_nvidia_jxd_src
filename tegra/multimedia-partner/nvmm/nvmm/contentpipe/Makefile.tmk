@@ -1,0 +1,50 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvmm_contentpipe: shared library
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := nvmm_contentpipe
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_SOURCES               := \
+	nvlocalfilecontentpipe.c \
+	nvmm_contentpipe.c \
+	nvmm_customprotocol.c \
+	nvmm_protocol_file.c \
+	nvmm_protocol_http.c \
+	nvmm_protocol_rtsp.c \
+	rtp_audio.c \
+	rtp.c \
+	rtp_latm.c \
+	rtp_video.c \
+	rtp_video_h264.c \
+	rtsp.c
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../utils \
+	$(NV_SOURCE)/core/drivers/nvrm \
+	$(NV_SOURCE)/core/utils/nvos
+
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_HAS_BROKEN_CODE       := ignore-all
+endif
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

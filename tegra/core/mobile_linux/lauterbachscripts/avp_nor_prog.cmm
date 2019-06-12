@@ -1,0 +1,46 @@
+; Lauterbach TRACE32 debugger script to program NOR flash from  AVP.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+winclear
+
+; Setup JTAG for AVP-only.
+system.reset
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_jtag_setup.cmm
+
+; This should be set to "auto" if the symbol information
+; is built with the correct labeling of "arm" vs. "thumb"
+; mode code areas.
+;system.option.dismode.auto
+system.option.dismode.access
+
+System.down
+;Break.Delete
+sYmbol.RESet
+
+system.up
+
+; For some reason the first system.up does not always work.
+; Do another one to be sure.
+wait 100.ms
+system.up
+
+;setup.stepbystep on
+
+print "Loading Serial NOR Flash programmer"
+data.load.elf &(TEGRA_TOP)/core-private/tools/norflash/&(TARGET_SOC)/_out/&(BUILD_FLAVOR)_nv&(TARGET_SOC)_rvds_armv4/norflash.axf
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+; Open the DCC console window
+do cpu_dcc_swi_setup.cmm
+
+; mode.hll
+
+enddo
+

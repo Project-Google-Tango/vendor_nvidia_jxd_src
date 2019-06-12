@@ -1,0 +1,75 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_blockdev library component makefile
+#
+###############################################################################
+
+#------------------------------------------------------------------------------
+# Common definitions
+#------------------------------------------------------------------------------
+_common_sources                := nvddk_blockdevmgr.c
+_common_includes               := $(NV_SOURCE)/hwinc
+_common_interfaces             := ../../nvrm
+_common_cflags                 :=
+ifneq ($(filter t30 t114, $(NV_TARGET_SOC)),)
+_common_cflags                 += \
+	-DBSEAV_USED
+endif
+ifneq ($(filter t114, $(NV_TARGET_SOC)),)
+_common_cflags            += \
+	-DXUSB_EXISTS=1
+else
+_common_cflags            += \
+	-DXUSB_EXISTS=0
+endif
+ifneq ($(filter t124, $(NV_TARGET_SOC)),)
+_common_cflags            += \
+	-DSATA_EXISTS=1 \
+	-DUSBH_EXISTS=1
+else
+_common_cflags            += \
+	-DSATA_EXISTS=0 \
+	-DUSBH_EXISTS=0
+endif
+
+
+
+#------------------------------------------------------------------------------
+# Static library
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := libnvddk_blockdev
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_SOURCES               := $(_common_sources)
+NV_COMPONENT_INCLUDES              := $(_common_includes)
+NV_COMPONENT_CFLAGS                += $(_common_cflags)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := $(_common_interfaces)
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+#------------------------------------------------------------------------------
+# Cleanup
+#------------------------------------------------------------------------------
+_common_sources    :=
+_common_includes   :=
+_common_interfaces :=
+_common_cflags     :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

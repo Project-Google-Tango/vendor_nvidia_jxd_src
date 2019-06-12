@@ -1,0 +1,32 @@
+; Lauterbach TRACE32 debugger script to reconfigure for bootloader to kernel hand-off.
+
+break.delete &OS_HANDOFF
+break.delete p:8
+
+; Setup for kernel virtual addressing mode.
+do virtual_setup.cmm
+
+sYmbol.RESet
+
+; Load the kernel symbols symbols.
+data.load.elf &KERNEL_ELF /NOCODE
+print "Loaded &KERNEL_ELF symbols"
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+; Always break on kernel panic
+break.set panic /onchip
+
+IF "&ENABLE_DCC_WINDOW"=="TRUE"
+(
+  do cpu_dcc_setup.cmm
+)
+
+; Comment out the following "GO" command if you want to halt before the WinCE kernel is started.
+;;;go
+
+enddo
+

@@ -1,0 +1,85 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvos_aos_avp: bootloader static library, Nvidia OS functions
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvos_aos_avp
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_CFLAGS :=
+ifeq ($(NV_TARGET_REFERENCE_BOARD),dalmore)
+NV_COMPONENT_CFLAGS += -DHACKS_DALMORE_ENABLE=1
+else
+NV_COMPONENT_CFLAGS += -DHACKS_DALMORE_ENABLE=0
+endif
+ifeq ($(NV_TARGET_REFERENCE_BOARD),pluto)
+NV_COMPONENT_CFLAGS += -DHACKS_PLUTO_ENABLE=1
+else
+NV_COMPONENT_CFLAGS += -DHACKS_PLUTO_ENABLE=0
+endif
+
+NV_COMPONENT_SOURCES           := \
+	bootloader.c \
+	bootloader_$(NV_TARGET_SOC_FAMILY).c \
+	aos_avp_board_info.c \
+	aos_avp_pmu.c
+
+NV_COMPONENT_INCLUDES          := \
+	.. \
+	../../../../drivers/nvavpgpio \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	$(NV_SOURCE)/core/drivers/nvboot/$(NV_TARGET_SOC)/include
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS := \
+	$(NV_SOURCE)/core/drivers/nvavp/sdmmc
+
+#
+# NOTE: The code from these modules is also executed on the AVP!
+#       Therefore they need to be compiled with code generation flags
+#       compatible with AVP, i.e. ARMv4T ARM code.
+#
+NV_COMPONENT_CODE_GENERATION   := avp
+
+NV_COMPONENT_HAS_BROKEN_CODE   := \
+	undef \
+	strict-aliasing
+
+NV_COMPONENT_CFLAGS += \
+	-DNV_AOS_ENTRY_POINT=0x80108000 \
+	-DAVP_CACHE_2X=1
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),roth)
+NV_COMPONENT_CFLAGS += -DUSE_ROTH_BOARD_ID=1
+endif
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS += \
+	-DNV_EMBEDDED_BUILD
+endif
+
+ifeq ($(NV_TARGET_REFERENCE_BOARD),cardhu)
+NV_COMPONENT_CFLAGS += -DSET_I2C_EXPANDER
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

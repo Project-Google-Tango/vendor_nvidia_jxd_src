@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+     <!-- Controller settings screen heading -->
+    <add-resource type="string" name="controller_settings" />
+    <string name="controller_settings">नियंत्रक</string>
+    <!-- Controller settings title -->
+    <add-resource type="string" name="controller_settings_title" />
+    <string name="controller_settings_title">नियंत्रक</string>
+
+    <!-- Controller Use RS as Mouse setting text -->
+    <add-resource type="string" name="controller_rsmouse_text" />
+    <string name="controller_rsmouse_text">वर्चुअल माउस के रूप में दाएं स्टिक का उपयोग करें</string>
+    <!-- Controller Use RS as Mouse Summary text -->
+    <add-resource type="string" name="controller_rsmouse_summary" />
+    <string name="controller_rsmouse_summary">दाएं ट्रिगर, A बटन को क्लिक करें या दाएं स्टिक पर नीचे धक्का दें</string>
+
+
+    <!-- Category title for Virtual mouse [CHAR LIMIT=40] -->
+    <add-resource type="string" name="nv_category_vmouse" />
+    <string name="nv_category_vmouse">वर्चुअल माउस</string>
+
+</resources>

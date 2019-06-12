@@ -1,0 +1,68 @@
+== NVOS->POSIX rewriting note ==
+
+[Infrastructure to support POSIX functions]
+  core/utils/nvos/README-functions	List of NVOS and POSIX functions
+  core/utils/nvos/README-rewrite	NVOS->POSIX rewriting note
+  core/utils/nvos/Makefile		Use POSIX emulation headers
+  core/utils/nvos/aos/avp/Makefile	Use POSIX emulation headers
+  core/utils/nvos/aos/nvos_aos.c	POSIX emulation layer
+  core/include/nvposix/*.h		POSIX emulation headers
+    core/include/nvposix/malloc.h
+    core/include/nvposix/pthread.h
+    core/include/nvposix/sched.h
+    core/include/nvposix/semaphore.h
+    core/include/nvposix/sys/stat.h
+
+  tests/nvos/nvos_unit.c		NVOS test
+  tests/nvos/nvposix_unit.c		NVPOSIX test
+
+[Rewriting instructions]
+1. Include necessary headers from the list below.
+    #include <string.h>
+    #include <malloc.h>
+    #include <pthread.h>
+    #include <sched.h>
+    #include <semaphore.h>
+    #include <stdio.h>
+    #include <sys/stat.h>
+
+2. Find functions and types to replace.
+    Use README-functions as a quick reference.
+    Use nvos_unit.c and nvposix_unit.c as examples.
+
+3. Do the replace.
+    I replace NvOsXxxHandle first, so compiler will catch necessary changes.
+    I use Emacs query-replace to see what I am doing.
+    On the way, I identify error paths that has to be changed.
+
+4. Fix the error paths.
+
+5. Modify Makefile and Android.mk; add following lines where necessary.
+
+  ifeq ($(TARGET_CPU),x86)
+    SYSTEM_LDLIBS_DLL += -lpthread
+  endif
+
+  ifeq ($(TARGET_OS),rvds)
+    LCDEFS=-DUSE_AOS=1
+    LCINCS += -I$(TEGRA_TOP)/core/include/nvposix/
+  endif
+
+6. Test with AOS and Android build
+
+7. Do MVS or GVS
+
+[Troubleshooting]
+<<Type conflicts between libc and nvposix>>
+In many cases this is due to the wrong include path.
+core/include/nvposix/ should be used only for AOS build
+with RVDS. So Makefile should go like as follows.
+
+  ifeq ($(TARGET_OS),rvds)
+    LCDEFS=-DUSE_AOS=1
+    LCINCS += -I$(TEGRA_TOP)/core/include/nvposix/
+  endif
+
+<<sem_timedwait() returns right away>>
+Note that sem_timedwait() requires absolute timeout value,
+while NvOsSemaphoreWaitTimeout() requires relative value.

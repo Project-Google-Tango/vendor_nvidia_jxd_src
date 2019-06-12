@@ -1,0 +1,14 @@
+Fix cwiid.pc by forcing config directory to /etc/cwiid
+Index: cwiid-0.6.00+svn201/libcwiid/cwiid.pc.in
+===================================================================
+--- cwiid-0.6.00+svn201.orig/libcwiid/cwiid.pc.in	2009-09-29 14:59:06.000000000 -0500
++++ cwiid-0.6.00+svn201/libcwiid/cwiid.pc.in	2009-09-29 14:59:31.000000000 -0500
+@@ -3,7 +3,7 @@
+ libdir=@libdir@
+ includedir=@includedir@
+ sysconfdir=@sysconfdir@
+-cwiid_config_dir=@CWIID_CONFIG_DIR@
++cwiid_config_dir=${sysconfdir}/cwiid
+ cwiid_plugins_dir=@CWIID_PLUGINS_DIR@
+ 
+ Name: CWiid

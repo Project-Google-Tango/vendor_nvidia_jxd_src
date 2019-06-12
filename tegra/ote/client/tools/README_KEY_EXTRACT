@@ -1,0 +1,53 @@
+#
+# Copyright (c) 2013-2014 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+This is the README for version 2 of "eks_extract_keys.py".
+"eks_extract_keys.py" is for extracting a key at a particular index in the
+encrypted key storage (EKS) partition file. The EKS partition file to be
+encrypted is specified as an argument.
+This version will support files created with the old version of
+"eks_encrypt_keys.py".
+NOTE: The new version of "eks_extract_keys.py" will not support extraction of
+keys from files created with the older version of "eks_encrypt_keys.py".
+
+How to extract key from a device
+
+1. boot the device with recovery mode
+
+2. read key partition from the device using "nvflash --read N <filename>
+--bl bootloader.bin --go". N should be id of EKS partion which is defined
+in flash.cfg
+Ex)
+$ cd $OUT
+$ $TOP/out/host/linux-x86/bin/nvflash --read 5 "my_eks.dat" --bl bootloader.bin
+--go
+
+3. run eks_extract_key.py with the file above, SBK, index of the key slot, and
+algorithm which is used to encrypt the key.
+for "--algo", it should match with the argument for algorithm supported by
+openssl. Please check OPENSSL
+
+Example:
+
+We want to extract wv key box in eks, and SBK value is:
+secure_boot_key_0 0x0c0d0e0f
+secure_boot_key_1 0x08090a0b
+secure_boot_key_2 0x04050607
+secure_boot_key_3 0x00010203
+
+The command is:
+$ python eks_extract_key.py --sbk=0f0e0d0c0b0a09080706050403020100
+--eks=eks.dat --index=5 --algo=aes-128-cbc
+
+4. the python tool will generate "Key_<index>.dat" file if the key is
+available in the slot
+
+5. the python tool will also generate "algorithm_file.dat" and
+"permissions_file.dat" files if version 2 is detected. For version 1,
+this informationw will not be attempted to be extracted

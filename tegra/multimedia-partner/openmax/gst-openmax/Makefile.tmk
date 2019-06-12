@@ -1,0 +1,150 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# makefile for libgstomx.so build system
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+_source_dir                          := $(NV_SOURCE)/external/gstreamer/gst-openmax
+_private_source_dir                  := $(_source_dir)/.nvtegra/pre-gen-source
+
+NV_COMPONENT_NAME                    := gstomx
+
+NV_COMPONENT_SOURCES                 := \
+	$(_source_dir)/omx/gstomx_amrnbdec.c \
+	$(_source_dir)/omx/gstgl_videosink.c \
+	$(_source_dir)/omx/gstomx_ilbcenc.c \
+	$(_source_dir)/omx/gstomx_videomixer.c \
+	$(_source_dir)/omx/gstomx_camera.c \
+	$(_source_dir)/omx/gstomx_base_filter.c \
+	$(_source_dir)/omx/gstomx_g711dec.c \
+	$(_source_dir)/omx/gstomx_wmadec.c \
+	$(_source_dir)/omx/gstomx_g711enc.c \
+	$(_source_dir)/omx/gstomx_g729enc.c \
+	$(_source_dir)/omx/gstomx_wmvdec.c \
+	$(_source_dir)/omx/gstomx_h263dec.c \
+	$(_source_dir)/omx/gstomx_base_audiodec.c \
+	$(_source_dir)/omx/gstomx_jpegenc.c \
+	$(_source_dir)/omx/gstomx_volume.c \
+	$(_source_dir)/omx/gstomx_dummy.c \
+	$(_source_dir)/omx/gstomx_util.c \
+	$(_source_dir)/omx/gstomx_x11eglutils.c \
+	$(_source_dir)/omx/gstomx_base_videodec.c \
+	$(_source_dir)/omx/gstomx_amrwbdec.c \
+	$(_source_dir)/omx/gstomx_h263enc.c \
+	$(_source_dir)/omx/gstomx_base_sink.c \
+	$(_source_dir)/omx/gstomx.c \
+	$(_source_dir)/omx/gstomx_mp3dec.c \
+	$(_source_dir)/omx/gstomx_interface.c \
+	$(_source_dir)/omx/gstomx_vorbisdec.c \
+	$(_source_dir)/omx/gstbin_videosink.c \
+	$(_source_dir)/omx/gstomx_overlaysink.c \
+	$(_source_dir)/omx/gstomx_h264enc.c \
+	$(_source_dir)/omx/gstomx_vp8enc.c \
+	$(_source_dir)/omx/gstomx_amrwbenc.c \
+	$(_source_dir)/omx/gstomx-camera2.c \
+	$(_source_dir)/omx/gstomx-camera2-priv.c \
+	$(_source_dir)/omx/gstomx_adpcmdec.c \
+	$(_source_dir)/omx/gstomx_nvutils.c \
+	$(_source_dir)/omx/gstomx_g729dec.c \
+	$(_source_dir)/omx/gstomx_h264dec.c \
+	$(_source_dir)/omx/gstomx_vp8dec.c \
+	$(_source_dir)/omx/gstomx_mp2dec.c \
+	$(_source_dir)/omx/gstomx_filereadersrc.c \
+	$(_source_dir)/omx/gstomx_base_src.c \
+	$(_source_dir)/omx/gstomx_amrnbenc.c \
+	$(_source_dir)/omx/gstomx_ilbcdec.c \
+	$(_source_dir)/omx/gstomx_adpcmenc.c \
+	$(_source_dir)/omx/gstomx_aacenc.c \
+	$(_source_dir)/omx/gstomx_audiosink.c \
+	$(_source_dir)/omx/gstomx_aacdec.c \
+	$(_source_dir)/omx/gstomx_base_videoenc.c \
+	$(_source_dir)/omx/gstomx_jpegdec.c \
+	$(_source_dir)/omx/gstomx_mpeg4dec.c \
+	$(_source_dir)/omx/gstomx_vip.c \
+	$(_source_dir)/omx/gstomx_mpeg4enc.c \
+	$(_source_dir)/omx/gstomx_videosink.c \
+	$(_source_dir)/omx/gstomx_hdmi_videosink.c \
+	$(_source_dir)/omx/gstoverlay_helper.c \
+	$(_source_dir)/omx/gstomx_mpeg2dec.c \
+	$(_source_dir)/util/async_queue.c \
+	$(_source_dir)/util/sem.c \
+
+# FIXME: The following file is not used at all while compiling the component.
+#        Why the file is here?
+# 	$(_source_dir)/omx/gstomx-camera2-photography.c
+
+NV_COMPONENT_OWN_INTERFACE_DIR       := .
+
+NV_COMPONENT_INCLUDES                := \
+	$(_private_source_dir)/ \
+	$(_source_dir)/util/ \
+	$(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/glib-2.0 \
+	$(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/gstreamer-0.10 \
+	$(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/include/libxml2 \
+	$(NV_SOURCE)/external/gstreamer/gst-openmax/.nvtegra/pre-gen-header/usr/lib/glib-2.0/include \
+	$(NV_SOURCE)/multimedia-partner/openmax/include/openmax/il
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS   := \
+	$(NV_INTERFACE_GPU_GRAPHICS_EGL) \
+	$(NV_INTERFACE_GPU_GRAPHICS_OPENGLES2) \
+	$(NV_SOURCE)/l4t/3rdpartystub/X11 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstreamer-0.10 \
+	$(NV_SOURCE)/l4t/3rdpartystub/glib-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gobject-2.0 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstvideo-0.10 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstinterfaces-0.10 \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstbase-0.10
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS   += \
+	$(NV_SOURCE)/l4t/3rdpartystub/gstaudio-0.10
+endif
+
+NV_COMPONENT_SYSTEM_SHARED_LIBRARIES := \
+	dl
+
+# FIXME: We need only following CFLAGS not ignore-all
+#        -Wno-error=strict-prototypes -Wno-pointer-sign -Wno-uninitialized -Wno-main
+
+NV_COMPONENT_HAS_BROKEN_CODE         := ignore-all
+
+NV_COMPONENT_CFLAGS                  := \
+	$(NV_TOOLCHAIN_X11_CFLAGS) \
+	-DHAVE_CONFIG_H \
+	-DDGST_DISABLE_DEPRECATED \
+	-DGST_KPI_MEASURE \
+	-DWAR_BUG_1322345
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+NV_COMPONENT_CFLAGS                  += \
+	-DAUTOMOTIVE
+NV_COMPONENT_SOURCES                 += \
+	$(_private_source_dir)/omx/gstomx_conf_emb.c
+else
+NV_COMPONENT_SOURCES                 += \
+	$(_private_source_dir)/omx/gstomx_conf_l4t.c
+endif
+
+NV_COMPONENT_SYSTEMIMAGE_NAME        := lib$(NV_COMPONENT_NAME).so
+NV_COMPONENT_SYSTEMIMAGE_DIR         := $(NV_SYSTEMIMAGE_GSTREAMER_DIR)/gstreamer-0.10
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

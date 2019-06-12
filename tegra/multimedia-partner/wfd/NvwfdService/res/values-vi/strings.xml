@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">Dịch vụ UI Màn hình hiển thị Không dây NVIDIA</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Không khả dụng vì Miracast đang hoạt động.</string>
+    <string name="miracast_hdcp_title">Xác thực HDCP thất bại với %1$s </string>
+    <string name="miracast_hdcp_failure_text">Không thể hiển thị nội dung cao cấp.</string>
+    <string name="miracast_connection_status_discovery">Đang tìm kiếm\u0020</string>
+    <string name="miracast_connection_status_progress">Đang kết nối đến\u0020</string>
+    <string name="miracast_connection_status_connected">Hiện đang truyền trực tiếp đến\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Không thể tìm thấy\u0020</string>
+    <string name="miracast_connection_status_warning_conn_lost">Mất kết nối đến\u0020</string>
+    <string name="miracast_connection_status_warning_auth_failed">Sự cố xác thực với\u0020</string>
+    <string name="miracast_access_settings_title">Truy cập Cài đặt Miracast</string>
+</resources>

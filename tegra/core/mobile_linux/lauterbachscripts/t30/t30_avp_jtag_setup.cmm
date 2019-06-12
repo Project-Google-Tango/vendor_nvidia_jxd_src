@@ -1,0 +1,22 @@
+; Lauterbach TRACE32 debugger script to configure JTAG for the AVP (COP).
+
+system.cpu arm7tdmis
+system.jtagclock rtck
+
+system.config.irpre 4.
+system.config.irpost 0.
+system.config.drpre 1.
+system.config.drpost 0.
+
+system.config.dapirpre 0.
+system.config.dapirpost 0.
+system.config.dapdrpre 0.
+system.config.dapdrpost 0.
+
+system.config.slave  off
+system.option.enreset   off
+system.option.resbreak  off
+system.option.waitreset on
+
+enddo
+

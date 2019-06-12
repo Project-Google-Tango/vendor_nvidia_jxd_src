@@ -1,0 +1,27 @@
+;---------------------------------------------------------------
+; Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+;---------------------------------------------------------------
+; Lauterbach TRACE32 debugger start-up script to install Coredump menu buttons.
+
+menu.rp
+(
+  add
+  toolbar
+  (
+    separator
+      toolitem "Source List" "list" "Data.List"
+      toolitem "Memory Dump" "dump" "Data.dump"
+    separator
+      toolitem "List Symbols" "symbols" "sYmbol.Browse"
+    separator
+       toolitem "Run load RAMdump script (load_ramdump.cmm)"  "RD,y"  "do load_ramdump.cmm"
+    separator
+       toolitem "Core 0"  "C0,B"  "do ramdump_coresel.cmm 0"
+       toolitem "Core 1"  "C1,B"  "do ramdump_coresel.cmm 1"
+       toolitem "Core 2"  "C2,B"  "do ramdump_coresel.cmm 2"
+       toolitem "Core 3"  "C3,B"  "do ramdump_coresel.cmm 3"
+  )
+)
+
+enddo
+

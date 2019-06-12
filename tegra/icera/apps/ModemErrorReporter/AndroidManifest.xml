@@ -1,0 +1,118 @@
+<?xml version="1.1" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="icera.DebugAgent"
+          android:versionCode="1"
+          android:versionName="5.6"
+          android:sharedUserId="android.uid.system">
+    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="15"/>
+    <application android:name=".DebugAgent" android:icon="@drawable/icon"  android:debuggable="false" android:label="@string/AppName">
+        <activity android:name=".IceraDebugAgentActivity"
+                  android:label="@string/AppName">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".BugReportService">
+        </service>
+
+        <activity android:name=".SaveLogs"
+                  android:launchMode="singleTop"
+                  android:windowSoftInputMode="stateHidden" 
+                  android:label="@string/AppName">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".Cleanup"
+                  android:label="@string/AppName"
+                  android:launchMode="singleTop"
+                  android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".DisplayLogs"
+                  android:launchMode="singleTop"
+                  android:windowSoftInputMode="stateHidden"
+                  android:label="@string/AppName">
+        </activity>
+
+        <activity android:name=".Settings"
+                  android:label="@string/AppNameSettings"
+                  android:launchMode="singleTop"
+                  android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".DisplayInfo"
+                  android:label="@string/AppNameDisplayInfo"
+                  android:launchMode="singleTop"
+                  android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+
+	 <activity android:name=".ModemLogging"
+	          android:label="@string/ModemLogging"
+	          android:launchMode="singleTop"
+	          android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+                <activity android:name=".LogcatLogging"
+              android:label="@string/ModemLogging"
+              android:launchMode="singleTop"
+              android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".AutoSaving"
+              android:label="@string/AutoSaving"
+              android:launchMode="singleTop"
+              android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ListMenu"
+              android:launchMode="singleTop"
+              android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".BugReportReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.nvidia.feedback.NVIDIAFEEDBACK" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+    <supports-screens android:largeScreens="true"
+                      android:normalScreens="true"
+                      android:smallScreens="true"
+                      android:anyDensity="true"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.DUMP" />
+    <uses-permission android:name="android.permission.DIAGNOSTIC" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+</manifest>

@@ -1,0 +1,50 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2013 NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# nvflash_miniloader_t14x: static target executable
+#
+###############################################################################
+ifdef NV_COMPONENT_FLAG_STATIC_EXECUTABLE_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+# include common parts
+_MINILOADER_SOC := t148
+_MINILOADER_SOC_FAMILY := t14x
+include $(NV_COMPONENT_DIR)/../Makefile.common.tmk
+
+# SOC specific parts
+NV_COMPONENT_SOURCES  += \
+	../nvml_device_t1xx.c
+
+ifeq ($(NV_BUILD_SYSTEM_TYPE),embedded-qnx)
+       NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS :=
+endif
+
+NV_COMPONENT_NEEDED_STATIC_INTERFACE_DIRS += \
+	../../../nvbct/t14x \
+	../../../nv3p/t14x \
+	../../../../drivers/nvddk/fuses/read/t14x \
+	$(NVBOOT_DRIVER_ROOT)/se
+
+NV_COMPONENT_CFLAGS += \
+	-DNAND_SUPPORT=0 \
+	-DNO_BOOTROM=0 \
+	-DPKC_ENABLE=1
+
+include $(NV_BUILD_STATIC_EXECUTABLE)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

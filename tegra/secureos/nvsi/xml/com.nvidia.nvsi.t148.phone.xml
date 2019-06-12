@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <feature name="com.nvidia.nvsi.version.v2"/>
+    <feature name="com.nvidia.nvsi.product.phone"/>
+    <feature name="com.nvidia.nvsi.gpu.class_001"/>
+    <feature name="com.nvidia.nvsi.gpu.family_001"/>
+</permissions>

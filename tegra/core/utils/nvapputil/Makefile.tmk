@@ -1,0 +1,83 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake component makefile for libnvapputil.
+#
+###############################################################################
+
+_nvapputil_common_name    := nvapputil
+_nvapputil_common_sources := \
+	nvaurand.c \
+	nvaugetopt.c \
+	nvaureadline.c \
+	nvauerr.c \
+	nvauprintf.c \
+	nvau_hashtable.c \
+	nvau_token.c
+_nvapputil_common_cflags  := -DNV_DEF_USE_FLOAT=1
+
+###############################################################################
+# Build configuration specific.
+
+# AOS build, non-hostcc.
+ifneq ($(filter 1-rvds_%,$(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST)-$(NV_TARGET_ARCH)),)
+_nvapputil_common_sources += nvauproc_null.c
+
+ifeq ($(NV_TARGET_ARCH),rvds_armv4)
+_nvapputil_common_cflags := -DNV_DEF_USE_FLOAT=0
+endif
+
+# Windows host build
+else ifeq ($(NV_HOST_OS)-$(NV_TARGET_ARCH),windows-hostcc)
+_nvapputil_common_sources += nvauproc_win32.c
+
+else
+_nvapputil_common_sources += nvauproc_linux.c
+endif
+
+###############################################################################
+# Static library
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := lib$(_nvapputil_common_name)
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_nvapputil_common_sources)
+NV_COMPONENT_CFLAGS            := $(_nvapputil_common_cflags)
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+###############################################################################
+# Shared library
+
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := $(_nvapputil_common_name)
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+NV_COMPONENT_SOURCES               := $(_nvapputil_common_sources)
+NV_COMPONENT_CFLAGS                := $(_nvapputil_common_cflags)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../nvos
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Local variable clean-up.
+_nvapputil_common_name :=
+_nvapputil_common_sources :=
+_nvapputil_common_cflags :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:

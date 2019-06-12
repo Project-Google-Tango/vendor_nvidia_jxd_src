@@ -1,0 +1,69 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvbdktest_testsources target static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvbdktest_testsources
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	se/se_test.c \
+	dsi/nvddk_dsi_block_driver_test.c \
+	uart/nvddk_avp_uart_driver_test.c \
+	i2c/nvddk_i2c_driver_test_eeprom.c \
+	usb/nvddk_usb_block_driver_test.c \
+	usbdevice/nvddk_usbf_test.c \
+	sd/nvddk_sd_block_driver_test.c \
+	pmu/nvbdk_pmu_test.c \
+	pwm/pwm_test.c \
+	fuse/nvddk_fuse_test.c \
+	bif/nvddk_mipibif_test_stub.c \
+	pcb/nvbdk_init_pcb_test.c \
+	pcb/nvbdk_api_osc.c \
+	pcb/nvbdk_api_i2c.c \
+	pcb/nvbdk_api_emmc.c \
+	pcb/nvbdk_api_wifi.c \
+	pcb/nvbdk_api_kbd.c
+
+ifneq ($(filter $(NV_TARGET_BOARD),macallan tegratab),)
+NV_COMPONENT_SOURCES           += \
+	pcb/board/nvbdk_pcb_interface_$(NV_TARGET_BOARD).c
+else
+NV_COMPONENT_SOURCES           += \
+	pcb/board/nvbdk_pcb_interface_default.c
+endif
+
+NV_COMPONENT_INCLUDES          := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	../framework \
+	../framework/error_handler \
+	../framework/registerer \
+	pwm/$(NV_TARGET_SOC_FAMILY) \
+	pcb
+
+NV_COMPONENT_CFLAGS            += \
+	-DNVODM_BOARD_IS_FPGA=0
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:
+

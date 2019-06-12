@@ -1,0 +1,12 @@
+# Copyright (c) 2012, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA Corporation and its licensors retain all intellectual property and
+# proprietary rights in and to this software and related documentation.  Any
+# use, reproduction, disclosure or distribution of this software and related
+# documentation without an express license agreement from NVIDIA Corporation
+# is strictly prohibited.
+#
+
+To start the test, run the following command:
+
+adb shell am startservice -n com.nvidia.NvCapPermTest/.NvCapPermTest --es com.nvidia.NvCapPermTest.NvCapControl start

@@ -1,0 +1,23 @@
+// TN8 default
+// version field (V1.0)
+<version:0x00010000>
+// vendor ID, product ID field
+<vid:0x955; pid:0x1001>
+// revision field
+<revision:10>
+// entry will be started at 0x4000
+<offset:0x4000>
+//-----------------------------------------------
+// comment
+// tag info
+// 0x10 : 1byte data , 0x1A : 1byte data array
+// 0x20 : 2bytes data, 0x2A : 2bytes data array
+// 0x40 : 4bytes data, 0x4A : 4bytes data array
+// 0x80 : string     , 0x8A : string array
+//-----------------------------------------------
+// name is just for identification (we won't use name in parser)
+<name:cm_id;             idx:3;  tag:0x20; data:0x0000>
+<name:lbh_id;            idx:4;  tag:0x20; data:0x0000>
+<name:factory_mode;      idx:5;  tag:0x40; data:0>
+<name:ramdump;           idx:6;  tag:0x40; data:0>
+<name:gps_id;            idx:9;  tag:0x20; data:0x0000>

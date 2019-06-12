@@ -1,0 +1,344 @@
+; Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+; Lauterbach TRACE32 debugger script to load the kernel image via the JTAG backdoor loader.
+
+LOCAL &RAMDISK_SIZE
+LOCAL &CHIPID
+LOCAL &MAJOR
+LOCAL &MINOR
+LOCAL &NETLIST
+LOCAL &PATCH
+LOCAL &CHIPID_HEX
+LOCAL &MAJOR_HEX
+LOCAL &MINOR_HEX
+LOCAL &NETLIST_HEX
+LOCAL &PATCH_HEX
+LOCAL &BAUD_RATE
+GLOBAL &CMDLINE
+GLOBAL &MEMORY_SIZE
+
+if ("&TARGET_SOC"=="ap15")
+(
+  PRINT "The backdoor loader script is not supported for AP15"
+  STOP
+)
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_jtag_setup.cmm
+
+system.mode.attach
+
+if state.run()
+(
+   break
+)
+
+; Force CPU to supervisor state with interrupt disabled.
+R.S CPSR 0xD3
+
+; Disable MMU and caches.
+do cpu_disable_mmu.cmm
+
+; Setup for kernel virtual addressing mode.
+do virtual_setup.cmm
+
+; Halt the AVP
+D.S SD:0x60007004  %LE %LONG  0x40000000 ; FLOW_CTLR_HALT_COP_EVENTS_0
+
+; Get the memory size
+&MEMORY_SIZE=data.long(D:0x7000E4A0)    ; APBDEV_PMC_SCRATCH20_0
+&MEMORY_SIZE=&MEMORY_SIZE&0xF0000000
+
+; Generate the "tegraid" string for the command line
+&CHIPID=data.long(A:0x70000804)    ; APB_MISC_GP_HIDREV_0
+&MAJOR=&CHIPID
+&MINOR=&CHIPID
+&CHIPID=(&CHIPID>>8)&0xFF
+&MAJOR=(&MAJOR>>4)&0xF
+&MINOR=((&MINOR>>8)>>8)&0xF        ; For some reason >>16 does not work
+
+&NETLIST=data.long(A:0x70000860)   ; APB_MISC_GP_EMU_REVID_0
+&PATCH=&NETLIST
+&NETLIST=(&NETLIST&0xFFFF)
+&PATCH=((&PATCH>>8)>>8)&0xFF       ; For some reason >>16 does not work
+
+&CHIPID_HEX=FORMAT.HEX(2.,&CHIPID)
+&MAJOR_HEX=FORMAT.HEX(1.,&MAJOR)
+&MINOR_HEX=FORMAT.HEX(1.,&MINOR)
+&NETLIST_HEX=FORMAT.HEX(2.,&NETLIST)
+&PATCH_HEX=FORMAT.HEX(2.,&PATCH)
+
+&BAUD_RATE="115200"
+
+; Up to 2GB
+IF &MEMORY_SIZE<=0x80000000
+(
+  LOCAL &MEMBASE
+  LOCAL &VPRBASE
+  LOCAL &BBPBASE
+  LOCAL &BBIBASE
+  LOCAL &MEMMB
+  LOCAL &VPRMB
+  LOCAL &BBPMB
+  LOCAL &BBIMB
+  LOCAL &VMALLOCMB
+  &MEMBASE=0x80000000>>20.
+  &VPRMB=0
+  &VMALLOCMB=256.
+
+  IF &MEMORY_SIZE==0x80000000
+    &MEMMB=2032.
+  IF &MEMORY_SIZE==0x40000000
+    &MEMMB=1024.
+  IF &MEMORY_SIZE==0x20000000
+    &MEMMB=512.
+  IF &MEMORY_SIZE==0x10000000
+  (
+    &MEMMB=256.
+    &VMALLOCMB=160.
+  )
+
+  ; VPR
+  IF ("&TARGET_SOC"!="ap20")&&("&TARGET_SOC"!="t30")
+  (
+    &VPRMB=32.
+    &MEMMB=&MEMMB-&VPRMB
+    &VPRBASE=&MEMBASE+&MEMMB
+    D.S SD:0x70019648  %LE %LONG  (&VPRBASE<<20.) ; MC_VIDEO_PROTECT_BOM
+    D.S SD:0x7001964C  %LE %LONG  (&VPRMB)        ; MC_VIDEO_PROTECT_SIZE_MB
+    D.S SD:0x70019418  %LE %LONG  0x00000000      ; MC_VIDEO_PROTECT_VPR_OVERRIDE
+  )
+
+  ; BBC
+  IF ("&TARGET_SOC"=="t14x")
+  (
+    &BBIMB=32.
+    &MEMMB=&MEMMB-&BBIMB
+    &BBIBASE=&MEMBASE+&MEMMB
+    &BBPMB=64.
+    &MEMMB=&MEMMB-&BBPMB
+    &BBPBASE=&MEMBASE+&MEMMB
+    D.S SD:0x700190F0 %LE %LONG (&BBIBASE<<16.)|(&BBPBASE)|0x80020003 ; MC_BBC_MEM_REGIONS_0
+  )
+
+  &MEMMB=format.decimal(1,&MEMMB)
+  &MEMBASE=format.decimal(1,&MEMBASE)
+  &VMALLOCMB=format.decimal(1,&VMALLOCMB)
+  &CMDLINE="tegraid=&CHIPID_HEX.&MAJOR_HEX.&MINOR_HEX.&NETLIST_HEX.&PATCH_HEX"
+  &CMDLINE="&CMDLINE mem=&(MEMMB)M@&(MEMBASE)M"
+  IF &VPRMB>0
+  (
+    &VPRMB=format.decimal(1,&VPRMB)
+    &VPRBASE=format.decimal(1,&VPRBASE)
+    &CMDLINE="&CMDLINE vpr=&(VPRMB)M@&(VPRBASE)M"
+  )
+  &CMDLINE="&CMDLINE vmalloc=&(VMALLOCMB)M video=tegrafb"
+  &CMDLINE="&CMDLINE console=ttyS0,&(BAUD_RATE)n8"
+  &CMDLINE="&CMDLINE debug_uartport=lsport,3 usbcore.old_scheme_first=1"
+)
+
+; 4GB - Fill swiss-cheese apertures
+IF &MEMORY_SIZE==0xF0000000
+(
+  &SCHEESE="mem=1008M@16M"
+  &ACTL=data.long(D:0x7000E6BC)    ; APBDEV_PMC_GLB_AMAP_CFG_0
+  if ((&ACTL&0x00000010)==0x00000010)  ; IRAM_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=112M@1040M"
+  )
+  if ((&ACTL&0x00000020)==0x00000020)  ; NOR_A1
+  (
+     &SCHEESE="&SCHEESE mem=16M@1152M"
+  )
+  if ((&ACTL&0x00000040)==0x00000040)  ; NOR_A2
+  (
+     &SCHEESE="&SCHEESE mem=32M@1168M"
+  )
+  if ((&ACTL&0x00000080)==0x00000080)  ; NOR_A3
+  (
+     &SCHEESE="&SCHEESE mem=80M@1200M"
+  )
+  if ((&ACTL&0x00000100)==0x00000100)  ; VERIF_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=48M@1296M"
+  )
+  if ((&ACTL&0x00000200)==0x00000200)  ; GFX_HOST_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=32M@1360M"
+  )
+  if ((&ACTL&0x00000400)==0x00000400)  ; GART_GPU
+  (
+     &SCHEESE="&SCHEESE mem=32M@1408M"
+  )
+  if ((&ACTL&0x00000800)==0x00000800)  ; PPSB_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=112M@1552M"
+  )
+  if ((&ACTL&0x00001000)==0x00001000)  ; EXTIO_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=112M@1680M"
+  )
+  if ((&ACTL&0x00002000)==0x00002000)  ; APB_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=112M@1808M"
+  )
+  if ((&ACTL&0x00008000)==0x00008000)  ; AHB_A1_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=48M@1936M"
+  )
+  if ((&ACTL&0x00010000)==0x00010000)  ; AHB_A2_RSVD
+  (
+     &SCHEESE="&SCHEESE mem=32M@2016M"
+  )
+
+  &CMDLINE="tegraid=&CHIPID_HEX.&MAJOR_HEX.&MINOR_HEX.&NETLIST_HEX.&PATCH_HEX &SCHEESE mem=2047M@2048M vmalloc=256M video=tegrafb console=ttyS0,&(BAUD_RATE)n8 usbcore.old_scheme_first=1"
+  &KERNEL_LOAD_PHYS="0x01A00800"
+  &KERNEL_RUN_PHYS="0x01008000"
+  &RAMDISK_ADDR=0x06000000
+  &TAGS_ADDR=0x01000100
+)
+
+;; Override for debugging
+;;&CMDLINE="tegraid=&CHIPID_HEX.&MAJOR_HEX.&MINOR_HEX.&NETLIST_HEX.&PATCH_HEX mem=1008M@16MB vmalloc=256M video=tegrafb console=ttyS0,&(BAUD_RATE)n8 usbcore.old_scheme_first=1"
+
+PRINT "CMDLINE=&CMDLINE"
+wait 2.S
+
+if (&CHIPID==0x14)&&(&MAJOR==0)&&(&MINOR>0)
+(
+  do t14x/t14x_cpu_fuse_bypass.cmm
+)
+
+; If OS is LDK the ramdisk must be initialized
+IF "&TARGET_OS"=="gnu_linux"
+(
+  &CMDLINE="rdinit=/linuxrc &(CMDLINE)"
+)
+
+; Load the kernel image and symbols.
+sYmbol.RESet
+
+IF "&LOAD_DECOMPRESSED_IMAGE"=="TRUE"
+(
+  data.load &KERNEL_IMAGE &KERNEL_RUN_PHYS /name kernel
+  ;print "data.load &KERNEL_IMAGE &KERNEL_RUN_PHYS /name kernel"
+  ;wait 2.s
+)
+ELSE
+(
+  data.load &KERNEL_ZIMAGE &KERNEL_LOAD_PHYS /name kernel
+  ;print "data.load &KERNEL_ZIMAGE &KERNEL_LOAD_PHYS /name kernel"
+  ;wait 2.s
+)
+
+data.load.ELF &KERNEL_ELF /NOCODE /RELPATH /PATH &KERNEL_SRC
+;print "data.load.ELF &KERNEL_ELF /NOCODE /RELPATH /PATH &KERNEL_SRC"
+;wait 2.s
+
+if ("&RAMDISK"!="")
+(
+  data.load &RAMDISK &RAMDISK_ADDR /name ramdisk /noclear
+  print "data.load &RAMDISK &RAMDISK_ADDR /name ramdisk /noclear"
+  &RAMDISK_SIZE=os.file.size("&RAMDISK")
+)
+else
+(
+  &RAMDISK_SIZE=0
+)
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+local &tags
+&tags=&TAGS_ADDR
+
+d.s &tags+0x00 %long 5
+d.s &tags+0x04 %long 0x54410001
+d.s &tags+0x08 %long 1
+d.s &tags+0x0C %long 4096
+d.s &tags+0x10 %long 0xFF
+&tags=&tags+0x14
+
+if (&RAMDISK_SIZE!=0)
+(
+  d.s &tags+0x00 %long 4
+  d.s &tags+0x04 %long 0x54420005
+  d.s &tags+0x08 %long &RAMDISK_ADDR
+  d.s &tags+0x0C %long &RAMDISK_SIZE
+  &tags=&tags+0x10
+)
+else
+(
+  PRINT "RAMDISK_SIZE==0"
+  WAIT 3.S
+)
+
+if ("&CMDLINE"!="")
+(
+  d.s &tags+0x00 %long 0x42
+  d.s &tags+0x04 %long 0x54410009
+  &tags=&tags+0x08
+  d.s &tags++0x100 %byte 0
+  d.s &tags "&CMDLINE"
+  &tags=&tags+0x100
+)
+
+; End of tags marker
+d.s &tags+0x00 %long 0
+d.s &tags+0x04 %long 0
+
+IF "&LOAD_DECOMPRESSED_IMAGE"=="TRUE"
+(
+  register.set pc &KERNEL_RUN_PHYS
+)
+ELSE
+(
+  register.set pc &KERNEL_LOAD_PHYS
+)
+register.set r0 0
+register.set r1 &MACHINE_ID
+register.set r2 &TAGS_ADDR
+
+; Load device tree
+if (os.env(TEGRA_DTB)!="")
+(
+  register.set r2 &DTB_ADDR
+  &TEGRA_DTB=os.env(TEGRA_DTB)
+  if "&BUILD_FLAVOR"=="debug"
+    &TEGRA_DTB="&TOP/out/debug/target/product/&TARGET_BOARD/obj/KERNEL/arch/arm/boot/&TEGRA_DTB"
+  else
+    &TEGRA_DTB="&TOP/out/target/product/&TARGET_BOARD/obj/KERNEL/arch/arm/boot/&TEGRA_DTB"
+
+  data.load "&TEGRA_DTB" &DTB_ADDR /name dt /noclear
+  print "data.load &TEGRA_DTB &DTB_ADDR /name dt /noclear"
+  register.set r1 -1
+)
+
+; Initialize new-style DCC console.
+IF "&ENABLE_DCC_WINDOW"=="TRUE"
+(
+  do cpu_dcc_setup.cmm
+)
+
+IF &MEMORY_SIZE==0x80000000
+(
+  PRINT "Memory size is 2GB"
+)
+ELSE IF &MEMORY_SIZE==0x40000000
+(
+  PRINT "Memory size is 1GB"
+)
+ELSE IF &MEMORY_SIZE==0x20000000
+(
+  PRINT "Memory size is 512MB"
+)
+ELSE
+(
+  PRINT "Memory size is 256MB"
+)
+enddo
+

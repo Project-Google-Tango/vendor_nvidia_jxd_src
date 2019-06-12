@@ -1,0 +1,32 @@
+#
+# U-boot environment for local storage boot.
+#
+usbname=sda
+pn=1
+board=pluto
+mmcname=mmcblk
+loadaddr=0x80408000
+baudrate=115200
+bootdelay=3
+bootfile=vmlinux.uimg
+console=ttyS0,115200n8
+stderr=serial,lcd
+stdin=serial,tegra-kbc
+stdout=serial,lcd
+user=user
+videospec=tegrafb
+serial#=1
+lp0_vec=0x00002000@0x9C406000
+platform_extras=vmalloc=128M mem=1024M@2048M
+extra_bootargs=usbcore.old_scheme_first=1 core_edp_mv=1300 panel=lvds tegraid=30.1.2.0.0 debug_uartport=lsport smp
+#
+# Local Storage Boot Scripts:
+#
+regen_all=setenv common_bootargs console=${console} console=tty1 lp0_vec=${lp0_vec} video=${videospec} ${platform_extras} ${dev_extras} noinitrd; setenv bootargs ${common_bootargs} ${extra_bootargs} ${bootdev_bootargs}
+mmc_setup=setenv bootdev_bootargs root=/dev/${mmcname}${mmcdev}p${pn} rw rootwait gpt; run regen_all
+mmc_boot=run mmc_setup; mmc rescan ${mmcdev}; ext2load mmc ${mmcdev}:${pn} ${loadaddr} /boot/${bootfile}; bootm ${loadaddr}
+mmc0_boot=setenv mmcdev 0; run mmc_boot
+mmc1_boot=setenv mmcdev 1; run mmc_boot
+usb_setup=setenv bootdev_bootargs root=/dev/${usbname}${pn} rw rootwait; run regen_all
+usb_boot=usb start; run usb_setup; ext2load usb 0:${pn} ${loadaddr} /boot/${bootfile}; bootm ${loadaddr}
+bootcmd=run usb_boot; run mmc1_boot; run mmc0_boot

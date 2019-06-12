@@ -1,0 +1,35 @@
+; Lauterbach TRACE32 debugger script to configure JTAG for the CPU.
+
+
+;system.reset
+system.jtagclock rtck
+
+system.cpu CORTEXA9
+;system.cpu CORTEXA9MPCoreSMP2
+;core.select 0
+
+system.option enreset off
+
+system.config corebase apb:0x80010000
+
+system.config irpre 0.
+system.config irpost 0.
+system.config drpre 0.
+system.config drpost 0.
+
+system.config DAPIRPOST 4
+system.config DAPDRPOST 1
+system.config DAPIRPRE 0
+system.config DAPDRPRE 0
+
+trace.disable
+
+system.mode.attach
+
+IF "&USE_ONCHIP_BRKPT"=="TRUE"
+(
+  break.select program onchip
+)
+
+enddo
+

@@ -1,0 +1,24 @@
+--BitMapInfo 4095
+--VersionID 33685504
+--AltitudeRef 0
+--AltitudeNr 12
+--AltitudeDr 12
+--Status A
+--MeasureMode 2
+--DOPNr 30
+--DOPDr 30
+--ImgDirectionRef T
+--ImgDirectionNr 20
+--ImgDirectionDr 20
+--MapDatum Pune-Nvidia
+--ProcessingMethod NvidiaGPS
+--DateStamp 2010:03:22
+--Satellites 2 7 14 15 16
+--LatitudeRef N
+--LatitudeNr 1 2 3
+--LatitudeDr 1 1 1
+--LongitudeRef W
+--LongitudeNr 1 2 3
+--LongitudeDr 1 1 1
+--TimeStampNr 1 2 3
+--TimeStampDr 1 1 1

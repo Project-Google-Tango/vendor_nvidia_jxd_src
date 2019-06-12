@@ -1,0 +1,51 @@
+; Lauterbach TRACE32 debugger script to set the memory size
+; *************** Will work only with FPGA SYSTEMS ***************
+
+LOCAL &STRAPS
+GLOBAL &MEMORY_SIZE
+
+; Read APBDEV_PMC_STRAPPING_OPT_A_0
+&STRAPS=data.long(D:0x7000E400)
+
+; Isolate the RAM_CODE field.
+&STRAPS=(&STRAPS&0x000000F0)
+
+; Shift the RAM_CODE field to the LSB position.
+&STRAPS=(&STRAPS>>4)
+
+
+IF &STRAPS==1
+(
+   D.S SD:0x7000E4A0  %LE %LONG  0x20000000 ;// APBDEV_PMC_SCRATCH20_0: CustomerOption = 512 MB
+   PRINT "Memory is 512MB ELPIDA_LPDDR2"
+   &MEMORY_SIZE=0x20000000
+)
+ELSE IF &STRAPS==3
+(
+   D.S SD:0x7000E4A0  %LE %LONG  0x10000000 ;// APBDEV_PMC_SCRATCH20_0: CustomerOption = 256 MB
+   PRINT "Memory is 2GB LPDDR3"
+   &MEMORY_SIZE=0x10000000
+)
+ELSE IF &STRAPS==5
+(
+   D.S SD:0x7000E4A0  %LE %LONG  0x40000000 ;// APBDEV_PMC_SCRATCH20_0: CustomerOption = 1GB MB
+   PRINT "Memory is 2GB DDR3 NO DSR"
+   &MEMORY_SIZE=0x40000000
+)
+ELSE IF &STRAPS==6
+(
+   D.S SD:0x7000E4A0  %LE %LONG  0xF0000000 ;// APBDEV_PMC_SCRATCH20_0: CustomerOption = 4GB
+   PRINT "Memory is DDR3 934 (4GB)"
+   &MEMORY_SIZE=0xF0000000
+)
+ELSE
+(
+   D.S SD:0x7000E4A0  %LE %LONG  0x20000000 ;// APBDEV_PMC_SCRATCH20_0: CustomerOption = 512 MB
+   PRINT "Memory is 512MB DDR3"
+   &MEMORY_SIZE=0x20000000
+)
+
+wait 2.s
+
+enddo
+

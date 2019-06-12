@@ -1,0 +1,8 @@
+Steps to build nvflash.exe in Visual Studio.
+
+1. Download and install Visual studio if not already installed.
+2. Install perforce for windows if not already installed.
+3. Get the latest revision of software tools in local folder required to build nvflash.exe from perforce and set this path to $PERFORCE_WORKSPACE 
+4. Edit bsp_build_nvflash.bat to set WDK_ROOT_DIR = $PERFORCE_WORKSPACE\<sw-tools-dir> and DEVENV_COMMAND according to the version of Visual Studio.
+5. Run bsp_build_nvflash.bat, it will open visual studio with nvflash.sln solution.
+6. Build nvflash.sln, nvflash.exe will be created.

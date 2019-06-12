@@ -1,0 +1,144 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvos: shared library, Nvidia OS functions
+#
+###############################################################################
+
+#------------------------------------------------------------------------------
+# Common definitions
+#------------------------------------------------------------------------------
+_common_sources := \
+	nvos_debug.c \
+	nvos_internal.c \
+	nvos_alloc.c \
+	nvos_pointer_hash.c \
+	../nvosutils/nvuhash.c \
+	../nvosutils/nvustring.c \
+	nvos_thread.c \
+	nvos_coop_thread.c \
+	nvos_trace.c \
+	nvos_file.c \
+	nvos_config.c
+
+ifeq ($(NV_HOST_OS)-$(NV_TARGET_ARCH),windows-hostcc)
+_common_sources += \
+	win32/nvos_winnt.c \
+	win32/nvos_win32.c \
+	nvos_callstack.c
+else ifeq ($(NV_TARGET_ARCH),qnx)
+_common_sources += \
+	qnx/nvos_qnx.c
+else
+_common_sources += \
+	linux/nvos_linux.c \
+	linux/nvos_linux_librt.c \
+	linux/nvos_linux_stub.c \
+	linux/nvos_linux_user.c \
+	linux/nvos_linux_debugcomm.c \
+	linux/nvos_linux_settings.c \
+	linux/nvos_linux_us.c
+endif
+
+ifeq ($(NV_TARGET_ARCH),hostcc)
+_common_sources += \
+	nvos_callstack.c
+endif
+
+#------------------------------------------------------------------------------
+# Static library
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvos
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_sources)
+NV_COMPONENT_INCLUDES          := \
+	$(NV_COMPONENT_DIR) \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY)
+
+# Advanced debug feature disabled until Bug 950465 fixed
+NV_COMPONENT_CFLAGS            += \
+	-DNVOS_ADVANCED_DEBUG=0 \
+	-UANDROID \
+	-DAOS_MON_MODE_ENABLE=0
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+#------------------------------------------------------------------------------
+# Shared library
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_SOURCES           := \
+	$(_common_sources)
+
+NV_COMPONENT_NAME              := nvos
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_INCLUDES          := \
+	$(NV_COMPONENT_DIR)
+
+NV_COMPONENT_CODE_GENERATION := arm
+
+# Advaced debug feature disabled until Bug 950465 fixed
+NV_COMPONENT_CFLAGS += \
+	-DNVOS_ADVANCED_DEBUG=0 \
+	-DAOS_MON_MODE_ENABLE=0
+
+ifeq ($(NV_TARGET_ARCH),hostcc)
+# Host OS version of libnvos
+ifneq ($(NV_HOST_OS),windows)
+NV_COMPONENT_SOURCES           += \
+	linux/nvos_main.c
+NV_COMPONENT_SYSTEM_SHARED_LIBRARIES := pthread dl rt
+endif
+
+else
+# Target OS version of libnvos
+ifeq ($(NV_BUILD_CONFIGURATION_LINUX_USERSPACE_IS_ANDROID),1)
+NV_COMPONENT_SOURCES           += \
+	linux/nvos_main.c
+# debug feature disabled until Bug 950465 fixed
+NV_COMPONENT_CFLAGS += \
+	-DNVOS_ADVANCED_DEBUG=0 \
+	-DANDROID_LOG_ADB=1
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	$(NV_SOURCE)/tmake/external/android/cutils \
+	$(NV_SOURCE)/tmake/external/android/dl \
+	$(NV_SOURCE)/tmake/external/android/log
+else ifeq ($(NV_BUILD_CONFIGURATION_OS_IS_QNX),1)
+# @TODO? QNX does not implement NvOsCallstack*()
+NV_COMPONENT_FLAG_NO_API_CHECK := 1
+else
+NV_COMPONENT_SOURCES           += \
+	linux/nvos_main.c
+NV_COMPONENT_SYSTEM_SHARED_LIBRARIES := pthread dl rt
+endif
+
+endif
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+#------------------------------------------------------------------------------
+# Cleanup
+#------------------------------------------------------------------------------
+_common_sources :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

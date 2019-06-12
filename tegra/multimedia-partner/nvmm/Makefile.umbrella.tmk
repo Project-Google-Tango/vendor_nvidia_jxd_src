@@ -1,0 +1,37 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile
+#
+# Repository umbrella makefile fragment for "multimedia-partner/nvmm"
+#
+###############################################################################
+#
+# Build tools in this repository
+#
+#NV_REPOSITORY_BUILD_TOOLS :=
+
+#
+# Components in this repository, that are common to all builds
+#
+NV_REPOSITORY_COMPONENTS := \
+	nvmm \
+	nvmm/blocks/nvmm_parser \
+	nvmm/blocks/nvmm_writer \
+	nvmm/contentpipe \
+	nvmm/utils \
+	nvmmlite \
+	nvmmlite/utils
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

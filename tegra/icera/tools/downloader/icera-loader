@@ -1,0 +1,132 @@
+#!/system/bin/sh -e
+#***********************************************************************************************
+#
+# Copyright (c) 2012-2014, NVIDIA CORPORATION.  All rights reserved.
+#
+#***********************************************************************************************
+
+## Some variables:
+##################
+LOGCAT_TAG="ICEFWDLD"
+LOG_FOLDER="/data/rfs/data/debug"
+LOG_FILE="${LOG_FOLDER}/fw_update.log"
+UPDATE_FILE_LIST="/data/rfs/data/debug/update_list"
+FILE_LIST=""
+
+## Some functions:
+##################
+ALOGI() {
+    /system/bin/log -p i -t ${LOGCAT_TAG} "$1"
+}
+
+ALOGE() {
+    /system/bin/log -p e -t ${LOGCAT_TAG} "$1"
+}
+
+ALOGD() {
+    /system/bin/log -p d -t ${LOGCAT_TAG} "$1"
+}
+
+UpdateFileList()
+{
+    list="$(ls ${1})"
+    for file in ${list}
+    do
+        if [ -n "${FILE_LIST}" ]; then
+            FILE_LIST="${FILE_LIST};${1}/${file}"
+        else
+            FILE_LIST="${1}/$file"
+        fi
+    done
+}
+
+WaitForDevice()
+{
+    local counter=$1
+
+    # Check device really exists and wait for it if not yet
+    while [ $counter -gt 0 -a ! -e $DEV_NAME ]
+    do
+        counter=$(( $counter - 1 ))
+        sleep 1
+    done
+    if [ $counter -eq 0 ]; then
+        ALOGE "$0: device $DEV_NAME not found"
+        return 1
+    else
+        ALOGD "$0: device name:   $DEV_NAME"
+    fi
+
+    return 0
+}
+
+HandleError()
+{
+    ALOGE "$0: downloader ERROR"
+    local timestamp=`date +%Y%m%d_%H%M%S`
+
+    set +e
+
+    # rotate error logs folders
+    cd ${LOG_FOLDER}
+    rm -rf dld_error_5
+    mv dld_error_4 dld_error_5
+    mv dld_error_3 dld_error_4
+    mv dld_error_2 dld_error_3
+    mv dld_error_1 dld_error_2
+    mv latest_dld_error dld_error_1
+    cd -
+
+    # create new error log folder
+    log_folder="${LOG_FOLDER}/latest_dld_error"
+    ALOGE "$0: all logs stored in ${log_folder}"
+    mkdir $log_folder
+    logcat -d -v time -b main -b radio -b system -f "$log_folder/logcat_$timestamp.txt"
+    dmesg > "$log_folder/dmesg_$timestamp.txt"
+
+    # could be a crash and re-start in loader mode:
+    # - wait for $DEV_NAME to disappear
+    sleep 2
+
+    # - wait for $DEV_NAME to "re-appear"
+    WaitForDevice 30
+
+    #restart the RIL and CPO even if download failed.
+    start icera-switcher
+    start ril-daemon
+}
+
+## Script starts here:
+######################
+DEV_NAME=$1
+
+trap HandleError ERR
+
+if [ $2 ]; then
+    # Script started manually.
+    # All files for an update pushed in "$2" folder:
+    UpdateFileList $2
+else
+    # Script started as a service
+    FILE_LIST=`cat ${UPDATE_FILE_LIST}`
+fi
+
+if [ -z "${FILE_LIST}" ]; then
+    ALOGI "$0: No file to update"
+else
+    #Stop the CPO and RIL to not interfere with modem firwmare upgrade
+    stop icera-switcher
+    stop ril-daemon
+    sleep 2
+
+    if WaitForDevice 30; then
+        #execute the downloader through logwrapper
+        ALOGI "Update file list: ${FILE_LIST}"
+        logwrapper downloader -d $DEV_NAME -v 2 -f "$FILE_LIST"
+        ALOGI "$0: SUCCESS"
+    fi
+
+    #restart the RIL and CPO
+    start icera-switcher
+    start ril-daemon
+fi

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout android:id="@+id/LinearLayout01"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+xmlns:android="http://schemas.android.com/apk/res/android">
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="5sp"
+    android:background="#7cb73c"
+    android:fadeScrollbars="true"
+    android:isScrollContainer="true"
+    android:scrollbars="vertical">
+
+    <TextView android:id="@+id/DisplayLogs"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="25sp"
+        android:text="@string/TextCleanup"
+        android:paddingTop="6sp"
+        android:paddingBottom="20sp">
+    </TextView>
+
+    <Button android:text="@string/ButtonShowLogs"
+        android:id="@+id/ButtonShowLogs"
+        android:textSize="17sp"
+        android:layout_below="@+id/DisplayLogs"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:enabled="true"
+        android:clickable="true"
+        android:onClick="DisplayLogs">
+    </Button>
+
+    <Button android:text="@string/ButtonTextBackSettings"
+        android:id="@+id/ButtonBackSettings"
+        android:textSize="17sp"
+        android:layout_below="@+id/ButtonShowLogs"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:enabled="true"
+        android:clickable="true"
+        android:onClick="Settings">
+    </Button>
+
+</RelativeLayout>
+</LinearLayout>

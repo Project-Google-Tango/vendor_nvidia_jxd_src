@@ -1,0 +1,13 @@
+debug.dbg2file=1
+debug.dbg_nmea=1
+BEE_enabled=1
+EPO_enabled=1
+RTC_DRIFT=500
+init.speed=921600
+link.speed=921600
+TIME_INTERVAL=1000
+TCXO_TYPE=0xFF
+TCXO_FEQ=16368000
+dev.gps=dev/gps
+dev.dsp=dev/ttyTHS1
+

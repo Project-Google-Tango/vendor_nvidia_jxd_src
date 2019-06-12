@@ -1,0 +1,28 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# Tmake component makefile for libnvtestio.
+#
+# This version of nvtestio has GDBT protocol enabled.  Version without it
+# is in the directory ./stdio.
+#
+###############################################################################
+
+_wrapper_name           := nvtestio
+_wrapper_gdbt_supported := 1
+_wrapper_relative_path  :=
+
+include $(NV_COMPONENT_DIR)/Makefile.common.tmk
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

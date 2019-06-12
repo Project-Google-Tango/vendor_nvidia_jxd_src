@@ -1,0 +1,15 @@
+; Lauterbach TRACE32 debugger script for Multiprocessor AVP Attach
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_jtag_setup.cmm
+
+; Tell the debugger not to access non-existent memory locations.
+do physical_setup.cmm
+
+system.mode.attach
+break
+
+PRINT "AVP attached via multi-processor JTAG scan chain"
+
+ENDDO
+

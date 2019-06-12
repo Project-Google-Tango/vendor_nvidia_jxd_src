@@ -1,0 +1,44 @@
+#
+# U-boot environment for network boot.
+#
+
+
+board=dalmore
+mmcname=mmcblk
+loadaddr=0x80408000
+baudrate=115200
+bootdelay=3
+bootfile=vmlinux.uimg
+console=ttyS0,115200n8
+stderr=serial,lcd
+stdin=serial,tegra-kbc
+stdout=serial,lcd
+user=user
+videospec=tegrafb
+serial#=1
+lp0_vec=0x00002000@0x9C406000
+platform_extras=mem=1944M@2048M memtype=1 commchip_id=0 usb_port_owner_info=0 emc_max_dvfs=0
+extra_bootargs=usbcore.old_scheme_first=1 core_edp_mv=1120 core_edp_ma=9000 display_panel=0 tegraid=35.1.1.0.0 debug_uartport=lsport,3 power_supply=Adapter audio_codec=rt5640 modem_id=0 power_config=0x00 android.kerneltype=normal
+#
+# All CAP nfs info tokens needs to be replaced with proper values as follow:
+# IPADDR ----- 172.17.187.71
+# SERVERIP --- 172.17.186.62
+# GATEWAYIP -- 172.17.186.62
+# NETMASK ---- 255.255.252.0
+# NFSARGS ---- ip=:::::eth0:on or ip=cip:sip:gip:mask::eth0:off
+# NFSROOT ---- 172.17.187.62:/cardhu_nfsroot
+#
+ipaddr=IPADDR
+serverip=SERVERIP
+gatewayip=GATEWAYIP
+netmask=NETMASK
+tftppath=TFTPPATH
+nfsbootargs=root=/dev/nfs NFSARGS nfsroot=NFSROOT
+#
+# Network Boot Scripts:
+#
+regen_all=setenv common_bootargs console=${console} console=tty1 lp0_vec=${lp0_vec} video=${videospec} ${platform_extras} ${dev_extras} noinitrd; setenv bootargs ${common_bootargs} ${extra_bootargs} ${bootdev_bootargs}
+regen_net_bootargs=setenv bootdev_bootargs rw ${nfsbootargs} ; run regen_all
+nfs_setup=setenv autoload n; run regen_net_bootargs
+nfs_boot=run nfs_setup; dhcp; tftpboot ${loadaddr} ${tftppath}; bootm ${loadaddr}
+bootcmd=usb start; run nfs_boot

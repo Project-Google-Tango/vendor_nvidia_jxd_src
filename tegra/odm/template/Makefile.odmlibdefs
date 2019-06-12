@@ -1,0 +1,19 @@
+#  This is a platform-specific file which is used to allow platform-
+#  specific remapping of the library directories.  Libraries which
+#  are used as-is from the template directory should point to the
+#  template directory, libraries which are compiled uniquely for the
+#  platform should point to the local subdirectory.
+#
+#  Query must always be implemented for the platform, and it is expected to
+#  be located at $(TARGET_BOARD_DIR)/odm_kit/query
+#
+#  Any drivers which are not included by the platform should be initialized
+#  to empty values
+
+NVODMDIR_ODM_AUDIOCODEC  := $(TEMPLATE_DIR)/odm_kit/adaptations/audiocodec
+NVODMDIR_ODM_DISPLAY     := $(TEMPLATE_DIR)/odm_kit/adaptations/disp
+NVODMDIR_ODM_BATTERY     := $(TEMPLATE_DIR)/odm_kit/platform/battery
+
+NVODMDIR_ODM_NVAPODM     := $(TEMPLATE_DIR)/os/$(OS_TREE)/odm
+NVODMDIR_ODM_EXTFSMGR_LINUX := $(TEMPLATE_DIR)/os/linux/system/nvextfsmgr
+NVODMDIR_ODM_EXTFS_LINUX    := $(TEMPLATE_DIR)/os/linux/system/extfs

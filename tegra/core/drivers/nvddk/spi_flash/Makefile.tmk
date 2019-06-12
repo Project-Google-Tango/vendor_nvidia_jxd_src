@@ -1,0 +1,50 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2012-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_spif library component makefile
+#
+###############################################################################
+
+#------------------------------------------------------------------------------
+# Common definitions
+#------------------------------------------------------------------------------
+_common_sources                := \
+	nvddk_spif_block_driver.c
+_common_includes               := $(NV_SOURCE)/hwinc
+_common_cflags                 :=
+
+#------------------------------------------------------------------------------
+# Static library
+#------------------------------------------------------------------------------
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvddk_spif
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_sources)
+NV_COMPONENT_INCLUDES          := $(_common_includes)
+NV_COMPONENT_CFLAGS            := $(_common_cflags)
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+#------------------------------------------------------------------------------
+# Cleanup
+#------------------------------------------------------------------------------
+_common_sources     :=
+_common_includes    :=
+_common_cflags      :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

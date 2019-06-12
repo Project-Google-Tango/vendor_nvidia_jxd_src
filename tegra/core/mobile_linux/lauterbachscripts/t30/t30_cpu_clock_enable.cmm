@@ -1,0 +1,12 @@
+; Lauterbach TRACE32 debugger script to enable the power and clocks for the CPU.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+; Take the CPU out of reset, enable the CPU clock and clear the CPU flow controller
+D.S SD:0x60006010  %LE %LONG  0x80000131    ;// CLK_OUT_ENB_L
+D.S SD:0x60006004  %LE %LONG  0x7FFFFEC9    ;// RST_DEVICES_L
+D.S SD:0x60006004  %LE %LONG  0x7FFFFEC8    ;// RST_DEVICES_L
+D.S SD:0x60007000  %LE %LONG  0x00000000    ;// HALT_CPU_EVENTS
+ENDDO

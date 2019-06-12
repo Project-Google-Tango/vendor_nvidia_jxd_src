@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="AppName">IDA</string>
+    <string name="AppNameSettings">IDA SETTINGS</string>
+    <string name="AppNameDisplayInfo">DISPLAY LOGS / INFO</string>
+    <string name="last_kmsg_filename">/data/dontpanic/last_kmsg</string>
+    <string name="last_coredump">/data/rfs/data/debug/crash_dump00001.zip</string>
+    <string name="TextGetLogs">Press to get logs!</string>
+    <string name="AppStarted">Application started</string>
+    <string name="TextLogging">Enable modem logging</string>
+    <string name="TextLogcat">Enable logcat logging</string>
+    <string name="TextLoggingSize">Modem log size</string>
+    <string name="TextDisablingLP0">LP0 and Auto suspend</string>
+    <string name="TextLogName">Log Directory</string>
+    <string name="TextComment">Add a comment here</string>
+    <string name="TextMarkerComment">Add a Marker comment here</string>
+    <string name="TextShowSettings">Settings</string>
+    <string name="TextShowAutoSaving">Automatic Log Saving</string>
+    <string name="ButtonShowLogs">Display Log Directories</string>
+    <string name="ButtonTextSave">Save logs</string>
+    <string name="ButtonTextDiscard">Delete logs</string>
+    <string name="ButtonTextSettings">Settings</string>
+    <string name="ButtonTextBackSettings">Back to Settings</string>
+    <string name="ButtonTextDisplayInfo">Display Logs/Info</string>
+    <string name="TextProgress">Saving progress</string>
+    <string name="TextBooting">Start IDA when device starts</string>
+    <string name="TextAutoSave">Save logs automatically</string>
+    <string name="TextSaveSDcard">Logging on SDcard</string>
+    <string name="TextCleanup">Display the log directories and delete the useless/old ones</string>
+    <string name="LogSize1">Choose Log size</string>
+    <string name="Space"></string>
+    <string name="TextZip">Compress Beanie Log</string>
+    <string name="AutoStart">Auto start at power on</string>
+    <string name="LogSize">Modem logging size</string>
+    <string name="ZipSaved">Zip saved modem logs</string>
+    <string name="ModemLogging">Modem logging ...</string>
+    <string name="LogcatSystem">Logcat system</string>
+    <string name="LogcatRadio">Logcat radio</string>
+    <string name="LogcatEvent">Logcat event</string>
+    <string name="LogcatMain">Logcat main</string>
+    <string name="LastKmsg">Last kmsg</string>
+    <string name="APBugReport">AP BugReport</string>
+    <string name="TCPDump">TCP dump</string>
+    <string name="InsertMarker">Insert Marker</string>
+    <string name="SaveLogs">Save Logs</string>
+    <string name="DeleteLogs">Delete Logs</string>
+    <string name="LogPath">/sdcard/BugReport_Logs/</string>
+    <string name="CommentFile">Comment.txt</string>
+
+    <string-array name="PossibleSizes">
+        <item>200Mo (5*40Mo)</item>
+        <item>300Mo (5*60Mo)</item>
+        <item>500Mo (5*100Mo)</item>
+        <item>800Mo (5*160Mo)</item>
+        <item>Max Available Space</item>
+    </string-array>
+    <string-array name="DeferredTimeout">
+        <item>10s</item>
+        <item>20s</item>
+        <item>30s</item>
+        <item>40s</item>
+        <item>50s</item>
+        <item>60s</item>
+        <item>70s</item>
+        <item>80s</item>
+        <item>90s</item>
+        <item>100s</item>
+        <item>110s</item>
+        <item>120s</item>        
+    </string-array>
+    <string-array name="DeferredWatermark">
+        <item>0</item>
+        <item>10%</item>
+        <item>20%</item>
+        <item>30%</item>
+        <item>40%</item>
+        <item>50%</item>
+        <item>60%</item>
+        <item>70%</item>
+        <item>80%</item>
+        <item>90%</item>
+        <item>100%</item>
+    </string-array>
+    <string name="MaxAvailSpace">Max Available Space</string>
+    <string name="TextKLog">Enable Kernel Logging</string>
+    <string name="DeferredLogging">Deferred logging</string>
+    <string name="DeferredTimeout">Deferred Timeout (s)</string>
+    <string name="DeferredWatermark">Deferred Watermark (%)</string>
+    <string name="Logcat">Logcat ...</string>
+    <string name="LogcatAll">Logcat 4in1\n(main/system/event/radio)</string>
+    <string name="AutoSaving">Auto log saving when …</string>
+    <string name="APLogging">AP logging ...</string>
+</resources>

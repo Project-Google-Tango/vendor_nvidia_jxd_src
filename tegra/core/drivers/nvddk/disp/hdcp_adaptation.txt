@@ -1,0 +1,57 @@
+NvDdk Display HDCP C-Key Adaptation
+-----------------------------------
+Copyright (c) 2009 - 2010 NVIDIA Corporation.  All rights reserved.
+
+The NVIDIA Display Driver Development Kit's HDCP adaptation is comprised of two
+parts: C source code and an encrypted binary glob which contains HDCP C-Keys,
+henceforth known as just "glob." The source code is intended to be embedded
+into a secure media player.
+
+The source code: nvhdcp.c, nvhdcp.h, sha1.c and sha1.h, implement the NVIDIA's
+Upstream protocol. The code requires C-Keys from the glob as part of
+its  cryptographic operations. The glob is obtained via the APIs that are
+defined below.
+
+The glob must be temporarily decrypted into secure memory. After authentication
+is completed, the secure memory is cleared and the glob is released back to the
+system to allow for leak-tracking.
+
+The code must be hardend to detect and prevent unauthorized access to the
+C-keys or any of the other Confidential or Secret values that are used during
+authentication. The means by which the keys are protected must not violate the
+integrity, security and interoperability requirements of HDCP. Any Device with
+an encrypted key glob must have secure boot enabled with a non-zero secure boot
+key and must have JTAG disabled.
+
+The following are the required APIs. These must be in the nvodm_hdmi library.
+
+/**
+ * Checks the given KSV list with a list of revoked KSVs. If any of the given
+ * KSVs are revoked, this returns NV_TRUE, NV_FALSE otherwise.
+ *
+ * @param Ksv The list of KSVs
+ * @param nKsvs The number of KSVs in the list
+ */
+NvBool
+NvOdmDispHdcpIsRevokedKsv( NvU64 *Ksv, NvU32 nKsvs );
+
+/**
+ * Returns a pointer to a decrypted glob for HDCP Upstream authentication. The
+ * pointer must be de-allocated with NvOdmDispHdcpReleaseGlob.
+ *
+ * If this is called multiple times without first releasing the glob, then
+ * this will fail (return NULL).
+ *
+ * This must decrypt the key glob into secure memory. If the memory cannot be
+ * mapped, then this must return NULL.
+ *
+ * @param size Pointer to the size of the glob
+ */
+void *
+NvOdmDispHdcpGetGlob( NvU32 *size );
+
+/**
+ * De-allocates/clears glob memory.
+ */
+void
+NvOdmDispHdcpReleaseGlob( void *glob );

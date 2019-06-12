@@ -1,0 +1,109 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnv3p static and shared library component makefile
+#
+###############################################################################
+
+_common_cflags += \
+	-DNVODM_BOARD_IS_FPGA=0
+
+ifeq ($(NV_BUILD_CONFIGURATION_VARIANT_IS_EMBEDDED),1)
+_common_cflags += \
+	-DNV_EMBEDDED_BUILD
+endif
+
+_common_host_sources := \
+	nv3p.c \
+	nv3p_transport_usb_host.c \
+	nv3p_transport_sema_host.c \
+	nv3p_transport_host.c
+
+# Static lib
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnv3p
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_CFLAGS            := \
+	$(_common_cflags)
+
+ifeq ($(NV_TARGET_ARCH),hostcc)
+NV_COMPONENT_SOURCES           := $(_common_host_sources)
+else
+NV_COMPONENT_SOURCES           := \
+	nv3p.c \
+	nv3p_transport_device.c \
+	nv3p_transport_usb_descriptors.c
+
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_SOURCES           += \
+	nvboot_misc_t30.c \
+	nvml_usbf_t30.c
+else
+NV_COMPONENT_SOURCES           += \
+	nvboot_misc_t1xx.c \
+	nvml_usbf_t1xx.c
+endif
+
+NV_COMPONENT_INCLUDES          := \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	../../drivers/nvboot \
+	../../drivers/nvboot/$(NV_TARGET_SOC)
+
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_CFLAGS            += \
+	-DENABLE_TXX \
+	-DENABLE_T30
+else ifeq ($(NV_TARGET_SOC),t114)
+NV_COMPONENT_CFLAGS            += \
+	-DENABLE_T1XX
+else ifeq ($(NV_TARGET_SOC),t124)
+NV_COMPONENT_CFLAGS            += \
+	-DENABLE_T1XX \
+	-DENABLE_T124
+else
+$(error unsupported target SoC '$(NV_TARGET_SOC)' for libnv3p!)
+endif
+
+endif
+
+NV_COMPONENT_HAS_BROKEN_CODE := undef
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif #NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+
+# Shared lib (host only)
+ifdef NV_COMPONENT_FLAG_SHARED_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := nv3p
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := $(_common_host_sources)
+NV_COMPONENT_CFLAGS            := $(_common_cflags)
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../utils/nvos \
+	../../utils/nvusbhost/libnvusbhost
+
+include $(NV_BUILD_SHARED_LIBRARY)
+endif
+
+# Variable cleanup
+_common_cflags       :=
+_common_host_sources :=
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

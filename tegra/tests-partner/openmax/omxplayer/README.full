@@ -1,0 +1,185 @@
+OmxPlayer:
+
+A commandline media file player.  Will play raw mp3 audio files, ogg vorbis
+audio files, m4a based aac/amr audio files, h264/mp4 with aac/amr audio
+encapsulated in a 3gp file, and wmv/wma encapsulated in a wmv/asf file.
+
+  Valid options are:
+    --dvbt --isdbt --aac --avi --mp3 --adts --vorbis --3gp --asf [file formats]
+    --noaudio, --novideo
+    --playtest --pausetest --seektest --stoptest
+    --input <filename/bitstreamsrc>, also -i
+    --add <filename>, also -a :: Add a file to be played next
+    --record <filename> :: Valid only for --isdbt option
+    --recordonly <filename> :: Valid only for --isdbt option
+    --channel <channel>
+    --isdbtcmdfile <filename>
+    --noavsync :: Disable all A/V sync
+    --noaspect :: Do not retain aspect ratio
+    --crop x y w h :: set the cropping rectangle for video playback
+    --rotate <degrees> :: Rotate video by <degrees>.  Valid values are 0, 90, 180, 270
+    --ovrgb --ovyuv :: Selecting 'ovrgb' selects an RGB overlay render target. 'ovyuv' selects YUV420 planar target.
+    --jpegdec [optional_display_time_in_sec]:: decode jpeg
+    --videncprop :: can specify video encode properties: application type, quality, and error resiliency level (see camera section)
+    --hdmi:: enables HDMI TVoutput in 720p (1280x720x60p) mode. Make sure HDMI TV is connected.
+    --hdmi1080p:: enables HDMI TVoutput in 1080p (1920x1080x60p) mode. Make sure HDMI TV is connected.
+    --eq [0-5] [-1200-1200] [-1200-1200]:: Set the audio equalizer values for Left and Right channel respectively.
+    --coverart :: save coverart to disk (if any).  Uses 'coverart.<ext>' as the filename.
+    --playtime :: show playtime info. every 1 sec unit on a/v playback.
+    --complexseektest :: combination of forward/backward seeking test.
+    --crazyseek <crazyseek_count> <time in millisec between immediate seeks> <seed value>::combination of crazy seeking using rand(crazyseed).
+    --deinterlacing [0-6, 0 = NO deinterlacing, BOB_at_framerate, BOB_at_fieldrate, WEAVE_at_framerate, WEAVE_at_fieldrate, ADAPTIVE_at_framerate, ADAPTIVE_at_fieldrate] :: Deinterlacing options
+    --disablerender (OR --dr)will disable flipping of the decoded surfaces to the display harware. This will be useful in analysing frame drops and AV sync issues.
+    --playtimeupdate <value> :: where the value duration is in seconds.
+    -y <youtube video id> <HP|BP> :: video id is from the youtube link, HP will open H.264 HP link, will work on AP20, BP will open H.264 BP version of the same link. BP is default option
+    --pausestoptest :: This usecase will first push the playback chain in pause state and then into stop state.
+    --loadedidleloaded :: This test will change to idle from loaded and then back to loaded from idle wihtout going in execution state
+    --idlestateflushports :: This test will flush all ports for all components when they are in moved to idle state from loaded state.
+
+    After one of the decoder format switches (--mp3, --mp4, --h264, --aac), the following are valid:
+    --profilevidrend :: generate profiling data in the video renderer
+
+    --camera :: enables camera functionality. See [Camera Options] section below.
+    --ulp :: To run in ULP mode, use --ulp after decoder type. Currently works only with --mp3 option.
+    --ulp_kpi :: To enable KPI logger in ULP mode.
+    --ulp_kpi_tune :: To enable KPI logger tuning mode.
+    --trickmode <speed> Enables trick mode (Fast forward/ Fast rewind)
+                speed < 0 - rewind
+                speed = 0 - pause
+                speed > 0 < 1 - slow forward
+                speed = 1 - normal
+                speed > 1 fast forward
+    --trickmodetest <speed> <ffRewTime> Enables trick mode Test(Tests fast forward, fast rewind)
+                <speed>  ff/rew speed. (same value is used for FF(+ve <speed>)/REW(-ve of the <speed>)
+        <ffRewTime> tiem in seconds to do ff/rew inbetween normal playback
+    --ratecontroltest <ffRewTime> :: Tests gradual increase of the rate from 0.5x till 32x and
+                                     gradual decrease om rewind rate from -1x to 32x
+                                     <ffRewTime> specify the time for ffw/rew
+    --thumbnail [width height]:: enable thumbnail output, width and height are optinal, but must be in pair, see CL 2381821.
+    --downscalefactor number :: downscaling factor must be 1/2/4/8
+    --readbuffersize size :: change read buffer size.
+    --fullscreen :: forces no window, and manually turns off Window A (desktop) while overlay is displayed
+    --capture [filename] :: capture a video frame to YUV420 planar raw data while playback and store it as the filename,
+                            filename is optional, default is "capture.yuv".
+    --tvout :: enable TV output for video playback. Video is only displayed on TV.
+    --custcomp :: enable an audio bypass component between audio decoder and renderer as a custom component.
+    --startoffset <time in sec> :: seek to <time in sec> position before starting playback.
+    --secondary :: for a system which has two display panels, play video on the secondary display.
+    --smartdimmer :: to enable the smart dimmer functionality which controls the backlight intensity depending on video content
+                     and video will be played in full screen mode in this case.
+    --stereorender <option> :: Configure the renderer to opertate in stereo mode, where it expects decoded frames in 
+                                 stereo YUV formats. Currently option 0 and 1 are only supported. 0 stands for default
+                                 mode of non-stereo data, 1 for horizontally stitched and down-scaled data.
+
+  The default input filename is 'test.3gp'.
+  The default test is 'playtest'.
+
+  Sample command lines:
+    nvtest omxplayer.dll --input file.mp3 (mp3 audio play test)
+    nvtest omxplayer.dll --seektest --input file.mp3
+    nvtest omxplayer.dll --playtime --seektest --input file.mp3(seeking and show playtime info)
+    nvtest omxplayer.dll --playtime --complexseektest --input file.mp3(complex seeking and show playtime info)
+    nvtest omxplayer.dll --input file.3gp  (mp4 video, aac audio)
+    nvtest omxplayer.dll --noaudio --input file.3gp (mp4 video only, even if audio in file)
+    nvtest omxplayer.dll --novideo --input file.m4a (aac audio only)
+    nvtest omxplayer.dll --seektest --input file.m4a (aac audio seek test)
+    nvtest omxplayer.dll --input input.ts (ISDB-T file playback on input.ts)
+    nvtest omxplayer.dll --dvbt -i <dvb-t stream> (DVB-T file playback)
+    nvtest omxplayer.dll --isdbt --input bitstreamsrc (full ISDB-T playback using tunner)
+
+    nvtest omxplayer.dll --input test.wmv
+    nvtest omxplayer.dll --input test.avi
+    nvtest omxplayer.dll --mp3 --ulp --input go.mp3 // ULP mode for mp3 decoder running on CPU
+    nvtest omxplayer.dll --mp3 --ulp --ulp_kpi --input go.mp3 // ULP mode + KPI logger for mp3 decoder
+    nvtest omxplayer.dll --mp3 --ulp --ulp_kpi_tune --input go.mp3 // ULP mode + KPI logger tuning mode
+    nvtest omxplayer.dll -i <filename> --crazyseek 10 100 2; // where seek loops for 10 times and seed value is 2 and the delay between 2 seek is 100msec.
+
+  Multiple video playback:
+
+s nvtest.exe omxplayer.dll --mp4 --x 0 --y 0 --width 176 --height 144 --input qcif.3gp --next --mp4 --x 240 --y 0 --width 176 --height 144 --input qcif.3gp --next --mp4 --x 0 --y 144 --width 176 --height 144 --input qcif.3gp --next --mp4 --x 240 --y 144 --width 176 --height 144 --input qcif.3gp --next --mp4 --x 0 --y 288 --width 176 --height 144 --input qcif.3gp
+
+[ISDBT options]
+---------------
+--record <filename>:: enable recording while playback. File's extension must be .ts or .trp.
+--recordonly <filename>:: enable recording, no playback. File's extension must be .ts or .trp.
+--channel <channel>:: select tuner's channel
+--isdbtcmdfile <filename>:: cmds to be used by player to control playback execution (P = Pause, R = Resume, S = Step, eof = Stop)
+
+[Audio recording]
+--audiorec          num          # required to enable audio recording, num is the recording time in seconds.
+--audiosamplerate   num          # optional, default is 44100
+--audiobitrate      num          # optional, default is 128000
+--audiochannel      num          # optional, default is 2
+--drc off or "on NoiseGateTh LowerCompTh UpperCompTh ClippingTh"   # optional, default is off.
+
+[Camera options]
+----------------
+--camera                         # required to enable camera
+--sensor num                     # optional, default is 0. 0 for main sensor, 1 for secondary
+--preview width height           # optional, default is 176 144 and off
+--video time width height        # optional, default is 176 144 and off, format is 3gp
+--still width height             # optional, default is 176 144 and off
+--image_quality quality          # optional, range is [1, 100]. 1 : least quality. 100:best quality   Default: 75.
+--thumbnail_quality quality      # optional, range is [1, 100]. 1 : least quality. 100:best quality   Default: 75.
+--image_qtables luma croma       # optional, default is 0 0. 0 for no custom tables, 1 for custom tables hardcoded in OmxPlayer
+--stillcount number              # optional, default is 1
+--previewtime time               # optional, default is 30 seconds
+--output filename                # optional, default is output.dat
+--focuspos num                   # optional, default is 0
+--focusauto on/off               # optional, default is OMX_IMAGE_FocusControlOn
+--autoframerate on/off [low high]     # optional, default is off, the "low high" pair is also optional and both are integers to specify AutoFrameRateRange
+--exposure number                # optional, default is 50ms. When this option is not specified, it's auto
+--iso number                     # optional, default is 200. When this option is not specified, it's auto
+--metermode spot/center/matrix   # optional, default is matrix
+--contrast number                # optional, range is [0, 100], default is 50
+--videncprop app quality err     # optional, app type [0 = camcorder, 1 = video telephony], quality [0 = low, 1 = medium, 2 = high], error resiliency [0 = none, 1 = low, 2 = high]
+--svcencode                      # required for h264 svc encoding.
+--loopstillcapture number        # optional, default is 1, for profiling purpose, to simulate continuous clicks.
+--videnctype type [level]        # optional, type can be mpeg4/h264/h263, default is h264. The "level" is optional. Its range is [0, 4] for MPEG4 and [0, 16] for h264.
+--delaycapture time_in_sec       # optional, simulate self-timer, default is no_delay. The delay time starts ticking when preview is started.
+--halfpress flag time_in_ms      # optional, to simulate a half press event, flag is the bit mask for AE, AF and AWB, bit0 for AF, bit1 for AE, bit2 for AWB, time_in_ms is timeout limit in millisecond
+--flash on/off/auto              # optional, default is off
+--flicker off/auto/50/60         # optional, default is off
+--zoom float_number              # optional, default is 1, allowed range is [1.0, 8.0]
+--zoommult float_number          # optional, default is 1, If you want it to zoom from 1 to 8 over N seconds, then zoommult = 8^(1/(N*framerate-1))
+--precaptureconverge off/on      # optional, default is off
+--rotate number [capture|preview]     # optional, default is 0; only 0/90/180/270 are supported; "capture" or "preview" is optional; if neither exists, there is no rotation;
+--video_rotate number               # optional, default is 0; only 0/90/180/270 are supported; Rotation is done by video encode HW. Dont use this if --rotate is already in use.
+--video_mirror value             # optional, default is 0, only 0, 1, 2, 3 are supported; 0: No Flip, 1: Vertical Flip, 2: Horizontal Flip, 3: H+V Flip (Flipping done by video encode HW)
+--encodedsize nBytes             # optional, setup jpeg encoder output size in bytes
+--stab on/off                    # optional, default is off
+--imagefilter none/bw/sepia/emboss/negative/solarize/posterize    #optional, default is none
+--brightness num                 # optional, range [-100, 100], default is 0
+--saturation num                 # optional, range [-100, 100], default is 0
+--hue num                        # optional, default is 0
+--whitebalance  off/sunlight/cloudy/shade/tungsten/fluorescent/incandescent/flash/horizon/auto   #optional, default is auto
+--cameracrop preview|capture left top right bottom     # optional, default is off, one example "--cameracrop capture 10 10 330 250"
+--edgeenhancement strengthBias       # optional, strengthBias is float number. if strengthBias is in range [-1.0, 1.0], -1 = min strength , 0 = no bias on strength and use the default recording mode strength, +1 = maximum strength.
+--delayhalfpress time_in_sec     # optional, default is no_delay. The delay time starts ticking when preview is started.
+--temporaltradeofflevel level    # optional, default is 0.
+--deletejpegfiles                # optional, default is yes for still capture and no for others
+--abortonhpfailure               # optional, default is not set
+--3gpmaxframes audio|video num   # optional, set desired max number of frames for audio or video
+--smoothzoomtime num             # optional, set time duration for smooth zooming, num is in milli seconds
+--zoomabort num                  # optional, set time to abort zooming, num is in milli seconds. It's recommended to use this option with preview only, since this is added only for testing purpose.
+--splitmode filename             # optional, set the file name for 3gp writer in case the the file exceeds 2GB limit. With this setting 2nd file will be opened for writing. Default functionality is stop encoding after limit exceed.
+--iframeinterval  num            # optional, set Intra Frame occurance frequency in video Encoder. Default is 60.
+--rcmode  [vbr | cbr]            # optional, set Rate Control Mode to be chosen by Video Encoder. Default is cbr.
+                                 # Currently only H264 Encoder supports this 2 modes of RC. Mpeg4 and H263 support only vbr and hence this option is don't care for them.
+--stereocamera left/right/stereo # optional, default is none
+--stereocapturetype video/videosquashed/still/stillburst # optional, default is video
+--stereotype lr/rl/tb/bt/slr/srl # optional, default is lr
+
+[APP1/Exif Header Options]
+----------------------------
+--exififd exif_filename  # set the required Exif fields
+--gpsifd gps_filename   # set the required GPS fields
+--interopifd string # set the Interoperability Index, ex: "R98", or "R03" etc.
+
+See the sample files (exifinfo.txt, and gpsinfo.txt) to know how to set the Exif, and Gps tags.
+See the Exif doc to know about more(\\netapp-pu\Handheld_GPU_Video\Docs\standards\JPEG\exifStandard2.pdf) OR (http://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html)
+--------------------------------------------------------
+
+Sample command line:
+s nvtest omxplayer --camera --preview 720 480 --video 30 720 480 --output release/out.3gp --bitrate 4000000
+

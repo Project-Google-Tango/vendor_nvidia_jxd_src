@@ -1,0 +1,136 @@
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >    
+    
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:scaleType="fitXY"
+                android:layout_marginTop="0dip"
+                 />
+<ScrollView 
+    android:id="@+id/LinearLayout01"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:isScrollContainer="true"
+    android:overScrollMode="always"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:scrollbarStyle="outsideOverlay"
+    android:scrollbars="vertical" 
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#80000000"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:isScrollContainer="true" 
+    >
+
+        <ListView
+       android:id="@+id/listview1"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:divider="#aaaaaa"
+       android:dividerHeight="1px"
+       />
+
+        
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/MarkerComment"
+        android:layout_below="@+id/button1"
+        android:layout_marginTop="23dp"
+        android:text="@string/LogPath"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#FFFFFF" 
+        android:textSize="12sp"/>
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView12"
+        android:layout_below="@+id/textView12"
+        android:layout_marginTop="23dp"
+        android:text="@string/CommentFile"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#FFFFFF" />
+
+    <EditText
+        android:id="@+id/Comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView13"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textView13"
+        android:ems="10" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="135sp"
+        android:layout_height="45dip"
+        android:layout_alignLeft="@+id/Comment"
+        android:layout_below="@+id/Comment"
+        android:layout_marginTop="16dip"
+        android:onClick="storeLogs"
+        android:text="@string/SaveLogs"
+        android:textSize="17sp" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="135sp"
+        android:layout_height="45dip"
+        android:layout_alignBaseline="@+id/button2"
+        android:layout_alignBottom="@+id/button2"
+        android:layout_alignParentRight="true"
+        android:onClick="discardLogs"
+        android:text="@string/DeleteLogs"
+        android:textSize="17sp" />
+
+   <EditText
+        android:id="@+id/MarkerComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/button1"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/listview1"
+        android:ems="10" >
+
+
+    </EditText>
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="45dip"
+        android:layout_alignRight="@+id/listview1"
+        android:layout_below="@+id/listview1"
+        android:onClick="insertMarker"
+        android:text="@string/InsertMarker" />
+
+    <EditText
+        android:id="@+id/Dirname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/textView12"
+        android:layout_alignBottom="@+id/textView12"
+        android:layout_alignRight="@+id/button1"
+        android:layout_toRightOf="@+id/textView12"
+        android:ems="10"
+        android:paddingLeft="10px"
+        android:paddingRight="10px"
+        android:textSize="12sp" />
+
+</RelativeLayout>
+
+</ScrollView>
+</RelativeLayout>

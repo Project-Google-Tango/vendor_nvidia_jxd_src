@@ -1,0 +1,54 @@
+; Lauterbach TRACE32 debugger script to boot AVP from NOR flash.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+; NOTE: THIS SCRIPT WILL WORK ONLY ON UN-FUSED PARTS.
+
+winclear
+
+; Setup JTAG for AVP-only.
+system.reset
+do &(TARGET_SOC)/&(TARGET_SOC)_avp_jtag_setup.cmm
+
+; This should be set to "auto" if the symbol information
+; is built with the correct labeling of "arm" vs. "thumb"
+; mode code areas.
+;system.option.dismode.auto
+system.option.dismode.access
+
+System.down
+;Break.Delete
+sYmbol.RESet
+
+system.up
+
+; For some reason the first system.up does not always work.
+; Do another one to be sure.
+wait 100.ms
+system.up
+
+;setup.stepbystep on
+
+print "Loading &FASTBOOT symbols from NOR at &NOR_LOAD_ADDR"
+data.load.elf &FASTBOOT /NOCODE /reloc .text at &NOR_LOAD_ADDR
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+; Setup common toolbar items
+do toolbar_setup.cmm
+
+IF ("&LOAD_SAVED_AVP_WINDOWS"=="TRUE")
+(
+  ; Restore saved window configuration (this is always saved in the $T32SYS directory -- don't change the path)
+  do &T32SYS/windows.cmm
+)
+
+; mode.hll
+
+enddo
+

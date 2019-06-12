@@ -1,0 +1,33 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvrm: Non-Android Linux shared library implementation
+#
+###############################################################################
+#
+# NOTE: there should be no need to use conditionals in this makefile!
+#
+###############################################################################
+
+NV_COMPONENT_SOURCES               += \
+	$(_libnvrm_src_shared_common) \
+	$(_libnvrm_src_shared_linux)
+NV_COMPONENT_CFLAGS                += \
+	-DPLATFORM_SIMULATION=0 \
+	-DNVRM_TRANSPORT_IN_KERNEL=1
+NV_COMPONENT_SYSTEM_SHARED_LIBRARIES += pthread
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

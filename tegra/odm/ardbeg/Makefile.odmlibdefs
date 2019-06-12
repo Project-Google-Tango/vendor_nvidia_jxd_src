@@ -1,0 +1,50 @@
+#  Copyright (c) 2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+#  This is a platform-specific file which is used to allow platform-
+#  specific remapping of the library directories.  Libraries which
+#  are used as-is from the template directory should point to the
+#  template directory, libraries which are compiled uniquely for the
+#  platform should point to the local subdirectory.
+#
+#  Query must always be implemented for the platform, and it is expected to
+#  be located at $(TARGET_BOARD_DIR)/odm_kit/query
+#
+#  Any drivers which are not included by the platform should be initialized
+#  to empty values
+
+NVODMDIR_ODM_AUDIOCODEC  := $(TEMPLATE_DIR)/odm_kit/adaptations/audiocodec
+NVODMDIR_ODM_DISPLAY   := $(TARGET_BOARD_DIR)/odm_kit/adaptations/disp
+NVODMDIR_ODM_GPIO_EXT    := $(TEMPLATE_DIR)/odm_kit/adaptations/gpio_ext
+NVODMDIR_ODM_USB_MUX     := $(TEMPLATE_DIR)/odm_kit/adaptations/usb_mux
+NVODMDIR_ODM_PMU         := $(TEMPLATE_DIR)/odm_kit/adaptations/pmu
+NVODMDIR_ODM_FUELGAUGEFWUPGRADE := $(TEMPLATE_DIR)/odm_kit/platform/fuelgaugefwupgrade
+NVODMDIR_ODM_DTVTUNER    := $(TEMPLATE_DIR)/odm_kit/adaptations/dtvtuner
+NVODMDIR_ODM_MISC        := $(TEMPLATE_DIR)/odm_kit/adaptations/misc
+NVODMDIR_ODM_HDMI        := $(TEMPLATE_DIR)/odm_kit/adaptations/hdmi
+NVODMDIR_ODM_TMON        := $(TEMPLATE_DIR)/odm_kit/adaptations/tmon
+NVODMDIR_ODM_CHARGING    := $(TEMPLATE_DIR)/odm_kit/adaptations/charging
+NVODMDIR_ODM_AVP         := $(TEMPLATE_DIR)/odm_kit/adaptations/avp
+NVODMDIR_ODM_IMAGER      :=
+
+ifeq ($(NVCAMERA_SUPPORTED),1)
+#  nvbug: 686615
+# NVODMDIR_ODM_IMAGER     := $(TARGET_BOARD_DIR)/odm_kit/adaptations/imager
+  NVODMDIR_ODM_IMAGER     := $(TEGRA_TOP)/camera-partner/imager
+endif
+
+NVODMDIR_ODM_ACCEL       := $(TEMPLATE_DIR)/odm_kit/platform/accelerometer
+NVODMDIR_ODM_TOUCH       := $(TEMPLATE_DIR)/odm_kit/platform/touch
+NVODMDIR_ODM_VIBRATE     := $(TEMPLATE_DIR)/odm_kit/platform/vibrate
+NVODMDIR_ODM_NLED        :=
+NVODMDIR_ODM_KEYBOARD    := $(TEMPLATE_DIR)/odm_kit/platform/keyboard
+NVODMDIR_ODM_OTA         := $(TEMPLATE_DIR)/odm_kit/platform/ota
+NVODMDIR_ODM_BATTERY     := $(TEMPLATE_DIR)/odm_kit/platform/battery
+ifeq ($(TARGET_OS),linux)
+NVODMDIR_ODM_KBCMAPPING  := $(TEMPLATE_DIR)/os/drivers/linux/keymapping
+endif
+NVODMDIR_ODM_MOUSE       :=
+NVODMDIR_ODM_NVAPODM     := $(TEMPLATE_DIR)/os/$(OS_TREE)/odm
+NVODMDIR_ODM_EXTFSMGR_LINUX := $(TEMPLATE_DIR)/os/linux/system/nvextfsmgr
+NVODMDIR_ODM_EXTFS_LINUX := $(TEMPLATE_DIR)/os/linux/system/extfs
+
+NVODM_HAS_BATTERY := 0

@@ -1,0 +1,5 @@
+fix_link_dependencies.patch
+fix_458245.patch
+fix_man_hyphen.patch
+add_other_plugins_#487498.patch
+fix_wiid_pc.patch

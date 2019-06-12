@@ -1,0 +1,13 @@
+; Lauterbach TRACE32 debugger script to detect CPU type
+
+GLOBAL &HAS_CORTEX_A15
+&HAS_CORTEX_A15=os.env(FPGA_HAS_CORTEX_A15)
+
+; The kernel decompressor runs very slowly on A15s. Load decompressed images.
+IF "&HAS_CORTEX_A15"=="1"
+(
+  &LOAD_DECOMPRESSED_IMAGE="TRUE"
+)
+
+enddo
+

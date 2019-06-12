@@ -1,0 +1,658 @@
+#
+# Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+#
+# export file for shared library libnvomxal.so
+#
+XA_IID_IMAGECONTROLS
+MPH_to_AudioRecorder
+SL_IID_VIBRA
+AudioInput_id_descriptors
+SL_IID_NULL
+SL_IID_3DCOMMIT
+Aacsamplerates
+SL_IID_VISUALIZATION
+SL_IID_ENGINECAPABILITIES
+DecoderDescriptors
+XA_IID_AUDIOENCODERCAPABILITIES
+SL_IID_PRESETREVERB
+XA_IID_RDS
+XA_IID_VIDEOENCODER
+BitRates_PCM
+XA_IID_DEVICEVOLUME
+SL_IID_MIDITIME
+MPH_to_CameraDevice
+MPH_to_MediaRecorder
+SL_IID_PREFETCHSTATUS
+MPH_to_LEDDevice
+xaCreateEngine
+XA_IID_VOLUME
+SL_IID_DYNAMICINTERFACEMANAGEMENT
+MPH_to_AudioPlayer
+SL_IID_METADATAEXTRACTION
+MPH_to_Vibra
+LED_id_descriptors
+EncoderDescriptors
+SL_IID_EFFECTSEND
+XA_IID_EQUALIZER
+XA_IID_CAMERA
+xaQuerySupportedEngineInterfaces
+SL_IID_EQUALIZER
+SL_IID_DEVICEVOLUME
+Encoder_IDs
+XA_IID_NVVIDEODECODER
+XA_IID_NULL
+SL_IID_OUTPUTMIXEXT
+SL_IID_BUFFERQUEUE
+XA_IID_PREFETCHSTATUS
+SL_IID_VIRTUALIZER
+Decoder_IDs
+SL_IID_AUDIOENCODERCAPABILITIES
+xaQueryNumSupportedEngineInterfaces
+XA_IID_SNAPSHOT
+SL_IID_AUDIODECODERCAPABILITIES
+SL_IID_3DSOURCE
+XA_IID_AUDIOENCODER
+XA_IID_PLAY
+theOneTrueRefCount
+BitRates_AMR
+XA_IID_ENGINE
+SL_IID_PLAYBACKRATE
+XA_IID_CAMERACAPABILITIES
+MPH_init_table
+SL_IID_ENGINE
+MPH_to_3DGroup
+XA_IID_OUTPUTMIX
+XA_IID_STREAMINFORMATION
+SL_IID_3DGROUPING
+SL_IID_3DDOPPLER
+XA_IID_VIDEODECODERCAPABILITIES
+MPH_to_OutputMix
+XA_IID_RADIO
+SL_IID_METADATATRAVERSAL
+MPH_to_MediaPlayer
+MPH_to_Listener
+MPH_to_MidiPlayer
+XA_IID_METADATATRAVERSAL
+SL_IID_MIDIMUTESOLO
+VideoEncoderIds
+XA_IID_RECORD
+AudioOutput_id_descriptors
+XA_IID_NVPUSHAPP
+XA_IID_NVBURSTMODE
+SL_IID_LED
+XA_IID_IMAGEENCODER
+SL_IID_MIDITEMPO
+XA_IID_GETCAPABILITIESOFINTERFACE
+XA_IID_PLAYBACKRATE
+SL_IID_3DLOCATION
+XA_IID_CONFIGEXTENSION
+Amrsamplerates
+XA_IID_IMAGEEFFECTS
+XA_IID_AUDIOIODEVICECAPABILITIES
+MPH_to_NvDataTap
+XA_IID_THREADSYNC
+SL_IID_array
+theOneTrueMutex
+SL_IID_VOLUME
+SL_IID_PLAY
+slesutResultToString
+XA_IID_IMAGEDECODERCAPABILITIES
+MPH_to_Engine
+XA_IID_SEEK
+SL_IID_DYNAMICSOURCE
+SL_IID_MUTESOLO
+XA_IID_NVVIDEODECODEREXTCAPABILITIES
+SL_IID_BASSBOOST
+SL_IID_SEEK
+SL_IID_AUDIOIODEVICECAPABILITIES
+Pcmsamplerates
+VideoDecoderIds
+Vibra_id_descriptors
+SL_IID_RATEPITCH
+BitRates_AAC
+SL_IID_3DMACROSCOPIC
+SL_IID_AUDIOENCODER
+XA_IID_VIDEOPOSTPROCESSING
+XA_IID_METADATAEXTRACTION
+XA_IID_IMAGEENCODERCAPABILITIES
+kMaxVideoDecoders
+SL_IID_THREADSYNC
+MPH_to_MetadataExtractor
+SL_IID_MIDIMESSAGE
+XA_IID_OBJECT
+XA_IID_NVVIDEOENCODEREXT
+XA_IID_NVVIDEOENCODEREXTCAPABILITIES
+XA_IID_VIDEOENCODERCAPABILITIES
+SL_IID_OBJECT
+XA_IID_LED
+XA_IID_AUDIODECODERCAPABILITIES
+XA_IID_DYNAMICINTERFACEMANAGEMENT
+XA_IID_METADATAINSERTION
+SL_IID_PITCH
+XA_IID_DYNAMICSOURCE
+SL_IID_RECORD
+XA_IID_VIBRA
+SL_IID_ENVIRONMENTALREVERB
+XA_IID_NVCAMERAEXTCAPABILITIES
+theOneTrueEngine
+SL_IID_OUTPUTMIX
+#checkDataSource(char const*, SLDataSource_ const*, DataLocatorFormat*, unsigned int, unsigned int)
+_Z15checkDataSourcePKcPK13SLDataSource_P17DataLocatorFormatjj
+#IDynamicSource_init(void*)
+_Z19IDynamicSource_initPv
+#ALBackendCameraDeviceSetAutoLocks(CCameraDevice_struct*, unsigned int)
+_Z33ALBackendCameraDeviceSetAutoLocksP20CCameraDevice_structj
+#ALBackendOutputMixDeInitialize(void*)
+_Z30ALBackendOutputMixDeInitializePv
+#CMediaPlayer_Realize(void*, unsigned int)
+_Z20CMediaPlayer_RealizePvj
+#ALBackendCameraDeviceGetWhiteBalance(CCameraDevice_struct*, unsigned int*, unsigned int*)
+_Z36ALBackendCameraDeviceGetWhiteBalanceP20CCameraDevice_structPjS1_
+#ALBackendCameraDeviceGetSupportedGammaSettings(CCameraDevice_struct*, short*, short*)
+_Z46ALBackendCameraDeviceGetSupportedGammaSettingsP20CCameraDevice_structPsS1_
+#IPlay_init(void*)
+_Z10IPlay_initPv
+#CCameraDevice_Destroy(void*)
+_Z21CCameraDevice_DestroyPv
+#COutputMix_PreDestroy(void*)
+_Z21COutputMix_PreDestroyPv
+#IMetadataTraversal_init(void*)
+_Z23IMetadataTraversal_initPv
+#ALBackendGetAvailableAudioOutputs(int*, unsigned int*)
+_Z33ALBackendGetAvailableAudioOutputsPiPj
+#ALBackendCameraDeviceSetMeteringMode(CCameraDevice_struct*, unsigned int)
+_Z36ALBackendCameraDeviceSetMeteringModeP20CCameraDevice_structj
+#IImageEncoderCapabilities_deinit(void*)
+_Z32IImageEncoderCapabilities_deinitPv
+#IImageEffects_init(void*)
+_Z18IImageEffects_initPv
+#checkInterfaces(ClassTable const*, unsigned int, SLInterfaceID_ const* const*, unsigned int const*, unsigned int*, unsigned int*)
+_Z15checkInterfacesPK10ClassTablejPKPK14SLInterfaceID_PKjPjS9_
+#IPlay_deinit(void*)
+_Z12IPlay_deinitPv
+#IEqualizer_init(void*)
+_Z15IEqualizer_initPv
+#CMediaPlayer_Resume(void*, unsigned int)
+_Z19CMediaPlayer_ResumePvj
+#IPrefetchStatus_init(void*)
+_Z20IPrefetchStatus_initPv
+#ALBackendVideoPostProcessingCommit(CMediaPlayer_struct*)
+_Z34ALBackendVideoPostProcessingCommitP19CMediaPlayer_struct
+#ALBackendMediaPlayerSeek(CMediaPlayer_struct*, unsigned int, unsigned int)
+_Z24ALBackendMediaPlayerSeekP19CMediaPlayer_structjj
+#ALBackendMediaRecorderInitiateSnapshot(CMediaRecorder_struct*, void*)
+_Z38ALBackendMediaRecorderInitiateSnapshotP21CMediaRecorder_structPv
+#sync_start(void*)
+_Z10sync_startPv
+#ALBackendEqualizerSetBandLevel(COutputMix_struct*, unsigned short, short)
+_Z30ALBackendEqualizerSetBandLevelP17COutputMix_structts
+#ALBackendMediaPlayerSetLoop(CMediaPlayer_struct*)
+_Z27ALBackendMediaPlayerSetLoopP19CMediaPlayer_struct
+#COutputMix_Destroy(void*)
+_Z18COutputMix_DestroyPv
+#ALBackendMediaPlayerGetPosition(CMediaPlayer_struct*, unsigned int*)
+_Z31ALBackendMediaPlayerGetPositionP19CMediaPlayer_structPj
+#CMediaRecorder_Realize(void*, unsigned int)
+_Z22CMediaRecorder_RealizePvj
+#ALBackendMediaPlayerSetContrast(CMediaPlayer_struct*, int)
+_Z31ALBackendMediaPlayerSetContrastP19CMediaPlayer_structi
+#object_cond_signal(Object_interface*)
+_Z18object_cond_signalP16Object_interface
+#ALBackendEqualizerGetPresetName(COutputMix_struct*, unsigned short, unsigned char const**)
+_Z31ALBackendEqualizerGetPresetNameP17COutputMix_structtPPKh
+#IRecord_init(void*)
+_Z12IRecord_initPv
+#ALBackendEqualizerSetEnabled(COutputMix_struct*, unsigned int, unsigned short)
+_Z28ALBackendEqualizerSetEnabledP17COutputMix_structjt
+#IThreadSync_deinit(void*)
+_Z18IThreadSync_deinitPv
+#object_lock_exclusive(Object_interface*)
+_Z21object_lock_exclusiveP16Object_interface
+#ALBackendMediaPlayerSignalThread(CMediaPlayer_struct*)
+_Z32ALBackendMediaPlayerSignalThreadP19CMediaPlayer_struct
+#CNvDataTap_PreDestroy(void*)
+_Z21CNvDataTap_PreDestroyPv
+#ALBackendOutputmixRealize(COutputMix_struct*, unsigned int)
+_Z25ALBackendOutputmixRealizeP17COutputMix_structj
+#CAudioRecorder_PreDestroy(void*)
+_Z25CAudioRecorder_PreDestroyPv
+#ALBackendOutputMixSetVolume(COutputMix_struct*, short)
+_Z27ALBackendOutputMixSetVolumeP17COutputMix_structs
+#CMediaPlayer_Destroy(void*)
+_Z20CMediaPlayer_DestroyPv
+#ALBackendMediaRecorderGetClockTime(CMediaRecorder_struct*, unsigned int*)
+_Z34ALBackendMediaRecorderGetClockTimeP21CMediaRecorder_structPj
+#ALBackendOutputMixGetMaxVolume(COutputMix_struct*, short*)
+_Z30ALBackendOutputMixGetMaxVolumeP17COutputMix_structPs
+#IObjectToObjectID(Object_interface*)
+_Z17IObjectToObjectIDP16Object_interface
+#IImageEffects_deinit(void*)
+_Z20IImageEffects_deinitPv
+#IEqualizer_deinit(void*)
+_Z17IEqualizer_deinitPv
+#CEngine_Resume(void*, unsigned int)
+_Z14CEngine_ResumePvj
+#ALBackendOutmixRegisterDeviceChangeCallback(void*, void (*)(XAOutputMixItf_ const* const*, void*), void*)
+_Z43ALBackendOutmixRegisterDeviceChangeCallbackPvPFvPKPK15XAOutputMixItf_S_ES_
+#ALBackendMediaPlayerTextTagsChangedCallback(_GstElement*, int, void*)
+_Z43ALBackendMediaPlayerTextTagsChangedCallbackP11_GstElementiPv
+#ALBackendCameraDeviceSetWhiteBalance(CCameraDevice_struct*, unsigned int, unsigned int)
+_Z36ALBackendCameraDeviceSetWhiteBalanceP20CCameraDevice_structjj
+#ALBackendReRoute(int, unsigned int*)
+_Z16ALBackendReRouteiPj
+#ThreadPool_remove(ThreadPool*)
+_Z17ThreadPool_removeP10ThreadPool
+#ALBackendCameraDeviceCreate(CCameraDevice_struct*)
+_Z27ALBackendCameraDeviceCreateP20CCameraDevice_struct
+#ALBackendMediaRecorderSetRecordState(CMediaRecorder_struct*, unsigned int)
+_Z36ALBackendMediaRecorderSetRecordStateP21CMediaRecorder_structj
+#liCreateEngine(SLObjectItf_ const* const**, unsigned int, SLEngineOption_ const*, unsigned int, SLInterfaceID_ const* const*, unsigned int const*, ClassTable const*)
+_Z14liCreateEnginePPKPK12SLObjectItf_jPK15SLEngineOption_jPKPK14SLInterfaceID_PKjPK10ClassTable
+#ALBackendCameraDeviceSetFlashMode(CCameraDevice_struct*, unsigned int)
+_Z33ALBackendCameraDeviceSetFlashModeP20CCameraDevice_structj
+#CEngine_Destroyed(CEngine_struct*)
+_Z17CEngine_DestroyedP14CEngine_struct
+#ALBackendMediaRecorderSetVolume(CMediaRecorder_struct*, short)
+_Z31ALBackendMediaRecorderSetVolumeP21CMediaRecorder_structs
+#err_to_result(int)
+_Z13err_to_resulti
+#IImageControls_init(void*)
+_Z19IImageControls_initPv
+#ALBackendCameraDeviceSetISOSensitivity(CCameraDevice_struct*, unsigned int, unsigned int)
+_Z38ALBackendCameraDeviceSetISOSensitivityP20CCameraDevice_structjj
+#ThreadPool_init(ThreadPool*, unsigned int, unsigned int)
+_Z15ThreadPool_initP10ThreadPooljj
+#ALBackendEqualizerGetBand(COutputMix_struct*, unsigned int, unsigned short*)
+_Z25ALBackendEqualizerGetBandP17COutputMix_structjPt
+#ALBackendMediaRecorderSetAudioSettings(CMediaRecorder_struct*, XAAudioEncoderSettings_*)
+_Z38ALBackendMediaRecorderSetAudioSettingsP21CMediaRecorder_structP23XAAudioEncoderSettings_
+#ALBackendMediaPlayerQueryContainerInfo(CMediaPlayer_struct*, StreamInfoData*)
+_Z38ALBackendMediaPlayerQueryContainerInfoP19CMediaPlayer_structP14StreamInfoData
+#ALBackendMediaRecorderTakeSnapshot(CMediaRecorder_struct*)
+_Z34ALBackendMediaRecorderTakeSnapshotP21CMediaRecorder_struct
+#ALBackendCameraDeviceGetFlashMode(CCameraDevice_struct*, unsigned int*)
+_Z33ALBackendCameraDeviceGetFlashModeP20CCameraDevice_structPj
+#IAudioIODeviceCapabilities_init(void*)
+_Z31IAudioIODeviceCapabilities_initPv
+#IStreamInformation_deinit(void*)
+_Z25IStreamInformation_deinitPv
+#ALBackendGetAssociatedAudioOutputs(void*, unsigned int, int*, unsigned int*)
+_Z34ALBackendGetAssociatedAudioOutputsPvjPiPj
+#__assert2(char const*, int, char const*, char const*)
+_Z9__assert2PKciS0_S0_
+#ALBackendMediaRecorderGetVolume(CMediaRecorder_struct*, short*)
+_Z31ALBackendMediaRecorderGetVolumeP21CMediaRecorder_structPs
+#IObject_deinit(void*)
+_Z14IObject_deinitPv
+#ALBackendOutputMixGetVolume(COutputMix_struct*, short*)
+_Z27ALBackendOutputMixGetVolumeP17COutputMix_structPs
+#ALBackendCameraDeviceRegisterCallback(CCameraDevice_struct*, void (*)(XACameraItf_ const* const*, void*, unsigned int, unsigned int), void*)
+_Z37ALBackendCameraDeviceRegisterCallbackP20CCameraDevice_structPFvPKPK12XACameraItf_PvjjES6_
+#ALBackendCameraDeviceGetAutoLocks(CCameraDevice_struct*, unsigned int*)
+_Z33ALBackendCameraDeviceGetAutoLocksP20CCameraDevice_structPj
+#IImageEncoder_init(void*)
+_Z18IImageEncoder_initPv
+#ISeek_init(void*)
+_Z10ISeek_initPv
+#IPrefetchStatus_deinit(void*)
+_Z22IPrefetchStatus_deinitPv
+#ALBackendMediaPlayerDestroy(CMediaPlayer_struct*)
+_Z27ALBackendMediaPlayerDestroyP19CMediaPlayer_struct
+#C3DGroup_PreDestroy(void*)
+_Z19C3DGroup_PreDestroyPv
+#ALBackendCameraDeviceSetShutterSpeed(CCameraDevice_struct*, unsigned int, unsigned int)
+_Z36ALBackendCameraDeviceSetShutterSpeedP20CCameraDevice_structjj
+#ALBackendOutputmixDestroy(COutputMix_struct*)
+_Z25ALBackendOutputmixDestroyP17COutputMix_struct
+#IObject_Publish(Object_interface*)
+_Z15IObject_PublishP16Object_interface
+#ALBackendMediaPlayerGetMute(CMediaPlayer_struct*, unsigned int*)
+_Z27ALBackendMediaPlayerGetMuteP19CMediaPlayer_structPj
+#handler_AudioPlayer_gain(Object_interface*)
+_Z24handler_AudioPlayer_gainP16Object_interface
+#ALBackendMediaPlayerVideoTagsChangedCallback(_GstElement*, int, void*)
+_Z44ALBackendMediaPlayerVideoTagsChangedCallbackP11_GstElementiPv
+#CAudioPlayer_Realize(void*, unsigned int)
+_Z20CAudioPlayer_RealizePvj
+#ALBackendMediaPlayerGetGamma(CMediaPlayer_struct*, short*)
+_Z28ALBackendMediaPlayerGetGammaP19CMediaPlayer_structPs
+#IAudioEncoder_deinit(void*)
+_Z20IAudioEncoder_deinitPv
+#ICameraCapabilities_init(void*)
+_Z24ICameraCapabilities_initPv
+#ALBackendMediaRecorderSignalThread(CMediaRecorder_struct*)
+_Z34ALBackendMediaRecorderSignalThreadP21CMediaRecorder_struct
+#ALBackendMediaPlayerSetPlayState(CMediaPlayer_struct*, unsigned int)
+_Z32ALBackendMediaPlayerSetPlayStateP19CMediaPlayer_structj
+#ALBackendMediaPlayerGetBrightness(CMediaPlayer_struct*, unsigned int*)
+_Z33ALBackendMediaPlayerGetBrightnessP19CMediaPlayer_structPj
+#CEngine_PreDestroy(void*)
+_Z18CEngine_PreDestroyPv
+#__bss_start__
+__bss_start__
+#CAudioRecorder_Destroy(void*)
+_Z22CAudioRecorder_DestroyPv
+#ALBackendMediaPlayerSetVolume(CMediaPlayer_struct*, short)
+_Z29ALBackendMediaPlayerSetVolumeP19CMediaPlayer_structs
+#ALBackendMediaPlayerSetGamma(CMediaPlayer_struct*, short)
+_Z28ALBackendMediaPlayerSetGammaP19CMediaPlayer_structs
+#ALBackendCameraDeviceSetZoom(CCameraDevice_struct*, short, unsigned int, unsigned int, unsigned int)
+_Z28ALBackendCameraDeviceSetZoomP20CCameraDevice_structsjjj
+#ALBackendQueryAudioOutputCapabilities(void*, unsigned int, XAAudioOutputDescriptor_*)
+_Z37ALBackendQueryAudioOutputCapabilitiesPvjP24XAAudioOutputDescriptor_
+#construct(ClassTable const*, unsigned int, SLEngineItf_ const* const*, unsigned int, SLInterfaceID_ const* const*, unsigned int const*)
+_Z9constructPK10ClassTablejPKPK12SLEngineItf_jPKPK14SLInterfaceID_PKj
+#CCameraDevice_Realize(void*, unsigned int)
+_Z21CCameraDevice_RealizePvj
+#IEngineCapabilities_QueryVibraCapabilities(SLEngineCapabilitiesItf_ const* const*, unsigned int*, unsigned int*, SLVibraDescriptor_*)
+_Z42IEngineCapabilities_QueryVibraCapabilitiesPKPK24SLEngineCapabilitiesItf_PjS4_P18SLVibraDescriptor_
+#CCameraDevice_PreDestroy(void*)
+_Z24CCameraDevice_PreDestroyPv
+#ALBackendMediaPlayerCreate(CMediaPlayer_struct*)
+_Z26ALBackendMediaPlayerCreateP19CMediaPlayer_struct
+#ALBackendOutputMixInitialize(void*)
+_Z28ALBackendOutputMixInitializePv
+#ThreadPool_add_piipp(ThreadPool*, void (*)(void*, int, int, void*, void*), void*, int, int, void*, void*)
+_Z20ThreadPool_add_piippP10ThreadPoolPFvPviiS1_S1_ES1_iiS1_S1_
+#IsInterfaceInitialized(Object_interface*, unsigned int)
+_Z22IsInterfaceInitializedP16Object_interfacej
+#ALBackendGetDeviceVolume(void*, unsigned int, int*)
+_Z24ALBackendGetDeviceVolumePvjPi
+#ChangeGraphState(_GstElement*, GstState)
+_Z16ChangeGraphStateP11_GstElement8GstState
+#ALBackendEqualizerGetNumberOfBands(COutputMix_struct*, unsigned short*)
+_Z34ALBackendEqualizerGetNumberOfBandsP17COutputMix_structPt
+#ICameraCapabilities_deinit(void*)
+_Z26ICameraCapabilities_deinitPv
+#COutputMix_Resume(void*, unsigned int)
+_Z17COutputMix_ResumePvj
+#ALBackendCameraDeviceSetExposureMode(CCameraDevice_struct*, unsigned int, unsigned int)
+_Z36ALBackendCameraDeviceSetExposureModeP20CCameraDevice_structjj
+#ALBackendCameraDeviceIsFlashReady(CCameraDevice_struct*, unsigned int*)
+_Z33ALBackendCameraDeviceIsFlashReadyP20CCameraDevice_structPj
+#ALBackendCameraDeviceGetMeteringMode(CCameraDevice_struct*, unsigned int*)
+_Z36ALBackendCameraDeviceGetMeteringModeP20CCameraDevice_structPj
+#ISeek_deinit(void*)
+_Z12ISeek_deinitPv
+#IVolume_init(void*)
+_Z12IVolume_initPv
+#ALBackendEqualizerGetBandLevelRange(COutputMix_struct*, short*, short*)
+_Z35ALBackendEqualizerGetBandLevelRangeP17COutputMix_structPsS1_
+#ALBackendCameraDeviceSetBrightness(CCameraDevice_struct*, unsigned int)
+_Z34ALBackendCameraDeviceSetBrightnessP20CCameraDevice_structj
+#ALBackendMediaRecorderDestroy(CMediaRecorder_struct*)
+_Z29ALBackendMediaRecorderDestroyP21CMediaRecorder_struct
+#ALBackendOutputMixGetMute(COutputMix_struct*, unsigned int*)
+_Z25ALBackendOutputMixGetMuteP17COutputMix_structPj
+#IEngine_init(void*)
+_Z12IEngine_initPv
+#ISnapshot_init(void*)
+_Z14ISnapshot_initPv
+#ALBackendOutputMixSetMute(COutputMix_struct*, unsigned int)
+_Z25ALBackendOutputMixSetMuteP17COutputMix_structj
+#ALBackendMediaRecorderSetVideoSettings(CMediaRecorder_struct*, XAVideoSettings_*)
+_Z38ALBackendMediaRecorderSetVideoSettingsP21CMediaRecorder_structP16XAVideoSettings_
+#ALBackendCameraDeviceGetFocusRegionPattern(CCameraDevice_struct*, unsigned int*, unsigned int*, unsigned int*)
+_Z42ALBackendCameraDeviceGetFocusRegionPatternP20CCameraDevice_structPjS1_S1_
+#IEngineCapabilities_init(void*)
+_Z24IEngineCapabilities_initPv
+#ALBackendMediaPlayerSetBrightness(CMediaPlayer_struct*, unsigned int)
+_Z33ALBackendMediaPlayerSetBrightnessP19CMediaPlayer_structj
+#ALBackendMediaPlayerGetTextStreamInfo(CMediaPlayer_struct*, StreamInfoData*)
+_Z37ALBackendMediaPlayerGetTextStreamInfoP19CMediaPlayer_structP14StreamInfoData
+#IEngine_deinit(void*)
+_Z14IEngine_deinitPv
+#IVideoPostProcessing_init(void*)
+_Z25IVideoPostProcessing_initPv
+#IStreamInformation_init(void*)
+_Z23IStreamInformation_initPv
+#CameraDeviceAutoLocksCallback(CCameraDevice_struct*)
+_Z29CameraDeviceAutoLocksCallbackP20CCameraDevice_struct
+#ALBackendMediaPlayerAudioChangedCallback(_GstElement*, void*)
+_Z40ALBackendMediaPlayerAudioChangedCallbackP11_GstElementPv
+#ReleaseStrongRefAndUnlockExclusive(Object_interface*)
+_Z34ReleaseStrongRefAndUnlockExclusiveP16Object_interface
+#IPlaybackRate_init(void*)
+_Z18IPlaybackRate_initPv
+#ALBackendCameraDeviceSetFocusMode(CCameraDevice_struct*, unsigned int, int, unsigned int)
+_Z33ALBackendCameraDeviceSetFocusModeP20CCameraDevice_structjij
+#ALBackendCameraDeviceGetISOSensitivity(CCameraDevice_struct*, unsigned int*, unsigned int*)
+_Z38ALBackendCameraDeviceGetISOSensitivityP20CCameraDevice_structPjS1_
+#IMetadataExtraction_init(void*)
+_Z24IMetadataExtraction_initPv
+#IAudioIODeviceCapabilities_deinit(void*)
+_Z33IAudioIODeviceCapabilities_deinitPv
+#ALBackendEqualizerGetBandFreqRange(COutputMix_struct*, unsigned short, unsigned int*, unsigned int*)
+_Z34ALBackendEqualizerGetBandFreqRangeP17COutputMix_structtPjS1_
+#CEngine_Destroy(void*)
+_Z15CEngine_DestroyPv
+#ALBackendMediaPlayerGetVideoStreamInfo(CMediaPlayer_struct*, StreamInfoData*)
+_Z38ALBackendMediaPlayerGetVideoStreamInfoP19CMediaPlayer_structP14StreamInfoData
+#ISnapshot_deinit(void*)
+_Z16ISnapshot_deinitPv
+#IImageDecoderCapabilities_init(void*)
+_Z30IImageDecoderCapabilities_initPv
+#IImageEncoder_deinit(void*)
+_Z20IImageEncoder_deinitPv
+#ThreadPool_add_ppi(ThreadPool*, void (*)(void*, void*, int), void*, void*, int)
+_Z18ThreadPool_add_ppiP10ThreadPoolPFvPvS1_iES1_S1_i
+#ALBackendMediaPlayerVideoChangedCallback(_GstElement*, void*)
+_Z40ALBackendMediaPlayerVideoChangedCallbackP11_GstElementPv
+#IAudioEncoderCapabilities_init(void*)
+_Z30IAudioEncoderCapabilities_initPv
+#ALBackendGetDefaultAudioDevices(void*, unsigned int, int*, unsigned int*)
+_Z31ALBackendGetDefaultAudioDevicesPvjPiPj
+#IDynamicInterfaceManagement_init(void*)
+_Z32IDynamicInterfaceManagement_initPv
+#ALBackendMediaPlayerAudioTagsChangedCallback(_GstElement*, int, void*)
+_Z44ALBackendMediaPlayerAudioTagsChangedCallbackP11_GstElementiPv
+#COutputMix_Realize(void*, unsigned int)
+_Z18COutputMix_RealizePvj
+#ALBackendCameraDeviceGetGamma(CCameraDevice_struct*, short*)
+_Z29ALBackendCameraDeviceGetGammaP20CCameraDevice_structPs
+#IXAEngine_deinit(void*)
+_Z16IXAEngine_deinitPv
+#ALBackendQueryAudioInputCapabilities(void*, unsigned int, XAAudioInputDescriptor_*)
+_Z36ALBackendQueryAudioInputCapabilitiesPvjP23XAAudioInputDescriptor_
+#IImageDecoderCapabilities_deinit(void*)
+_Z32IImageDecoderCapabilities_deinitPv
+#IObject_init(void*)
+_Z12IObject_initPv
+#ALBackendProbeNDevicesIDs(unsigned int, int*, unsigned int*)
+_Z25ALBackendProbeNDevicesIDsjPiPj
+#ALBackendMediaPlayerGetSupportedGammaSettings(CMediaPlayer_struct*, short*, short*)
+_Z45ALBackendMediaPlayerGetSupportedGammaSettingsP19CMediaPlayer_structPsS1_
+#ThreadPool_deinit(ThreadPool*)
+_Z17ThreadPool_deinitP10ThreadPool
+#ALBackendCameraDeviceGetShutterSpeed(CCameraDevice_struct*, unsigned int*, unsigned int*)
+_Z36ALBackendCameraDeviceGetShutterSpeedP20CCameraDevice_structPjS1_
+#checkSourceSinkVsInterfacesCompatibility(DataLocatorFormat const*, DataLocatorFormat const*, ClassTable const*, unsigned int)
+_Z40checkSourceSinkVsInterfacesCompatibilityPK17DataLocatorFormatS1_PK10ClassTablej
+#CMediaRecorder_Resume(void*, unsigned int)
+_Z21CMediaRecorder_ResumePvj
+#ALBackendGetAssociatedAudioInputs(void*, unsigned int, int*, unsigned int*)
+_Z33ALBackendGetAssociatedAudioInputsPvjPiPj
+#CNvDataTap_Realize(void*, unsigned int)
+_Z18CNvDataTap_RealizePvj
+#CCameraDevice_Resume(void*, unsigned int)
+_Z20CCameraDevice_ResumePvj
+#ALBackendMediaPlayerGetAudioStreamInfo(CMediaPlayer_struct*, StreamInfoData*)
+_Z38ALBackendMediaPlayerGetAudioStreamInfoP19CMediaPlayer_structP14StreamInfoData
+#IImageEncoderCapabilities_init(void*)
+_Z30IImageEncoderCapabilities_initPv
+#ALBackendEqualizerGetCenterFreq(COutputMix_struct*, unsigned short, unsigned int*)
+_Z31ALBackendEqualizerGetCenterFreqP17COutputMix_structtPj
+#IObject_Destroy(SLObjectItf_ const* const*)
+_Z15IObject_DestroyPKPK12SLObjectItf_
+#ALBackendMediaRecorderResume(CMediaRecorder_struct*, unsigned int)
+_Z28ALBackendMediaRecorderResumeP21CMediaRecorder_structj
+#CAudioPlayer_GetOutputMix(CAudioPlayer_struct*)
+_Z25CAudioPlayer_GetOutputMixP19CAudioPlayer_struct
+#ALBackendMediaPlayerSetSource(CMediaPlayer_struct*, XADataSource_*)
+_Z29ALBackendMediaPlayerSetSourceP19CMediaPlayer_structP13XADataSource_
+#ALBackendMediaPlayerGetVolume(CMediaPlayer_struct*, short*)
+_Z29ALBackendMediaPlayerGetVolumeP19CMediaPlayer_structPs
+#ALBackendGetAvailableAudioInputs(int*, unsigned int*)
+_Z32ALBackendGetAvailableAudioInputsPiPj
+#ALBackendCameraDeviceDestroy(CCameraDevice_struct*)
+_Z28ALBackendCameraDeviceDestroyP20CCameraDevice_struct
+#ICameraDevice_init(void*)
+_Z18ICameraDevice_initPv
+#ALBackendMediaRecorderGetMute(CMediaRecorder_struct*, unsigned int*)
+_Z29ALBackendMediaRecorderGetMuteP21CMediaRecorder_structPj
+#ALBackendMediaPlayerRealize(CMediaPlayer_struct*, unsigned int)
+_Z27ALBackendMediaPlayerRealizeP19CMediaPlayer_structj
+#ALBackendMediaPlayerSetRate(CMediaPlayer_struct*, short)
+_Z27ALBackendMediaPlayerSetRateP19CMediaPlayer_structs
+#IVideoEncoder_deinit(void*)
+_Z20IVideoEncoder_deinitPv
+#CAudioPlayer_Resume(void*, unsigned int)
+_Z19CAudioPlayer_ResumePvj
+#CMediaRecorder_Destroy(void*)
+_Z22CMediaRecorder_DestroyPv
+#ALBackendSetDeviceVolume(void*, unsigned int, int)
+_Z24ALBackendSetDeviceVolumePvji
+#ALBackendEqualizerGetBandLevel(COutputMix_struct*, unsigned short, short*)
+_Z30ALBackendEqualizerGetBandLevelP17COutputMix_structtPs
+#ALBackendMediaRecorderSetMute(CMediaRecorder_struct*, unsigned int)
+_Z29ALBackendMediaRecorderSetMuteP21CMediaRecorder_structj
+#IPlaybackRate_deinit(void*)
+_Z20IPlaybackRate_deinitPv
+#ALBackendCameraDeviceSetContrast(CCameraDevice_struct*, int)
+_Z32ALBackendCameraDeviceSetContrastP20CCameraDevice_structi
+#IVideoEncoderCapabilities_init(void*)
+_Z30IVideoEncoderCapabilities_initPv
+#InitializeFramework()
+_Z19InitializeFrameworkv
+#CNvDataTap_Resume(void*, unsigned int)
+_Z17CNvDataTap_ResumePvj
+#ALBackendMediaPlayerGetMaxVolume(CMediaPlayer_struct*, short*)
+_Z32ALBackendMediaPlayerGetMaxVolumeP19CMediaPlayer_structPs
+#IOutputMix_deinit(void*)
+_Z17IOutputMix_deinitPv
+#ALBackendCameraDeviceGetExposureMode(CCameraDevice_struct*, unsigned int*, unsigned int*)
+_Z36ALBackendCameraDeviceGetExposureModeP20CCameraDevice_structPjS1_
+#IXAEngine_init(void*)
+_Z14IXAEngine_initPv
+#CAudioRecorder_Resume(void*, unsigned int)
+_Z21CAudioRecorder_ResumePvj
+#ALBackendMediaPlayerQueryActiveStreams(CMediaPlayer_struct*, StreamInfoData*)
+_Z38ALBackendMediaPlayerQueryActiveStreamsP19CMediaPlayer_structP14StreamInfoData
+#ALBackendCameraDeviceGetZoom(CCameraDevice_struct*, short*, unsigned int*)
+_Z28ALBackendCameraDeviceGetZoomP20CCameraDevice_structPsPj
+#IMetadataInsertion_init(void*)
+_Z23IMetadataInsertion_initPv
+#ALBackendMediaPlayerTextChangedCallback(_GstElement*, void*)
+_Z39ALBackendMediaPlayerTextChangedCallbackP11_GstElementPv
+#CAudioPlayer_PreDestroy(void*)
+_Z23CAudioPlayer_PreDestroyPv
+#IID_to_MPH(SLInterfaceID_ const*)
+_Z10IID_to_MPHPK14SLInterfaceID_
+#ThreadPool_add_ppii(ThreadPool*, void (*)(void*, void*, int, int), void*, void*, int, int)
+_Z19ThreadPool_add_ppiiP10ThreadPoolPFvPvS1_iiES1_S1_ii
+#slTraceSetEnabled(unsigned int)
+_Z17slTraceSetEnabledj
+#ALBackendEqualizerUsePreset(COutputMix_struct*, unsigned short)
+_Z27ALBackendEqualizerUsePresetP17COutputMix_structt
+#object_cond_broadcast(Object_interface*)
+_Z21object_cond_broadcastP16Object_interface
+#IAudioDecoderCapabilities_init(void*)
+_Z30IAudioDecoderCapabilities_initPv
+#IVolume_deinit(void*)
+_Z14IVolume_deinitPv
+#CNvDataTap_Destroy(void*)
+_Z18CNvDataTap_DestroyPv
+#ALBackendOutputmixResume(COutputMix_struct*, unsigned int)
+_Z24ALBackendOutputmixResumeP17COutputMix_structj
+#object_unlock_exclusive(Object_interface*)
+_Z23object_unlock_exclusiveP16Object_interface
+#IDeviceVolume_init(void*)
+_Z18IDeviceVolume_initPv
+#IRecord_deinit(void*)
+_Z14IRecord_deinitPv
+#CAudioPlayer_Destroy(void*)
+_Z20CAudioPlayer_DestroyPv
+#ALBackendDeInitializePulseAudio(void*)
+_Z31ALBackendDeInitializePulseAudioPv
+#ALBackendMediaPlayerResume(CMediaPlayer_struct*, unsigned int)
+_Z26ALBackendMediaPlayerResumeP19CMediaPlayer_structj
+#IAudioEncoder_init(void*)
+_Z18IAudioEncoder_initPv
+#ALBackendCameraDeviceGetContrast(CCameraDevice_struct*, int*)
+_Z32ALBackendCameraDeviceGetContrastP20CCameraDevice_structPi
+#freeDataLocatorFormat(DataLocatorFormat*)
+_Z21freeDataLocatorFormatP17DataLocatorFormat
+#ThreadPool_add(ThreadPool*, ClosureKind, void (*)(void*, void*, void*, int, int), void*, void*, void*, int, int)
+_Z14ThreadPool_addP10ThreadPool11ClosureKindPFvPvS2_S2_iiES2_S2_S2_ii
+#checkDataSink(char const*, SLDataSink_ const*, DataLocatorFormat*, unsigned int, unsigned int)
+_Z13checkDataSinkPKcPK11SLDataSink_P17DataLocatorFormatjj
+#ALBackendMediaRecorderRealize(CMediaRecorder_struct*, unsigned int)
+_Z29ALBackendMediaRecorderRealizeP21CMediaRecorder_structj
+#ALBackendMediaRecorderGetMaxVolume(CMediaRecorder_struct*, short*)
+_Z34ALBackendMediaRecorderGetMaxVolumeP21CMediaRecorder_structPs
+#GetCodecCapabilities(unsigned int, unsigned int*, SLAudioCodecDescriptor_*, CodecDescriptor const*)
+_Z20GetCodecCapabilitiesjPjP23SLAudioCodecDescriptor_PK15CodecDescriptor
+#IOutputMix_init(void*)
+_Z15IOutputMix_initPv
+#ALBackendCameraDeviceRealize(CCameraDevice_struct*, unsigned int)
+_Z28ALBackendCameraDeviceRealizeP20CCameraDevice_structj
+#liQuerySupportedInterfaces(unsigned int, SLInterfaceID_ const**, ClassTable const*)
+_Z26liQuerySupportedInterfacesjPPK14SLInterfaceID_PK10ClassTable
+#ALBackendCameraDeviceSetGamma(CCameraDevice_struct*, short)
+_Z29ALBackendCameraDeviceSetGammaP20CCameraDevice_structs
+#IVideoDecoderCapabilities_init(void*)
+_Z30IVideoDecoderCapabilities_initPv
+#AcquireStrongRef(Object_interface*, unsigned int)
+_Z16AcquireStrongRefP16Object_interfacej
+#object_unlock_exclusive_attributes(Object_interface*, unsigned int)
+_Z34object_unlock_exclusive_attributesP16Object_interfacej
+#ALBackendInitializePulseAudio(void*)
+_Z29ALBackendInitializePulseAudioPv
+#CEngine_Realize(void*, unsigned int)
+_Z15CEngine_RealizePvj
+#ALBackendCameraDeviceGetFocusMode(CCameraDevice_struct*, unsigned int*, int*, unsigned int*)
+_Z33ALBackendCameraDeviceGetFocusModeP20CCameraDevice_structPjPiS1_
+#ALBackendCameraDeviceSetFocusRegionPattern(CCameraDevice_struct*, unsigned int, unsigned int, unsigned int)
+_Z42ALBackendCameraDeviceSetFocusRegionPatternP20CCameraDevice_structjjj
+#IThreadSync_init(void*)
+_Z16IThreadSync_initPv
+#ALBackendEqualizerGetNumberOfPresets(COutputMix_struct*, unsigned short*)
+_Z36ALBackendEqualizerGetNumberOfPresetsP17COutputMix_structPt
+#__assert(char const*, int, char const*)
+_Z8__assertPKciS0_
+#CMediaPlayer_PreDestroy(void*)
+_Z23CMediaPlayer_PreDestroyPv
+#ALBackendQuerySampleFormatsSupported(unsigned int, unsigned int, int*, int*)
+_Z36ALBackendQuerySampleFormatsSupportedjjPiS_
+#ALBackendMediaRecorderCreate(CMediaRecorder_struct*)
+_Z28ALBackendMediaRecorderCreateP21CMediaRecorder_struct
+#ALBackendMediaPlayerSetMute(CMediaPlayer_struct*, unsigned int)
+_Z27ALBackendMediaPlayerSetMuteP19CMediaPlayer_structj
+#CAudioRecorder_Realize(void*, unsigned int)
+_Z22CAudioRecorder_RealizePvj
+#objectIDtoClass(unsigned int)
+_Z15objectIDtoClassj
+#IVideoEncoder_init(void*)
+_Z18IVideoEncoder_initPv
+#CMediaRecorder_PreDestroy(void*)
+_Z25CMediaRecorder_PreDestroyPv
+#ReleaseStrongRef(Object_interface*)
+_Z16ReleaseStrongRefP16Object_interface
+#ALBackendCameraDeviceGetBrightness(CCameraDevice_struct*, unsigned int*)
+_Z34ALBackendCameraDeviceGetBrightnessP20CCameraDevice_structPj
+#ALBackendMediaPlayerGetContrast(CMediaPlayer_struct*, int*)
+_Z31ALBackendMediaPlayerGetContrastP19CMediaPlayer_structPi
+#ALBackendGetDeviceVolumeScale(void*, unsigned int, int*, int*)
+_Z29ALBackendGetDeviceVolumeScalePvjPiS0_
+#ALBackendOutputmixCreate(COutputMix_struct*)
+_Z24ALBackendOutputmixCreateP17COutputMix_struct
+#liQueryNumSupportedInterfaces(unsigned int*, ClassTable const*)
+_Z29liQueryNumSupportedInterfacesPjPK10ClassTable
+#IEngineCapabilities_QueryLEDCapabilities(SLEngineCapabilitiesItf_ const* const*, unsigned int*, unsigned int*, SLLEDDescriptor_*)
+_Z40IEngineCapabilities_QueryLEDCapabilitiesPKPK24SLEngineCapabilitiesItf_PjS4_P16SLLEDDescriptor_
+#object_cond_wait(Object_interface*)
+_Z16object_cond_waitP16Object_interface
+#ALBackendCameraDeviceResume(CCameraDevice_struct*, unsigned int)
+_Z27ALBackendCameraDeviceResumeP20CCameraDevice_structj
+#ALBackendMediaPlayerGetDuration(CMediaPlayer_struct*, unsigned int*)
+_Z31ALBackendMediaPlayerGetDurationP19CMediaPlayer_structPj

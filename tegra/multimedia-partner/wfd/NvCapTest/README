@@ -1,0 +1,11 @@
+To start the capture, run the following command:
+
+adb shell am startservice -n com.nvidia.NvCapTest/.NvCapTest --es com.nvidia.NvCapTest.NvCapControl start
+
+To update parameters at runtime (FPS, BPS, force an IDR picture), run the following command:
+
+adb shell am startservice -n com.nvidia.NvCapTest/.NvCapTest --es com.nvidia.NvCapTest.NvCapControl runtime
+
+To end the capture, run the following command:
+
+adb shell am startservice -n com.nvidia.NvCapTest/.NvCapTest --es com.nvidia.NvCapTest.NvCapControl end

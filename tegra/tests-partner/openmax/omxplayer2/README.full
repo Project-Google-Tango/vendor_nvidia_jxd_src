@@ -1,0 +1,33 @@
+OmxPlayer2:
+
+A commandline media file player written using NVIDIA OpenMAX Graph Helper Library, PlayerGraph interface.
+
+Command line options availabe are:
+	
+--input <filename>, also -i :: Provide the filename with full path/ streaming url
+--pausetest :: Pause resume test
+--complexseektest :: Combination of forward/backward seeking test.
+--stoptest :: Stop playback test
+
+--playtimeupdate <value> :: where the value of duration is in seconds. By default this value is 10 secs.
+  Note: playtimeupdate is not a separate command, it is to be used in conjunction with other commands. For example, pausetest  will pause and resume the playback in every 10 secs by default. If commandline is given as 
+./omxplayer2 -i "/streams/sample.mp4" --pausetest --playtimeupdate 5, then the pause and resume will happen every 5 secs.
+
+--metadata :: Extracts metadata for ex: Album, Artist, Title etc.
+
+--jpegdecode :: JPEG Image Decode test.
+
+--X11 :: Specifies the display is X. Will create an X window and paint it black to give the full-screen effect.
+         If you do not specify this option, and your video is being played on the same VD as that of X, any open
+         overlays that were already present on the display and not completely obscured will still be visible. If you specify
+         a different VD then you will see a behavior similar to having an exclusive overlays i.e. the previous desktop
+         will not be visible.
+
+--VD <n> :: Specify the virtual desktop number on which you wish to play the video. Valid values are 0-2.
+
+--alphablend <alpha_value> -- Test the constant alpha blending. Provide alpha_value for transparency level.
+
+Example usage:
+./omxplayer2 -i "/streams/sample.mp4" --complexseektest
+./omxplayer2 -i "http://trailers.apple.com/movies/universal/thewolfman/thewolfman-fte2_480p.mov"
+

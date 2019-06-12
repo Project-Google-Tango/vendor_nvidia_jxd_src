@@ -1,0 +1,67 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_disp static library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME                  := libnvddk_disp
+NV_COMPONENT_OWN_INTERFACE_DIR     := .
+
+NV_COMPONENT_SOURCES               := \
+        nvddk_disp.c \
+        nvddk_disp_hw.c \
+        nvddk_disp_edid.c \
+        dc_hal.c \
+        dc_crt_hal.c \
+        dc_dsi_hal.c \
+        dc_hdmi_hal.c \
+        dc_sd3.c
+
+NV_COMPONENT_INCLUDES              := \
+        $(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+        $(NV_SOURCE)/hwinc \
+        $(NV_SOURCE)/camera/core/hwinc/$(NV_TARGET_SOC_FAMILY)
+
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_CFLAGS                += \
+	-DNV_MIPI_PAD_CTRL_EXISTS \
+	-DNV_MIPI_CSI_CIL \
+	-DT30_CHIP
+else ifeq ($(NV_TARGET_SOC),t114)
+NV_COMPONENT_CFLAGS                += \
+	-DNV_SUPPORTS_MULTIPLE_PADS \
+	-DNV_SUPPORTS_GANGED_MODE
+else ifeq ($(NV_TARGET_SOC),t124)
+NV_COMPONENT_CFLAGS                += \
+	-DNV_MIPI_PAD_CTRL_EXISTS \
+	-DNV_SUPPORTS_GANGED_MODE
+else
+$(error unsupported NV_TARGET_SOC=$(NV_TARGET_SOC))
+endif
+
+NV_COMPONENT_CFLAGS                += $(_common_cflags)
+
+NV_COMPONENT_NEEDED_INTERFACE_DIRS := \
+	../../nvrm
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

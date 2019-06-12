@@ -1,0 +1,3 @@
+#!/bin/bash
+export T32_INSTANCE=avp
+t32marm -c $T32SYS/config_avp.t32

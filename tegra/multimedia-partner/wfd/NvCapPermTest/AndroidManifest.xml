@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+# Copyright (c) 2012, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA Corporation and its licensors retain all intellectual property and
+# proprietary rights in and to this software and related documentation.  Any
+# use, reproduction, disclosure or distribution of this software and related
+# documentation without an express license agreement from NVIDIA Corporation
+# is strictly prohibited.
+#
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.nvidia.NvCapPermTest"
+      android:versionCode="1"
+      android:versionName="1.0"
+      android:sharedUserId="android.uid.user">
+    <application android:label="@string/app_name">
+        <service android:name=".NvCapPermTest"
+                 android:exported="true">
+        </service>
+    </application>
+    <uses-sdk android:minSdkVersion="3" />
+</manifest>

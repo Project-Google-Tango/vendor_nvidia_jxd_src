@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto.  Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">UI-tjenester for NVIDIA trådløs skærm</string>
+    <string name="miracast_hdmi_title">HDMI</string>
+    <string name="miracast_hdmi_unavailable">Ikke tilgængelig fordi Miracast er aktiv.</string>
+    <string name="miracast_hdcp_title">HDCP-godkendelse mislykkedes med %1$s </string>
+    <string name="miracast_hdcp_failure_text">Gebyrbelagt indhold kan ikke vises.</string>
+    <string name="miracast_connection_status_discovery">Søger efter\u0020</string>
+    <string name="miracast_connection_status_progress">Etablerer forbindelse med\u0020…</string>
+    <string name="miracast_connection_status_connected">Streamer nu til\u0020</string>
+    <string name="miracast_connection_status_warning_conn_failed">Kunne ikke finde\u0020</string>
+    <string name="miracast_connection_status_warning_conn_lost">Tabt forbindelse til \u0020</string>
+    <string name="miracast_connection_status_warning_auth_failed">Godkendelsesproblem med\u0020</string>
+    <string name="miracast_access_settings_title">Adgang til Miracast-indstillinger</string>
+</resources>

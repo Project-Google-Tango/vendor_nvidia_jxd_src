@@ -1,0 +1,87 @@
+---- NvMM ----
+Intro:
+The nvmm directory contains all source and headers for the multimedia block
+implementation except the public headers (which are, predictably, located
+in the public header directory).
+
+"nvmm" is the name of the NvDDK API for multimedia blocks. Blocks include
+(but are not limited to) codecs, sources, sinks, mixers, and splitters
+addressing the audio, video, and image processing. 
+
+nvmm provides a base upon which we implement OpenMax, DirectShow, DMOs, 
+and other publically established multimedia frameworks. As is true of the
+rest of the DDK, this is facilitated by a thin "shim" layer above nvmm.
+
+nvmm is a implementation agnostic abstraction. It may be implemented (among
+other things) as software running on a CPU, a co-processor, or even in a
+hardware block. Though amenable to AP15, it is not specific to it, i.e. it
+is suitable for any platform.
+
+Directory Structure:
+include/*                        Public driver headers
+drivers/nvmm/                    Root directory of the nvmm implementation
+drivers/nvmm/blocks/             Location of the source implementations
+                                 of each NvMM block
+drivers/nvmm/blocks/common       NvMMBlock base class, block implementations
+                                 can be derived to share common code
+drivers/nvmm/blocks/reference    Reference implementation of the nvmm
+                                 inter-block communication
+drivers/nvmm/transport           Location of the transport implementation
+                                 (each change reviewed by Jim Van Welzen)
+drivers/nvmm/include             Include files. Entry points's exported
+                                 by each block, for instance Open, Close,
+                                 and GetCapabilities
+drivers/nvmm/nvmm.c              The top level implementation of NvMM.  Its
+                                 Open, Close, and GetCapabilities is what is
+                                 called by clients of any NvMM block.
+drivers/nvmm/Makefile            Top level Makefile, it will build everything
+                                 under nvmm.  No one should have to type
+                                 make anywhere else below it.
+drivers/nvmm/libnvmm.export      For DLL building, which symbols to make public (NvMM framework public API's)
+                                 
+drivers/nvmm/blocks/libnvmm_audio.export    Public API's for building libnvmm_audio DLL  (all audio blocks)
+drivers/nvmm/blocks/libnvmm_video.export    Public API's for building libnvmm_video DLL  (all video blocks)
+drivers/nvmm/blocks/libnvmm_image.export    Public API's for building libnvmm_image DLL  (all imaging blocks)
+drivers/nvmm/blocks/libnvmm_parser.export   Public API's for building libnvmm_parser DLL (all parser blocks)
+drivers/nvmm/blocks/libnvmm_misc.export     Public API's for building libnvmm_misc DLL   (all other blocks) 
+
+Building:
+  For AOS/Linux everything is build into one library/DLL. For WinCE/WinXP NVMM interface is build as one DLL,
+NvMM util is build as another library and six other DLLs are built for blocks (libnvmm_audio, libnvmm_video,
+libnvmm_image, libnvmm_parser, libnvmm_misc).
+
+  For AVP block axf's are built. They will be dynamically loaded. Entry point for block must be in thumb mode
+(Taken care by NVMM Transport though a separate library). The make file has to support building axf for AVP. 
+
+Enabling blocks:
+  All blocks have enable/disable in "drivers/nvmm/Makefile.nvmm_enable_defs" file
+
+Block locale:
+  Blocks locale can be specified in "drivers/nvmm/Makefile.nvmm_locale_defs" file.
+
+If you want to change the locale the following things needs to be done.
+1. CPU to AVP
+  change the locale in "Makefile.nvmm_locale_defs"
+  change make file of the block for creating axf, if not done already. 
+  edit nvmm.bib if this block needs to be part of WinCE image
+  change NvMMTransport client/block to load/unload block if not done already.
+
+2. AVP to CPU
+  change the locale in "Makefile.nvmm_locale_defs"
+  For linux/AOS add the library in "drivers/nvmm/Makefile"
+  For WInCE/Xp add the library in "drivers/nvmm/blocks/Makefile", Also add the block open/close in export.
+
+How To Build and Run:  (TOT = your sw client root)
+
+   to build:
+ > cd TOT/embedded/drivers/nvmm
+ > make install
+ > cd ../../tests/nvmm
+ > make install
+
+   to run:
+ > cd TOT/embedded/_out/debug_Linux_x86_PCPCI/ (or whatever it is for you)
+ > ./reference_application
+
+because we are using static libraries, you must rebuild from drivers/nvmm each time. When we switch to dynamic libraries, you should be able to just rebuild your block.
+

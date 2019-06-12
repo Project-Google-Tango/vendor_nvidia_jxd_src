@@ -1,0 +1,58 @@
+#!/bin/bash
+# ---------------------------------------------------------------
+#  Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+# ---------------------------------------------------------------
+
+if [[ -z $T32SYS ]]; then
+    echo "ERROR: Environment variable T32SYS not set"
+    echo "ERROR: T32SYS should point to the directory where the Lauterbach software is installed"
+    exit 1
+fi
+if [[ -z $TEGRA_TOP ]]; then
+    echo "ERROR: Environment variable TEGRA_TOP not set"
+    echo "ERROR: TEGRA_TOP should point to the top of the tegra tree (e.g., ~/full_tree/tegra)"
+    exit 1
+fi
+
+pushd $T32SYS
+
+if [[ -f user_config.cmm ]]; then
+    rm user_config.cmm.backup
+    cp user_config.cmm user_config.cmm.backup
+    echo ""
+    echo "Saving old $T32SYS/user_config.cmm as $T32SYS/user_config.cmm.backup"
+fi
+
+echo ""
+echo "Installing Lauterbach scripts to $T32SYS"
+rm -f config_avp.t32 config_cpu.t32 config_coredump.t32 config_ramdump.t32 t32avp t32cpu t32coredump t32ramdump t32.cmm user_config.cmm
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/config_avp.t32 $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/config_cpu.t32 $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/config_coredump.t32 $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/config_ramdump.t32 $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/t32avp $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/t32cpu $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/t32coredump $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/t32ramdump $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/t32.cmm $T32SYS/.
+cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/user_config.cmm $T32SYS/.
+if ! test -f /opt/t32/xwindows.cmm; then
+    cp $TEGRA_TOP/core/mobile_linux/lauterbachscripts/windows.cmm $T32SYS/.
+fi
+
+# Make sure shell scripts are executable
+chmod +x $T32SYS/t32avp
+chmod +x $T32SYS/t32cpu
+chmod +x $T32SYS/t32coredump
+chmod +x $T32SYS/t32ramdump
+
+# Make sure user configuration file is writable
+chmod +w $T32SYS/user_config.cmm
+
+# Call the editor to let the user customize user_config.cmm
+echo ""
+echo "Customize $T32SYS/user_config.cmm to match your debug environment"
+echo ""
+
+popd
+

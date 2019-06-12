@@ -1,0 +1,38 @@
+NVSI - NVIDIA SECURE INTERFACE v2
+
+Copyright 2012-2013 NVIDIA Corporation.  All rights reserved.
+
+IMPORTANT: STARTING WITH TEGRA 4 NVSI IS FULLY INTEGRATED IN NVIDIA HARDWARE AND REPRESENTS CRITICAL COMPONENT IN THE ENTIRE SYSTEM.
+PLEASE DO NOT MODIFY THE CONENTS OF THIS REPOSITORY WITHOUT CONSULTING NVIDIA. IN ADDITION, PLEASE DO NOT MODIFY OR REMOVE NVSI_PRODUCT_CLASS
+FROM PRODUCT MAKEFILES. FAILURE TO DO SO MIGHT RESULT IN YOUR DEVICES NOT BEING ABLE TO BOOT OR FUNCTION PROPERLY.
+
+To test whether your devices are configured properly for NVSI please run '. ./tsec_nvsi.sh' script which is located in this folder.
+
+Here is the standard output for this test:
+
+=======================================================
+
+NVSI Verifier v2.0, Copyright (C) NVIDIA Corporation 2013
+
+PASS: TSecCheckMarketFilter()
+PASS: TSecCheckPermissions()
+PASS: TSecOpenChannel()
+PASS: TSecCreateCtx(&ctx, &info)
+PASS: TSecGetSharedSegment(ctx, &shared_seg)
+PASS: TSecRun(ctx)
+PASS: TSecWait(ctx, &returnCode, 0xFFFFFFFF)
+PASS: TSecValidateKp()
+PASS: TSecValidateResult()
+PASS: TSecDestroyCtx(ctx)
+PASS: TSecCloseChannel()
+
+-----------------
+total failures: 0
+
+=======================================================
+
+IMPORTANT:
+
+IF ANY OF THE ABOVE LINES SHOWS 'FAIL' INSTEAD OF 'PASS' PLEASE CONTACT NVIDIA SO WE CAN HELP YOU ADDRESS THE PROBLEM. 
+*** FAILURE TO DO SO WILL RENDER ALL NVSI CONTENT UNUSABLE ON YOUR DEVICES. ***
+

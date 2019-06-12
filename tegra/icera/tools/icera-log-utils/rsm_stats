@@ -1,0 +1,129 @@
+#!/system/bin/python
+# Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+import sys
+import commands
+import datetime
+import os.path
+import time
+
+#function that sends an AT command and write the result into an already opened file
+def at(command, outfile, remove_endlines):
+    ttyw = open("/dev/ttySHM2", "w")
+    ttyr = open("/dev/ttySHM2", "r")
+    ttyw.write(command)
+    ttyw.close
+
+    while outfile:
+        text = ttyr.readline()
+        if (remove_endlines):
+            str = " "
+            l = text.split('\r')
+            text = str.join(l)
+            l = text.split('\n')
+            text = str.join(l)
+
+        if(text.startswith("OK")):
+            break
+        if(text.startswith("ERROR")):
+            outfile.write("{}")
+            break
+        if(text.startswith("+CME ERROR")):
+            outfile.write("{}")
+            break
+        if (not(text.startswith("AT"))):   #don't copy the echo
+            #To remove null chars that are inserted
+            str = ""
+            l = text.split('\x00')
+            text = str.join(l)
+            outfile.write(text)
+    ttyr.close()
+
+#main code
+
+param = sys.argv[1]
+
+
+if (param== "start"):
+    if (os.path.exists("/dev/ttySHM2")):
+        #sends AT commands to enable statistics
+        at("AT%ISTAT=1,9\r\n", None, 0)
+        at("AT%ISTAT=1,10\r\n", None, 0)
+        at("AT%ISTAT=1,11\r\n", None, 0)
+        print  "Now collecting RSM statistics - don\'t forget to dump before switch off."
+    else:
+        print  "WARNING - Modem not yet available - please re-start stats later."
+
+elif (param== "dump"):
+    #create the output folder in case not already present on the system
+    commands.getoutput("mkdir /data/icera_reports")
+    if (len(sys.argv)==3):
+        filename = "/data/icera_reports/"+sys.argv[2]
+        commands.getoutput("rm "+filename)
+    else:
+        #construct filename rsm_stats_product_serialno_yyyymmdd-hhmmss.txt and open it
+        filename = "/data/icera_reports/rsm_stats_"
+        filename += commands.getoutput("getprop ro.product.name")
+        filename += "_"
+        filename += commands.getoutput("getprop ro.serialno")
+        filename += "_"
+        now=datetime.datetime.now()
+        ts = "%(y)04d%(mo)02d%(d)02d-%(h)02d%(m)02d%(s)02d" % {"y":now.year, "mo":now.month, "d":now.day, "h":now.hour, "m":now.minute, "s":now.second}
+        filename += ts
+        filename += ".txt"
+    result = open(filename, "w+")
+    result.write("{\r")
+    #print board serial number into the file
+    board_id = "\"board_serialno\":\"" + commands.getoutput("getprop ro.serialno") + "\",\n"
+    result.write(board_id)
+    #print ap version
+    version = "\"ap_version\":\"" + commands.getoutput("getprop ro.build.display.id") + "\",\n"
+    result.write(version)
+    #print modem version
+    result.write("\"modem_version\":\"")
+    at("AT+GMR\r\n", result, 1)
+    result.write("\",\r")
+    #print modem modes statistics
+    result.write("\"mode_statistics\":")
+    at("AT%ISTAT=3,9,1\r\n", result, 0)
+    result.write(",\r")
+    #print transitions statistics
+    result.write("\"transitions_statistics\":")
+    at("AT%ISTAT=3,10,1\r\n", result, 0)
+    result.write(",\r")
+    #print acknowledge statistics
+    result.write("\"ack_statistics\":")
+    at("AT%ISTAT=3,11,1\r\n", result, 0)
+    result.write("}")
+
+    #close output file and print its name on the user console.
+    result.close()
+    print "statistics data succesfully written in"
+    print filename
+elif (param== "mode"):
+    ttyw = open("/dev/ttySHM2", "w")
+    ttyr = open("/dev/ttySHM2", "r")
+    ttyw.write("AT%ISTAT=3,9,1\r\n")
+    ttyw.close()
+    while ttyr:
+        text = ttyr.readline()
+        if("OK" in text):
+            break
+        if("ERROR" in text):
+            break
+        if("+CME ERROR" in text):
+            break
+        if("currentMode" in text):
+            print text
+    ttyr.close()
+
+elif (param== "delete"):
+    commands.getoutput("rm -rf /data/icera_reports/*")
+else:
+    print "Unknown input parameter. must be 'start' 'dump' or 'delete'"

@@ -1,0 +1,135 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvos_aos: AOS/bootloader static library, Nvidia OS functions
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvos_aos
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	../nvos_alloc.c \
+	../nvos_coop_thread.c \
+	../nvos_debug.c \
+	../nvos_file.c \
+	../nvos_internal.c \
+	../nvos_pointer_hash.c \
+	../nvos_thread.c \
+	../nvos_trace.c \
+	../../nvosutils/nvuhash.c \
+	../../nvosutils/nvustring.c \
+	aos_print.c \
+	aos_process_args.c \
+	aos_profile.c \
+	aos_semi_rvice.c \
+	aos_semi_uart.c \
+	dlmalloc.c \
+	nvos_aos.c \
+	nvos_aos_core.c \
+	nvos_aos_semi.c \
+	nvap/aos_cpu.c \
+	nvap/aos_cpu_odmstub.c \
+	nvap/aos_mon_mode.c \
+	nvap/aos_ns_mode.c \
+	nvap/aos_cpu_t30.c \
+	nvap/aos_odmoption.c \
+	nvap/init_cpu.c \
+	nvap/init_fpu.c \
+
+NV_COMPONENT_CFLAGS            := \
+	-DNVAOS_SHELL=0 \
+	-DNV_AOS_ENTRY_POINT=0x80108000
+
+ifeq ($(NV_TARGET_SOC),t114)
+NV_COMPONENT_CFLAGS            += -DSECURE_BSEV_CYA_SETTING_WAR
+endif
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_CFLAGS            += -DTARGET_SOC_T30=1
+else
+NV_COMPONENT_CFLAGS            += -DTARGET_SOC_T30=0
+endif
+
+ifeq ($(AOS_MON_MODE_ENABLE),1)
+NV_COMPONENT_CFLAGS            += -DAOS_MON_MODE_ENABLE=1
+else
+NV_COMPONENT_CFLAGS            += -DAOS_MON_MODE_ENABLE=0
+endif
+
+ifeq ($(NV_TARGET_SOC),t30)
+NV_COMPONENT_SOURCES           += nvap/aos_pl310.c
+else
+NV_COMPONENT_SOURCES           += nvap/aos_pl310_dummy.c
+endif
+
+NV_COMPONENT_INCLUDES          := \
+	. \
+	.. \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/$(NV_TARGET_SOC_FAMILY) \
+	$(NV_SOURCE)/core/drivers/nvrm/nvrmkernel/core/common
+
+NV_COMPONENT_CODE_GENERATION   := arm
+
+NV_COMPONENT_HAS_BROKEN_CODE   := \
+	strict-aliasing \
+	undef
+
+#
+# Implementation variants or fail for unsupported configuration
+#
+# OS-independent non-userspace variants
+#
+ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AOSTEST),1)
+ifeq ($(NV_TARGET_ARCH),rvds_armv6)
+NV_COMPONENT_SOURCES           += ../nvos_callstack.c
+endif
+NV_COMPONENT_CFLAGS            += -DNVOS_ADVANCED_DEBUG=0
+NV_COMPONENT_INCLUDES          += ../../../include/nvposix
+
+else ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_BOOTING),1)
+NV_COMPONENT_SOURCES	       += \
+	nvap/nvos_aos_gcc.c \
+	nvap/nvos_aos_libc.c
+
+NV_COMPONENT_CFLAGS            += -DARCH_ARM_HAVE_NEON=1
+
+ifeq ($(NV_TARGET_ARCH),android)
+# Android user space toolchain is used to compile EABI code
+NV_COMPONENT_CFLAGS            += \
+	-DNO_MALLINFO \
+	-DNVOS_IS_LINUX=0 \
+	-DCOMPILE_ARCH_V7=1
+else ifeq ($(NV_TARGET_ARCH),qnx)
+# Embedded EABI toolchain doesn't have POSIX headers
+NV_COMPONENT_INCLUDES          += ../../../include/nvposix
+endif
+
+else ifeq ($(NV_BUILD_CONFIGURATION_EXECUTABLE_FOR_AVP_IRAM),1)
+$(error libnvos_aos static library must not be used in microboot/miniloader)
+#
+# OS-dependent userspace variants
+#
+else
+$(error libnvos_aos static library must not be used in userspace)
+endif
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

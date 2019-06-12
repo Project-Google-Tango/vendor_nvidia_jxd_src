@@ -1,0 +1,100 @@
+; Lauterbach TRACE32 debugger script to boot CPU with FASTBOOT loaded into SDRAM by this script.
+
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+
+
+IF "&I_KNOW_WHAT_I_AM_DOING"!="TRUE"
+(
+  PRINT "You don't know what you're doing. If you did, you wouldn't be trying to run FS. Use FB instead."
+  STOP
+)
+
+; We can locally modify the bootload handoff point depending on whether we have
+; been loaded via the bootrom or debugger scripts
+LOCAL &BIT_VERSION
+&OS_HANDOFF="&BOOT_HANDOFF"
+
+IF "&BACKDOOR_HANDOFF"==""
+(
+  &BACKDOOR_HANDOFF="&BOOT_HANDOFF"
+)
+
+winclear
+
+; Setup JTAG for CPU.
+do &(TARGET_SOC)/&(TARGET_SOC)_cpu_jtag_setup.cmm
+
+; This should be set to "auto" if the symbol information
+; is built with the correct labeling of "arm" vs. "thumb"
+; mode code areas.
+;system.option.dismode.auto
+system.option.dismode.access
+
+; Tell the debugger not to access non-existent memory locations.
+do physical_setup.cmm
+
+sYmbol.RESet
+
+ON ERROR JUMPTO nobreak
+
+system.mode.attach
+break
+
+nobreak:
+
+; Read the BIT version from IRAM
+&BIT_VERSION=data.long(D:0x40000000)
+
+IF &BIT_VERSION==0x00000000
+(
+  ; Loaded by backdoor
+  &OS_HANDOFF="&BACKDOOR_HANDOFF"
+)
+ELSE IF &BIT_VERSION==0xFFFFFFFF
+(
+  ; Loaded by backdoor
+  &OS_HANDOFF="&BACKDOOR_HANDOFF"
+)
+ELSE
+(
+  ; Loaded by bootrom
+  &OS_HANDOFF="&BOOT_HANDOFF"
+)
+
+ON ERROR
+
+; Disable the MMU and caches.
+do cpu_disable_mmu.cmm
+
+print "Loading &FASTBOOT binary and symbols"
+data.load.elf &FASTBOOT /GNU
+
+IF "&TRANSLATE_SRC_PATH"=="TRUE"
+(
+  SYMBOL.SOURCEPATH.TRANSLATE "&BUILDTOP" "&TOP"
+)
+
+break.delete &BOOT_HANDOFF
+break.delete &BACKDOOR_HANDOFF
+break.set &OS_HANDOFF /Program /CMD "do cpu_lk.cmm" /onchip
+
+; Setup common toolbar items
+do toolbar_setup.cmm
+
+; Set up the DCC debug console using the SWI interface.
+IF "&ENABLE_DCC_WINDOW"=="TRUE"
+(
+  do cpu_dcc_swi_setup.cmm
+)
+
+IF ("&LOAD_SAVED_WINDOWS"=="TRUE")
+(
+  ; Restore saved window configuration (this is always saved in the $T32SYS directory -- don't change the path)
+  do &T32SYS/windows.cmm
+)
+
+;mode.hll
+
+enddo
+

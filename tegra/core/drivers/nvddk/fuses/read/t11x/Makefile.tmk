@@ -1,0 +1,50 @@
+################################### tell Emacs this is a -*- makefile-gmake -*-
+#
+# Copyright (c) 2013, NVIDIA CORPORATION.  All Rights Reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# tmake for SW Mobile component makefile
+#
+# libnvddk_fuse_read_avp_t11x library component makefile
+#
+###############################################################################
+
+ifdef NV_COMPONENT_FLAG_STATIC_LIBRARY_SECTION
+include $(NV_BUILD_START_COMPONENT)
+
+NV_COMPONENT_NAME              := libnvddk_fuse_read_avp_t11x
+NV_COMPONENT_OWN_INTERFACE_DIR := .
+NV_COMPONENT_SOURCES           := \
+	../nvddk_fuse_read.c \
+	../../common/nvddk_fuse_common.c \
+	../../private/t11x/nvddk_fuse_read_priv_t11x.c
+
+NV_COMPONENT_INCLUDES          := \
+	../ \
+	../../common \
+	$(NV_SOURCE)/hwinc \
+	$(NV_SOURCE)/hwinc/t11x \
+	../private/t11x
+
+NV_COMPONENT_CFLAGS += -DNVODM_BOARD_IS_SIMULATION=0
+NV_COMPONENT_CFLAGS += -DADDITIONAL_FUNCTIONALITY=0
+NV_COMPONENT_CFLAGS += -DENABLE_T114
+
+#
+# Generating the code compatible with AVP
+#
+NV_COMPONENT_CODE_GENERATION   := avp
+
+include $(NV_BUILD_STATIC_LIBRARY)
+endif
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 8
+# End:
+# vi: set tabstop=8 noexpandtab:

@@ -1,0 +1,49 @@
+#!/bin/bash
+
+echo "
+*** nvmake has been retired! ***
+
+Please setup your environment as follows:
+
+export P4ROOT=<your_p4_root>
+export TOP=<your_top_dir>
+export TEGRA_TOP=\${TOP}/vendor/nvidia/tegra
+. build/envsetup.sh
+
+Next, run \"choosecombo\" in order to select your configuration.
+
+choosecombo
+
+Use your board name (e.g. \"cardhu\") as the product when asked.
+For use in shell scripts, you can give the choices as arguments, e.g.
+
+choosecombo 1 2 cardhu eng
+
+If you prefer, you can use a buildspec.mk file instead of choosecombo.
+This is what we used to do with Froyo.  buildspec.mk is useful if
+you rarely change your build setup.  Just copy the sample from
+\$TOP/build/buildspec.mk.default to \$TOP/buildspec.mk and edit.
+
+To build the complete image, say
+
+m dev
+
+or plain
+
+m
+
+To build your module only, say
+
+mm
+
+in the module directory.  For parallel builds, use convenience
+commands \"mp\" and \"mmp\".
+
+To nvflash the board, use
+
+flash
+
+In case of issues, please fix, or file a bug with Mobile_Build_System .
+"
+
+return 1

@@ -1,0 +1,223 @@
+;-------------------------------------------------------------------------------
+; Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+;-------------------------------------------------------------------------------
+; Lauterbach TRACE32 debugger script to set user-specific parameters:
+;
+; For NVIDIA internal use only. Customers should not use this script
+; unless NVIDIA explicitly directs them to do so.
+;
+; Change the following parameters to match your particular development system:
+;
+;   TOP                 Case-sensitive path to the root of your android tree (e.g., "~/mytree")
+;   TEGRA_TOP           Case-sensitive path to the root of your tegra tree (e.g., "~/mytree/vendor/nvidia/tegra")
+;   BUILDTOP            Case-sensitive path to the directory contain the sw and tegra directories on the machine where the source code was built (e.g., "<some_path>/full_tree/android")
+;   BUILD_FLAVOR        "debug" or "release"
+;   TARGET_OS           operating system (android, gnu_linux)
+;   TARGET_CONFIG       Configuration used for memory & clock initialization
+;   TARGET_BOARD        For T30: cardhu
+;                       For T11x: dalmore, pluto, roth
+;                       For T14x: ceres
+;                       For T12x: bonaire, ardbeg, loki
+;   TARGET_SOC          ap20, t30, or t11x
+;                       t14x
+;                       t12x
+;   TRANSLATE_SRC_PATH  If TRUE, translate symbol paths from BUILDTOP to TOP.
+;                       NOTE: Paths are case-sensitive.
+;   LOAD_SAVED_WINDOWS  If TRUE, load saved window configuration from $T32SYS/windows.cmm (which must already exist)
+;
+; The following global parameter should only be changed if you are an experienced
+; user and you know what you're doing. If you don't leave these alone.
+; You've been warned.
+;
+;   QUERY_CORE_COUNT    Ask for number of running cores (leave FALSE if you don't know what you're doing).
+;-------------------------------------------------------------------------------
+
+; Set global variable TEGRA_TOP to root of the tegra tree
+GLOBAL &TEGRA_TOP
+&TEGRA_TOP=os.env(TEGRA_TOP)
+
+; Set global variable TOP to root of android repository.
+GLOBAL &TOP
+&TOP=os.env(TOP)
+
+GLOBAL &LOAD_SAVED_WINDOWS
+&LOAD_SAVED_WINDOWS="FALSE"
+
+GLOBAL &LOAD_SAVED_AVP_WINDOWS
+&LOAD_SAVED_AVP_WINDOWS="FALSE"
+
+GLOBAL &TRANSLATE_SRC_PATH
+&TRANSLATE_SRC_PATH="FALSE"
+
+GLOBAL &BUILDTOP
+&BUILDTOP=os.env(BUILDTOP)
+
+GLOBAL &BUILD_FLAVOR
+GLOBAL &TARGET_BOARD
+GLOBAL &TARGET_OS
+
+LOCAL &TARGET_OS_SUBTYPE
+&TARGET_OS_SUBTYPE=os.env(TARGET_OS_SUBTYPE)
+
+LOCAL &TARGET_PRODUCT
+&TARGET_PRODUCT=os.env(TARGET_PRODUCT)
+
+; Attempt to establish if JackBuild was used or not by checking TARGET_PRODUCT and TARGET_OS_SUBTYPE
+; If TARGET_PRODUCT, assume JackBuild. If TARGET_OS_SUBTYPE, assume LDK. Both cannot be set at once.
+IF "&TARGET_PRODUCT"==""
+(
+  IF "&TARGET_OS_SUBTYPE"==""
+  (
+    PRINT "Either TARGET_PRODUCT or TARGET_OS_SUBTYPE must be set, but not both."
+    STOP
+  )
+  ELSE IF "&TARGET_OS_SUBTYPE"=="gnu_linux"
+  (
+    ; Do nothing
+  )
+  ELSE IF "&TARGET_OS_SUBTYPE"=="rvds"
+  (
+    ; Do nothing
+  )
+  ELSE
+  (
+    PRINT "TARGET_OS_SUBTYPE=&(TARGET_OS_SUBTYPE) is not supported"
+    STOP
+  )
+  &TARGET_OS="&TARGET_OS_SUBTYPE"
+  &BUILD_FLAVOR=os.env(BUILD_FLAVOR)
+  ; LDK uses TARGET_BOARD rather than TARGET_PRODUCT but it needs to be sanitized
+  &TARGET_PRODUCT=os.env(TARGET_BOARD)
+)
+ELSE IF "&TARGET_PRODUCT"!=""
+(
+  IF "&TARGET_OS_SUBTYPE"!=""
+  (
+    PRINT "Either TARGET_PRODUCT or TARGET_OS_SUBTYPE must be set, but not both."
+    STOP
+  )
+  &TARGET_OS="android"
+  ; BUILD_FLAVOR is called TARGET_BUILD_TYPE under JackBuild.
+  &BUILD_FLAVOR=os.env(TARGET_BUILD_TYPE)
+)
+
+; Under JackBuild, TARGET_BOARD is derived from TARGET_PRODUCT.
+; For LDK, make sure TARGET_BOARD is valid by checking TARGET_PRODUCT
+IF "&TARGET_PRODUCT"=="cardhu"
+(
+  &TARGET_BOARD="cardhu"
+)
+IF "&TARGET_PRODUCT"=="bonaire"
+(
+  &TARGET_BOARD="bonaire"
+)
+IF "&TARGET_PRODUCT"=="dalmore"
+(
+  &TARGET_BOARD="dalmore"
+)
+IF "&TARGET_PRODUCT"=="pluto"
+(
+  &TARGET_BOARD="pluto"
+)
+IF "&TARGET_PRODUCT"=="ceres"
+(
+  &TARGET_BOARD="ceres"
+)
+IF "&TARGET_PRODUCT"=="roth"
+(
+  &TARGET_BOARD="roth"
+)
+IF "&TARGET_PRODUCT"=="p1852"
+(
+  &TARGET_BOARD="p1852"
+)
+IF "&TARGET_PRODUCT"=="ardbeg"
+(
+  &TARGET_BOARD="ardbeg"
+)
+IF "&TARGET_PRODUCT"=="loki"
+(
+  &TARGET_BOARD="loki"
+)
+IF "&TARGET_BOARD"==""
+(
+  PRINT "TARGET_PRODUCT=&(TARGET_PRODUCT) is not supported"
+  STOP
+)
+
+GLOBAL &TARGET_CONFIG
+GLOBAL &TARGET_SOC
+GLOBAL &TARGET_SOC_VERSION
+GLOBAL &QUERY_CORE_COUNT
+
+IF "&TARGET_BOARD"=="cardhu"
+(
+  &TARGET_SOC="t30"
+  &TARGET_CONFIG="t30_E1186_Hynix_2GB_H5TC2G83BFR-PBA_300MHz_110306"
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="bonaire"
+(
+  &TARGET_SOC="t12x"
+  &TARGET_CONFIG="t12x_qt"
+  ; &TARGET_CONFIG="t12x_fpga_net01_core2_13mhz_ddr3_single"
+  ; &TARGET_CONFIG="t12x_fpga_net02_core4_13mhz_ddr3_single"
+  ; &TARGET_CONFIG="t12x_fpga_net03_core15_13mhz_ddr3_single"
+  ; &TARGET_CONFIG="t12x_fpga_net04_core17_13mhz_ddr3_single"
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="dalmore"
+(
+  &TARGET_SOC="t11x"
+  &TARGET_CONFIG="t11x_E1613_Hynix_2GB_H9CCNNN8JTMLAR-NTM_204MHz"
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="pluto"
+(
+  &TARGET_SOC="t11x"
+  &TARGET_CONFIG="t11x_E1580_Hynix_1GB_LPDDDR3_1GB_H9CCNNN8KTMLBR-NTM_204Mhz"
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="ceres"
+(
+  &TARGET_SOC="t14x"
+  &TARGET_CONFIG="t14x_E1680_Elpida_1GB_EDF8132A1MC-JD-F_533Mhz"
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="roth"
+(
+  &TARGET_SOC="t11x"
+  &TARGET_CONFIG="t11x_E1613_Hynix_2GB_H9CCNNN8JTMLAR-NTM_204MHz"
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="p1852"
+(
+  &TARGET_SOC="t30"
+  &TARGET_CONFIG="t30_E1888_Hynix_2GB_H5TQ4G83MFR_625MHz_110519"
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="ardbeg"
+(
+  &TARGET_SOC="t12x"
+  &TARGET_SOC_VERSION="t124"
+  &TARGET_CONFIG="NONE" ;Debugger loading not yet supported
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_BOARD"=="loki"
+(
+  &TARGET_SOC="t12x"
+  &TARGET_SOC_VERSION="t124"
+  &TARGET_CONFIG="NONE" ;Debugger loading not yet supported
+  &QUERY_CORE_COUNT="TRUE"
+)
+IF "&TARGET_SOC"==""
+(
+  PRINT "TARGET_BOARD=&TARGET_BOARD not supported"
+  STOP
+)
+
+path + &TEGRA_TOP/core/mobile_linux/lauterbachscripts
+path + &TEGRA_TOP/core/mobile_linux/lauterbachscripts/&(TARGET_SOC)
+
+enddo
+
